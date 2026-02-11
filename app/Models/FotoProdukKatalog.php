@@ -8,4 +8,15 @@ use Illuminate\Database\Eloquent\Model;
 class FotoProdukKatalog extends Model
 {
     use HasFactory;
+
+    protected $fillable = [
+        'produk_id',
+        'path'
+    ];
+
+    public function produk()
+    {
+        return $this->belongsTo(Produk::class, 'produk_id', 'produk_id');
+    }
+
 }
