@@ -22,6 +22,21 @@ Route::get('/login', function () {
 });
 Route::post('/login', LoginController::class)->name('login');
 
+
+
+// guest routes
 Route::get('/', function () {
     return view('pages.guest.landing');
-});
+})->name('home');
+
+Route::get('/kustom', function () {
+    return view('pages.guest.landing');
+})->name('kustom');
+
+Route::get('/katalog', function () {
+    return view('pages.guest.landing');
+})->name('katalog');
+
+Route::get('/cart', function () {
+    return view('pages.guest.landing');
+})->name('cart');

@@ -1,11 +1,32 @@
 @extends('components.shared.top')
 @section('navigation')
-<nav class="flex items-center gap-8 text-xl space-x-3">
-        <a href="/" class="hover:text-gray-600">Beranda</a>
-        <a href="/kustom" class="hover:text-gray-600">Kustom</a>
-        <a href="/katalog" class="hover:text-gray-600">Katalog</a>
-        <a href="/cart" class="ml-4 hover:opacity-70 transition-opacity">
-            <i class="fa-solid fa-cart-shopping"></i>
-        </a>
-    </nav>
+@php
+$active = 'text-black border-b-2 border-yellow-400';
+$inactive = 'text-gray-400 hover:text-gray-800';
+@endphp
+
+<nav class="flex items-center gap-10 text-xl">
+
+    <a href="{{ route('home') }}"
+        class="{{ request()->routeIs('home') ? $active : $inactive }}">
+        Beranda
+    </a>
+
+    <a href="{{ route('kustom') }}"
+        class="{{ request()->routeIs('kustom') ? $active : $inactive }}">
+        Kustom
+    </a>
+
+    <a href="{{ route('katalog') }}"
+        class="{{ request()->routeIs('katalog') ? $active : $inactive }}">
+        Katalog
+    </a>
+
+    <a href="{{ route('cart') }}"
+        class="{{ request()->routeIs('cart') ? $active : $inactive }}">
+        <i class="fa-solid fa-cart-shopping"></i>
+    </a>
+
+</nav>
+
 @endsection()

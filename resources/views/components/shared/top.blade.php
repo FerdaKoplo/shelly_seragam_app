@@ -5,6 +5,5 @@
     </div> 
     
     @yield('navigation')
-    
-    
+
 </div>
