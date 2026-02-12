@@ -1,5 +1,5 @@
 @extends('components.shared.top')
-@section('navigation')
+@section('action')
 @php
 $active = 'text-black border-b-2 border-yellow-400';
 $inactive = 'text-gray-400 hover:text-gray-800';

@@ -4,6 +4,6 @@
         <h1 class="font-bold text-sm tracking-[0.3em] uppercase -mt-1">SERAGAM</h1>
     </div> 
     
-    @yield('navigation')
+    @yield('action')
 
 </div>

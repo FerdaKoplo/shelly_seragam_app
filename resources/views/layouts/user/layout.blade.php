@@ -1,31 +1,14 @@
-<!DOCTYPE html>
-<html lang="en">
+@extends('layouts.app')
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>@yield('title')</title>
-    @vite('resources/css/app.css')
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
-        integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw=="
-        crossorigin="anonymous" referrerpolicy="no-referrer" />
-</head>
+@section('body')
+@include('components.shared.top')
+@include('components.user.nav')
+<main class="bg-white pl-2 md:pl-60">
+    @include('components.user.sidebar')
+    <div class="p-4">
+        @yield('content')
+    </div>
+</main>
 
-
-<body>
-
-    @include('components.user.nav')
-    <main class="bg-white pl-2 md:pl-60">
-        @include('components.user.sidebar')
-        <div class="p-4">
-            @yield('content')
-        </div>
-    </main>
-
-    <x-shared.notification />
-
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-</body>
-
-</html>
+@include('components.shared.footer')
+@endsection
