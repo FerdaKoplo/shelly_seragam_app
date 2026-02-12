@@ -7,4 +7,7 @@
             SERAGAM
         </h1>
     </div>
+
+    @yield('navigation')
+    
 </div>

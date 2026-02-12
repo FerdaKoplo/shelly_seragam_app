@@ -13,7 +13,7 @@
 </head>
 
 <body>
-    @include('components.shared.top')
+    @include('components.navigation.top-navbar')
     @yield('content')
 
     @include('components.shared.footer')

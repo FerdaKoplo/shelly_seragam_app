@@ -23,5 +23,5 @@ Route::get('/login', function () {
 Route::post('/login', LoginController::class)->name('login');
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('pages.guest.landing');
 });
