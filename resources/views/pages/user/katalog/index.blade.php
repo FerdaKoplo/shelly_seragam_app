@@ -3,7 +3,7 @@
 @section('content')
 
 <div class="flex justify-center mt-6">
-    Katalog
+    Manage Katalog
 </div>
 
 @endsection
