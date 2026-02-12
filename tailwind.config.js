@@ -6,7 +6,21 @@ module.exports = {
     "./resources/**/*.vue",
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        bebas: ['"Bebas Neue"', 'sans-serif'],
+        inter: ['Inter', 'sans-serif'],
+      },
+
+      colors: {
+        brand: "#FFE96E",
+        secondary: "#F7CF43",
+        primary: "#E09624",
+        neutral: "#1A1919",
+        warningPrimary: "#AB0000",
+        warningSecondary: "#FFE9E9",
+      }
+    },
   },
   plugins: [],
 }

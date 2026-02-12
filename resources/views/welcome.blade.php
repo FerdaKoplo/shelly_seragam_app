@@ -11,9 +11,6 @@
         <link href="https://fonts.bunny.net/css?family=figtree:400,600&display=swap" rel="stylesheet" />
 
     </head>
-    <body class="antialiased">
-        <h1 class="bg-red-500 text-red-300">
-            Hello World Tailwind CSS
-        </h1>
+    <body >
     </body>
 </html>
