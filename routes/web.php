@@ -67,9 +67,6 @@ Route::prefix('admin')->group(function () {
         return view('pages.user.admin.statistik-transaksi.index');
     })->name('traffic');
 
-    Route::get('/statistik-transaksi', function () {
-        return view('pages.user.admin.statistik-transaksi.index');
-    })->name('statistik.transaksi');
 
     Route::get('/manage-pegawai', function () {
         return view('pages.user.admin.manage-pegawai.index');
