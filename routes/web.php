@@ -30,13 +30,13 @@ Route::get('/', function () {
 })->name('home');
 
 Route::get('/kustom', function () {
-    return view('pages.guest.landing');
+    return view('pages.guest.kustom.index');
 })->name('kustom');
 
 Route::get('/katalog', function () {
-    return view('pages.guest.landing');
+    return view('pages.guest.katalog.index');
 })->name('katalog');
 
-Route::get('/cart', function () {
-    return view('pages.guest.landing');
-})->name('cart');
+Route::get('/kerannjang', function () {
+    return view('pages.guest.keranjang.index');
+})->name('keranjang');

@@ -22,8 +22,8 @@ $inactive = 'text-gray-400 hover:text-gray-800';
         Katalog
     </a>
 
-    <a href="{{ route('cart') }}"
-        class="{{ request()->routeIs('cart') ? $active : $inactive }}">
+    <a href="{{ route('keranjang') }}"
+        class="{{ request()->routeIs('keranjang') ? $active : $inactive }}">
         <i class="fa-solid fa-cart-shopping"></i>
     </a>
 
