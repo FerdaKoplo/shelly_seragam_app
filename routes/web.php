@@ -40,3 +40,39 @@ Route::get('/katalog', function () {
 Route::get('/kerannjang', function () {
     return view('pages.guest.keranjang.index');
 })->name('keranjang');
+
+
+// user routes
+Route::prefix('admin')->group(function () {
+    // Pegawai
+    Route::get('/manage-transaksi', function () {
+        return view('pages.user.transaksi.index');
+    })->name('manage.transaksi');
+
+    Route::get('/manage-katalog', function () {
+        return view('pages.user.katalog.index');
+    })->name('manage.katalog');
+    
+    Route::get('/manage-kustom', function () {
+        return view('pages.user.kustom.index');
+    })->name('manage.kustom');
+
+
+    // Admin
+    Route::get('/statistik-transaksi', function () {
+        return view('pages.user.admin.statistik-transaksi.index');
+    })->name('statistik.transaksi');
+
+    Route::get('/traffic', function () {
+        return view('pages.user.admin.statistik-transaksi.index');
+    })->name('traffic');
+
+    Route::get('/statistik-transaksi', function () {
+        return view('pages.user.admin.statistik-transaksi.index');
+    })->name('statistik.transaksi');
+
+    Route::get('/manage-pegawai', function () {
+        return view('pages.user.admin.manage-pegawai.index');
+    })->name('manage.pegawai');
+
+});
