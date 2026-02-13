@@ -3,7 +3,7 @@
 @section('body')
 @include('components.shared.top')
 @include('components.user.nav')
-<main class="bg-white pl-2 md:pl-60">
+<main class="bg-white pl-2 md:pl-80">
     @include('components.user.sidebar')
     <div class="p-4">
         @yield('content')

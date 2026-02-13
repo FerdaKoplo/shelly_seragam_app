@@ -30,5 +30,9 @@ class DatabaseSeeder extends Seeder
             'role' => 'Admin',
             'password' => Hash::make('pegawai')
         ]);
+
+        $this->call([
+            ProdukSeeder::class,
+        ]);
     }
 }
