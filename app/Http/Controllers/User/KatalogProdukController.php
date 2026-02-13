@@ -24,7 +24,16 @@ class KatalogProdukController extends Controller
 
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'produk_id' => 'required|exists:produk,produk_id',
+            'kategori' => 'required|string|max:255',
+            'harga' => 'required|numeric|min:0',
+            'stok' => 'required|integer|min:0',
+        ]);
+
+        ProdukKatalog::create($validated);
+
+        return redirect()->route('manage.katalog')->with('success', 'Produk katalog berhasil ditambahkan.');
     }
 
     public function edit($id)

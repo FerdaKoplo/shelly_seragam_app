@@ -18,7 +18,7 @@ return new class extends Migration
                 ->on('produk')
                 ->onDelete('cascade');
             $table->string('nama_detail');
-            $table->string('deskripsi_detail');
+            $table->json('deskripsi_detail');
             $table->timestamps();
         });
     }

@@ -10,6 +10,7 @@ module.exports = {
       fontFamily: {
         bebas: ['"Bebas Neue"', 'sans-serif'],
         inter: ['Inter', 'sans-serif'],
+        roboto: ['Roboto', 'sans-serif'],
       },
 
       colors: {
