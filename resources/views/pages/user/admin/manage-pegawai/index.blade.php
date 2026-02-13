@@ -2,7 +2,38 @@
 @section('title', 'Manage Pegawai')
 @section('content')
 
-<div class="flex-col bg-gray-50 min-h-screen" x-data="{ showForm: false, pegawaiIsActive: true }">
+<div class="flex-col bg-gray-50 min-h-screen"
+    x-data="{ 
+        showForm: false, 
+        isEdit: false,
+        actionUrl: '{{ route('manage.pegawai.store') }}',
+        formData: {
+            nama: '',
+            username: '',
+            password: '',
+        },
+        pegawaiIsActive: true,
+
+        editPegawai(p) {
+            this.isEdit = true;
+            this.showForm = true;
+            this.formData.nama = p.nama;
+            this.formData.username = p.username;
+            this.formData.password = ''; // Leave password blank for security
+            this.pegawaiIsActive = (p.status === 'aktif');
+            this.actionUrl = '/manage-pegawai/' + p.user_id;
+        },
+
+        resetForm() {
+            this.isEdit = false;
+            this.showForm = true;
+            this.formData.nama = '';
+            this.formData.username = '';
+            this.formData.password = '';
+            this.pegawaiIsActive = true;
+            this.actionUrl = '{{ route('manage.pegawai.store') }}';
+        }
+    }">
 
     {{-- TABLE HEADER --}}
     <div class="flex justify-between items-center mb-6">
@@ -31,26 +62,37 @@
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-100">
-                {{--
-                @foreach($pegawai as $p) --}}
+
+                @foreach($pegawai as $p)
                 <tr class="hover:bg-gray-50 transition">
-                    <td class="py-4 px-6"> $p->name </td>
-                    <td class="py-4 px-6 text-gray-500">$p->username</td>
-                    <td class="py-4 px-6">$p->status</td>
+                    <td class="py-4 px-6"> {{ $p->nama  }} </td>
+                    <td class="py-4 px-6 text-gray-500">{{ $p->username }} </td>
+                    <td class="py-4 px-6">{{ $p->status }} </td>
                     <td class="py-4 px-6 flex justify-center gap-2">
-                        <button class="bg-[#4A90E2] text-white px-4 py-1 rounded text-sm hover:bg-blue-600">Edit</button>
-                        <button class="bg-[#C04D41] text-white px-4 py-1 rounded text-sm hover:bg-red-700">Hapus</button>
+                        <button
+                            @click="editPegawai({{ json_encode($p) }})"
+                            class="bg-[#4A90E2] text-white px-4 py-1 rounded text-sm hover:bg-blue-600">
+                            Edit
+                        </button>
+                        <form action="{{ route('manage.pegawai.destroy', $p->user_id) }}" method="POST" onsubmit="return confirm('Hapus pegawai ini?')">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="bg-[#C04D41] text-white px-4 py-1 rounded text-sm hover:bg-red-700">
+                                Hapus
+                            </button>
+                        </form>
+
                     </td>
                 </tr>
-                {{-- @endforeach
-                --}}
+                @endforeach
+
             </tbody>
         </table>
     </div>
 
     {{-- BTN ADD --}}
     <div class="flex justify-end items-center mb-6">
-        <button @click="showForm = !showForm" class="bg-[#333333] text-white px-6 py-2 rounded shadow-sm hover:bg-black transition">
+        <button @click="resetForm()" class="bg-[#333333] text-white px-6 py-2 rounded shadow-sm hover:bg-black transition">
             Tambah Pegawai
         </button>
     </div>
@@ -66,42 +108,47 @@
         <h2 class="text-xl font-sans mb-6 text-gray-700">Form Pegawai</h2>
 
         <!-- TODO -->
-        <form action="#" method="POST" class="space-y-4">
+        <form :action="actionUrl" method="POST" class="space-y-4">
             @csrf
+            <template x-if="isEdit">
+                @method('PUT')
+            </template>
+
             <div class="grid grid-cols-3 items-center">
                 <label class="text-gray-600">Nama:</label>
-                <input type="text" name="name" class="col-span-2 bg-[#E9EDF0] border-gray-300 rounded p-2 outline-none">
+                <input type="text" name="nama" x-model="formData.nama"
+                    class="col-span-2 bg-[#E9EDF0] border-gray-300 rounded p-2 outline-none">
             </div>
 
             <div class="grid grid-cols-3 items-center">
                 <label class="text-gray-600">Username:</label>
-                <input type="text" name="username" class="col-span-2 bg-[#E9EDF0] border-gray-300 rounded p-2 outline-none">
+                <input type="text" name="username" x-model="formData.username"
+                    class="col-span-2 bg-[#E9EDF0] border-gray-300 rounded p-2 outline-none">
             </div>
 
             <div class="grid grid-cols-3 items-center">
                 <label class="text-gray-600">Password:</label>
-                <input type="password" name="password" class="col-span-2 bg-[#E9EDF0] border-gray-300 rounded p-2 outline-none">
+                <input type="password" name="password" x-model="formData.password"
+                    :placeholder="isEdit ? '(Kosongkan jika tidak diubah)' : ''"
+                    class="col-span-2 bg-[#E9EDF0] border-gray-300 rounded p-2 outline-none">
             </div>
 
             <div class="flex justify-end gap-0 pt-2">
+                {{-- Actual hidden input for the database --}}
                 <input type="hidden" name="status" :value="pegawaiIsActive ? 'aktif' : 'non-aktif'">
-                <button
-                    type="button"
-                    @click="pegawaiIsActive = false"
+
+                <button type="button" @click="pegawaiIsActive = false"
                     class="border px-4 py-1 text-xs rounded-l transition-colors"
                     :class="!pegawaiIsActive ? 'bg-[#333333] text-white border-gray-800' : 'bg-white text-gray-600 border-gray-400'">
                     Non Aktif
                 </button>
 
-                <button
-                    type="button"
-                    @click="pegawaiIsActive = true"
+                <button type="button" @click="pegawaiIsActive = true"
                     class="border px-4 py-1 text-xs rounded-r transition-colors"
                     :class="pegawaiIsActive ? 'bg-[#333333] text-white border-gray-800' : 'bg-white text-gray-600 border-gray-400'">
                     Aktif
                 </button>
             </div>
-
             <div class="flex justify-center gap-4 pt-10">
                 <button type="button" @click="showForm = false" class="border border-black px-12 py-2 rounded hover:bg-gray-100">Batal</button>
                 <button type="submit" class="bg-[#333333] text-white px-12 py-2 rounded hover:bg-black">Simpan</button>
