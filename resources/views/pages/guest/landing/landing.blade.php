@@ -18,7 +18,7 @@
 </div>
 
 {{-- 3. Product Catalog Preview --}}
-<section class="max-w-7xl mx-auto px-4 py-16">
+<section class="max-w-7xl mx-auto px-4">
     <div class="flex justify-between items-end mb-8">
         <h2 class="text-3xl font-bold uppercase tracking-tight">Katalog Produk</h2>
         <a href="{{ route('katalog') }}" class="text-yellow-600 font-semibold hover:underline">Lihat Semua Katalog</a>
@@ -31,13 +31,25 @@
         @endforeach
     </div>
 
-    <div class="mt-12 text-center">
-        <p class="text-gray-500 mb-4">Tidak menemukan yang kamu cari?</p>
-        <x-shared.button href="{{ route('kustom') }}" variant="outline" class="w-full md:w-auto py-4">
-            <span class="mr-2">👕</span> BUAT SERAGAMMU SENDIRI! ✏️
-        </x-shared.button>
-    </div>
 </section>
+
+<div class="mt-16 flex flex-col items-center">
+    <p class="text-gray-600 mb-6 font-medium text-[20px]">Tidak menemukan yang kamu cari?</p>
+
+    <div class="w-full flex items-center gap-0">
+        <div class="flex-1 h-4 bg-[#F3C344]"></div>
+        <x-shared.button href="{{ route('kustom') }}" variant="outline" class="w-full md:w-auto py-4 px-20">
+            <span class="text-xl font-bebas text-[28px] tracking-widest gap-4">
+                <i class="fa-solid fa-shirt"></i> 
+                Buat Seragammu Sendiri!
+                <i class=" fa-solid fa-pen"></i>
+            </span>
+        </x-shared.button>
+
+
+        <div class="flex-1 h-6 bg-[#F3C344]"></div>
+    </div>
+</div>
 
 {{-- 4. Location Section --}}
 @include('pages.guest.landing.partials.location')

@@ -22,10 +22,10 @@
             </div>
 
             <div class="flex flex-col gap-3">
-                <x-shared.button variant="outline" class="justify-between text-sm">
+                <x-shared.button variant="outline" class="justify-between text-sm" href="https://maps.app.goo.gl/SM9DLWgfabvBqfbx8">
                     Lihat di Google Maps <span>📍</span>
                 </x-shared.button>
-                <x-shared.button variant="outline" class="justify-between text-sm" href="https://maps.app.goo.gl/SM9DLWgfabvBqfbx8">
+                <x-shared.button variant="outline" class="justify-between text-sm" href="https://wa.me/+6282139101450">
                     Hubungi Kami <span>💬</span>
                 </x-shared.button>
             </div>
