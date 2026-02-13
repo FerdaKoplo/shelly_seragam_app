@@ -9,6 +9,7 @@ class FotoProdukKatalog extends Model
 {
     use HasFactory;
 
+    protected $table = 'foto_produk_katalog';
     protected $fillable = [
         'produk_id',
         'path'

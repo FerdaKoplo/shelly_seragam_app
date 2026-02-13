@@ -6,82 +6,66 @@ use Carbon\Carbon;
 use DB;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Faker\Factory as Faker;
 
 class ProdukSeeder extends Seeder
 {
     /**
      * Run the database seeds.
      */
-    public function run(): void
+   public function run(): void
     {
-        $items = [
-            [
-                'nama' => 'Seragam SMA Lengan Panjang',
-                'deskripsi' => 'Bahan katun oxford, sejuk dan tidak mudah kusut. Standar nasional.',
-                'jenis' => 'katalog',
-                'harga' => 125000,
-                'stok' => 100,
-                'kategori' => 'Seragam Sekolah',
-                'foto' => 'uploads/produk/seragam_sma.jpg'
-            ],
-            [
-                'nama' => 'Kemeja PDH Navy',
-                'deskripsi' => 'Bahan American Drill, cocok untuk seragam kantor atau organisasi.',
-                'jenis' => 'katalog',
-                'harga' => 185000,
-                'stok' => 50,
-                'kategori' => 'Seragam Kantor',
-                'foto' => 'uploads/produk/pdh_navy.jpg'
-            ],
-            [
-                'nama' => 'Kaos Polo Polos Hitam',
-                'deskripsi' => 'Bahan Lacoste CVC, nyaman dipakai sehari-hari.',
-                'jenis' => 'katalog',
-                'harga' => 95000,
-                'stok' => 200,
-                'kategori' => 'Kaos',
-                'foto' => 'uploads/produk/polo_hitam.jpg'
-            ],
-            // Example of a 'kustom' product (Usually doesn't have fixed catalog price/stock yet, but entered in parent table)
-            [
-                'nama' => 'Jasa Jahit Jas Almamater',
-                'deskripsi' => 'Pemesanan khusus jas almamater dengan bordir logo universitas.',
-                'jenis' => 'kustom',
-                'harga' => null, // Kustom might not have catalog price
-                'stok' => null,
-                'kategori' => null,
-                'foto' => null
-            ]
-        ];
+        $faker = Faker::create('id_ID'); 
 
-        foreach ($items as $item) {
+        $kategoris = ['Seragam Sekolah', 'Seragam Kantor', 'Kaos', 'Jaket', 'Celana', 'Aksesoris'];
+        
+        for ($i = 0; $i < 100; $i++) {
             $now = Carbon::now();
+            
+            $jenis = $faker->boolean(90) ? 'katalog' : 'kustom';
 
             $produkId = DB::table('produk')->insertGetId([
-                'nama_produk' => $item['nama'],
-                'deskripsi' => $item['deskripsi'],
-                'jenis_produk' => $item['jenis'],
+                'nama_produk' => $this->generateProductName($faker, $jenis),
+                'deskripsi' => $faker->paragraph(2),
+                'jenis_produk' => $jenis,
                 'created_at' => $now,
                 'updated_at' => $now,
             ]);
 
-            if ($item['jenis'] === 'katalog') {
+            if ($jenis === 'katalog') {
+                $kategori = $faker->randomElement($kategoris);
+                
                 DB::table('produk_katalog')->insert([
                     'produk_id' => $produkId,
-                    'kategori' => $item['kategori'],
-                    'harga' => $item['harga'],
-                    'stok' => $item['stok'],
+                    'kategori' => $kategori,
+                    'harga' => $faker->numberBetween(50, 500) * 1000, 
+                    'stok' => $faker->numberBetween(0, 200),
                     'created_at' => $now,
                     'updated_at' => $now,
                 ]);
 
                 DB::table('foto_produk_katalog')->insert([
                     'produk_id' => $produkId,
-                    'path' => $item['foto'],
+                    'path' => 'uploads/produk/' . \Str::slug($kategori) . '-' . $faker->numberBetween(1, 10) . '.jpg',
                     'created_at' => $now,
                     'updated_at' => $now,
                 ]);
             }
         }
+    }
+
+    private function generateProductName($faker, $jenis)
+    {
+        if ($jenis === 'kustom') {
+            return 'Jasa Jahit ' . $faker->randomElement(['Jas Almamater', 'Seragam Komunitas', 'Baju PDH Custom', 'Wearpack Safety']);
+        }
+
+        $adjectives = ['Lengan Panjang', 'Lengan Pendek', 'Premium', 'Polos', 'Motif Kotak', 'Oversize', 'Slim Fit'];
+        $items = ['Kemeja', 'Kaos Polo', 'Celana Chino', 'Rok Rempel', 'Blazer', 'Rompi', 'Jaket Bomber'];
+        $materials = ['Katun', 'Drill', 'Oxford', 'Canvas', 'Denim'];
+
+        return $faker->randomElement($items) . ' ' . 
+               $faker->randomElement($materials) . ' ' . 
+               $faker->randomElement($adjectives);
     }
 }

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\User\KatalogProdukController;
 use App\Http\Controllers\User\PegawaiController;
 use Illuminate\Support\Facades\Route;
 
@@ -50,9 +51,16 @@ Route::prefix('admin')->group(function () {
         return view('pages.user.transaksi.index');
     })->name('manage.transaksi');
 
-    Route::get('/manage-katalog', function () {
-        return view('pages.user.katalog.index');
-    })->name('manage.katalog');
+
+    Route::prefix('manage-katalog')->name('manage.katalog')->group(function () {
+        Route::get('/', [KatalogProdukController::class, 'index']);
+
+        Route::get('/create', [KatalogProdukController::class, 'create'])->name('.create');
+    });
+
+    // Route::get('/manage-katalog', function () {
+    //     return view('pages.user.katalog.index');
+    // })->name('manage.katalog');
 
     Route::get('/manage-kustom', function () {
         return view('pages.user.kustom.index');
@@ -75,5 +83,5 @@ Route::prefix('admin')->group(function () {
         Route::put('/{user_id}', [PegawaiController::class, 'update'])->name('.update');
         Route::delete('/{user_id}', [PegawaiController::class, 'destroy'])->name('.destroy');
     });
-    
+
 });

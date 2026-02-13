@@ -9,6 +9,8 @@ class ProdukKatalog extends Model
 {
     use HasFactory;
 
+    protected $table = 'produk_katalog';
+
     protected $primaryKey = 'katalog_id';
 
     protected $fillable = [
@@ -21,6 +23,11 @@ class ProdukKatalog extends Model
     public function produk()
     {
         return $this->belongsTo(Produk::class, 'produk_id', 'produk_id');
+    }
+
+    public function fotos()
+    {
+        return $this->hasMany(FotoProdukKatalog::class, 'produk_id', 'produk_id');
     }
 
 }

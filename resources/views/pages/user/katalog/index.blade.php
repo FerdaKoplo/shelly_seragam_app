@@ -2,7 +2,7 @@
 @section('title', 'Katalog')
 @section('content')
 
-    <div class="flex flex-col justify-center mt-6 items-center px-10">
+    <div class="flex gap-16 flex-col justify-center mt-6 items-center px-10">
         <div class="flex items-center gap-7 w-full">
             <div>
                 <button class="border border-black p-2 rounded-md">
@@ -15,7 +15,8 @@
             </div>
 
             <div class="flex-1 relative">
-                <input type="text" placeholder="Cari Produk" class="w-full p-2 rounded-md">
+                <input type="text" placeholder="Cari Produk"
+                    class="w-full p-2 rounded-md  border border-black focus:outline-none">
                 <div class="absolute right-4 top-1/2 transform -translate-y-1/2">
                     <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path
@@ -23,22 +24,66 @@
                             fill="#323232" />
                     </svg>
                 </div>
+            </div>
 
+            <div>
+                {{ $katalog->onEachSide(1)->links('vendor.pagination.custom') }}
             </div>
 
         </div>
 
+        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-16">
+            @forelse ($katalog as $item)
+                <div class="bg-white  shadow-md rounded-2xl relative group hover:shadow-lg transition">
 
-        <div>
+                    <button
+                        class="absolute top-3 right-3 bg-white p-1.5 rounded-full shadow-sm hover:bg-gray-100 transition z-10">
+                        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M0 9.48896V11.9856H2.49666L9.86013 4.62215L7.36348 2.12549L0 9.48896ZM11.7909 2.6914C12.0505 2.43174 12.0505 2.01231 11.7909 1.75265L10.233 0.194739C9.97332 -0.0649131 9.55388 -0.0649131 9.29422 0.194739L8.07586 1.41311L10.5725 3.90977L11.7909 2.6914V2.6914Z"
+                                fill="#323232" />
+                        </svg>
+
+                    </button>
+
+                    <div class="w-full aspect-square overflow-hidden rounded-xl bg-[#F5F5F5] mb-3">
+                        <img src="{{ $item->fotos->first()?->path ?? asset('images/default-product.jpg') }}"
+                            alt="{{ $item->produk->nama }}" class="w-full h-full object-contain">
+                    </div>
+
+                    <div class="space-y-1 grid grid-cols-1 px-2 pb-3">
+                        <h3 class="font-bold text-xl text-gray-900 truncate">{{ $item->produk->nama_produk ?? 'Nama Produk' }}
+                        </h3>
+
+                        <p class="text-[10px] text-gray-500">#{{ $item->kategori ?? 'Kategori Tidak Tersedia' }}</p>
+
+                        <div class="flex items-center justify-between mt-2">
+                            <p class="font-bold text-xl">Rp.{{ number_format($item->harga, 0, ',', '.') }}</p>
+
+                            <button class="text-gray-700 hover:text-black">
+                                <svg width="20" height="20" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path
+                                        d="M11.5401 5.3262H9.27647V2.6631H6.70214V5.3262H4.4385L7.98931 8.87701L11.5401 5.3262ZM14.2032 0H1.76652C0.781176 0 0 0.79893 0 1.7754V14.2032C0 15.1797 0.781176 15.9786 1.76652 15.9786H14.2032C15.1797 15.9786 15.9786 15.1797 15.9786 14.2032V1.7754C15.9786 0.79893 15.1797 0 14.2032 0ZM14.2032 14.2032H1.7754V11.5401H4.93562C5.54813 12.5965 6.68439 13.3155 7.99818 13.3155C9.31198 13.3155 10.4394 12.5965 11.0607 11.5401H14.2032V14.2032ZM14.2032 9.76471H9.77358C9.77358 10.7412 8.97465 11.5401 7.99818 11.5401C7.02171 11.5401 6.22278 10.7412 6.22278 9.76471H1.7754L1.76652 1.7754H14.2032V9.76471Z"
+                                        fill="#323232" />
+                                </svg>
+
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            @empty
+                <div class="col-span-full text-center py-20 text-gray-500">
+                    <p>Belum Ada Produk Yang Tersedia</p>
+                </div>
+            @endforelse
         </div>
-        Manage Katalog
 
     </div>
 
     {{-- floating button --}}
-    <a href="">
+    <a href="{{ route('manage.katalog.create') }}">
         <button
-            class="fixed bottom-8 flex font-inter items-center gap-3 right-4 px-5 bg-white border border-black text-black p-3 rounded-full shadow-md ">
+            class="z-50 fixed bottom-8 flex font-inter items-center gap-3 right-4 px-5 bg-white border border-black text-black p-3 rounded-full shadow-md ">
             <p>
                 Tambahkan Produk Baru
             </p>
