@@ -2,7 +2,7 @@
 @section('title', 'Katalog Seragam')
 @section('content')
 
-<div class="px-16 justify-center my-6 max-w-full z-10">
+<div class="px-16 justify-center my-6 max-w-full">
     <section class="max-w-full py-8 mx-auto">
         {{-- Page Title & Back Button --}}
         <div class="flex items-center gap-4 mb-8">
@@ -16,9 +16,11 @@
         <div class="flex md:flex-row gap-4 mb-10 items-center">
             {{-- Search and Filter Row --}}
             <div class="flex flex-1 gap-2 md:w-auto">
-                <button class="p-3 border rounded-xl hover:bg-gray-50 shadow-sm">
+
+                <button @click="$dispatch('open-modal', 'filter-katalog')" class="p-3 border rounded-xl hover:bg-gray-50 shadow-sm transition-all">
                     <i class="fa-solid fa-sliders text-black"></i>
                 </button>
+                
                 <!-- Wrapper Div now acts as the visual input box -->
                 <div class="flex items-center flex-1 md:w-80 border rounded-xl shadow-sm px-4 py-3 focus-within:ring-2 focus-within:ring-secondary">
 
@@ -91,5 +93,7 @@
     </div>
 
 </div>
+
+<x-guest.katalog.modals.filter-katalog />
 
 @endsection
