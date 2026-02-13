@@ -2,7 +2,7 @@
 
 @section('body')
 @include('components.shared.top')
-@include('components.user.nav')
+{{-- @include('components.user.') --}}
 <main class="bg-white pl-2 md:ps-60 lg:ps-80">
     @include('components.user.sidebar')
     <div class="p-4">

@@ -3,31 +3,31 @@
 
 @section('content')
     <div class="px-6 pb-12" x-data="{
-                images: [],
-                variations: [], 
+                                images: [],
+                                variations: [], 
 
-                handleImageUpload(event) {
-                    const files = event.target.files;
-                    if (files.length > 0) {
-                        for (let i = 0; i < files.length; i++) {
-                            this.images.push({
-                                file: files[i],
-                                url: URL.createObjectURL(files[i])
-                            });
-                        }
-                    }
-                },
-                removeImage(index) {
-                    this.images.splice(index, 1);
-                },
+                                handleImageUpload(event) {
+                                    const files = event.target.files;
+                                    if (files.length > 0) {
+                                        for (let i = 0; i < files.length; i++) {
+                                            this.images.push({
+                                                file: files[i],
+                                                url: URL.createObjectURL(files[i])
+                                            });
+                                        }
+                                    }
+                                },
+                                removeImage(index) {
+                                    this.images.splice(index, 1);
+                                },
 
-                addVariation(type, data) {
-                    this.variations.push({ type: type, ...data });
-                },
-                removeVariation(index) {
-                    this.variations.splice(index, 1);
-                }
-            }" @add-size.window="addVariation('ukuran', $event.detail)"
+                                addVariation(type, data) {
+                                    this.variations.push({ type: type, ...data });
+                                },
+                                removeVariation(index) {
+                                    this.variations.splice(index, 1);
+                                }
+                            }" @add-size.window="addVariation('ukuran', $event.detail)"
         @add-color.window="addVariation('warna', $event.detail)">
 
         <a href="{{ route('manage.katalog') }}"
@@ -53,8 +53,8 @@
 
             <div class="lg:col-span-7 space-y-6">
 
-                <div class="flex gap-2 h-[450px]">
-                    <div class="w-28 flex flex-col gap-2 overflow-y-auto">
+                <div class="flex gap-3 h-[600px]">
+                    <div class="w-28 flex flex-col gap-5 overflow-y-auto">
                         <template x-for="(img, index) in images" :key="index">
                             <div
                                 class="w-28 h-28 flex-shrink-0 border-2 border-gray-200 rounded-md overflow-hidden relative group">
@@ -69,7 +69,7 @@
                         </template>
 
                         <div @click="$refs.fileInput.click()"
-                            class="w-28 h-24 flex-shrink-0 border-2 border-[#D9D9D9] rounded-md flex items-center justify-center cursor-pointer hover:bg-gray-50 transition">
+                            class="w-28 h-20 flex-shrink-0 border-2 border-[#D9D9D9] rounded-md flex items-center justify-center cursor-pointer hover:bg-gray-50 transition">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                                 <path d="M12 5V19M5 12H19" stroke="#323232" stroke-width="3" stroke-linecap="round"
                                     stroke-linejoin="round" />
@@ -88,18 +88,26 @@
 
                         <template x-if="images.length === 0">
                             <div class="flex flex-col items-center pointer-events-none">
-                                <svg width="100" height="100" viewBox="0 0 24 24" fill="currentColor"
-                                    class="text-gray-300 mb-4">
-                                    <path
-                                        d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zm-5.04-6.71l-2.75 3.54-1.96-2.36L6.5 17h11l-3.54-4.71z" />
-                                </svg>
-                                <p class="text-sm text-gray-500 font-medium">Belum ada gambar dipilih</p>
+                                <div class="flex ">
+                                    <svg width="400" height="300" viewBox="0 0 24 24" fill="currentColor">
+                                        <path
+                                            d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zm-5.04-6.71l-2.75 3.54-1.96-2.36L6.5 17h11l-3.54-4.71z" />
+                                    </svg>
+                                    <div class="absolute right-40 top-1/2 transform -translate-y-20">
+                                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none">
+                                            <path d="M12 5V19M5 12H19" stroke="#323232" stroke-width="3"
+                                                stroke-linecap="round" stroke-linejoin="round" />
+                                        </svg>
+                                    </div>
+                                </div>
+                                <p class="text-sm absolute bottom-4 font-medium">Tambahkan Minimal 1 Gambar</p>
                             </div>
                         </template>
                     </div>
                 </div>
 
                 {{-- iki aku ijek bingung terjual iki gae op, jadi ak comment dlu ya --}}
+
                 {{-- <div class="flex items-center gap-2">
                     <label class="font-medium text-[#323232]">Terjual :</label>
                     <input type="number" name="terjual" value="0"
@@ -148,9 +156,18 @@
                         <div class="flex justify-between items-center mb-4">
                             <h3 class="font-bold text-lg flex gap-1">Ukuran <span class="text-red-500">*</span></h3>
                             <button type="button" class="text-xs flex items-center gap-2 text-gray-600 hover:text-black">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                    stroke-width="1.5">
-                                    <path d="M2 12h20M2 12l4 4m-4-4l4-4" stroke-linecap="round" stroke-linejoin="round" />
+                                <svg width="21" height="21" viewBox="0 0 21 21" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <g clip-path="url(#clip0_936_3015)">
+                                        <path
+                                            d="M18.375 5.25H2.625C1.6625 5.25 0.875 6.0375 0.875 7V14C0.875 14.9625 1.6625 15.75 2.625 15.75H18.375C19.3375 15.75 20.125 14.9625 20.125 14V7C20.125 6.0375 19.3375 5.25 18.375 5.25ZM18.375 14H2.625V7H4.375V10.5H6.125V7H7.875V10.5H9.625V7H11.375V10.5H13.125V7H14.875V10.5H16.625V7H18.375V14Z"
+                                            fill="#323232" />
+                                    </g>
+                                    <defs>
+                                        <clipPath id="clip0_936_3015">
+                                            <rect width="21" height="21" fill="white" />
+                                        </clipPath>
+                                    </defs>
                                 </svg>
                                 Panduan Ukuran
                             </button>
