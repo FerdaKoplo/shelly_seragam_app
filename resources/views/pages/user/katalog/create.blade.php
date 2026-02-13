@@ -24,7 +24,7 @@
             <div class="lg:col-span-7 space-y-6">
                 
                 <div class="flex gap-4 h-[400px]">
-                    <div class="w-24 h-24 flex-shrink-0 border-2  rounded-md flex items-center justify-center cursor-pointer hover:bg-blue-50 transition">
+                    <div class="w-24 h-24 flex-shrink-0 border-2 rounded-md flex items-center justify-center cursor-pointer transition">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M12 5V19M5 12H19" stroke="#323232" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
