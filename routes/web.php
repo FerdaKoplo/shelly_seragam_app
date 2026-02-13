@@ -28,7 +28,7 @@ Route::post('/login', LoginController::class)->name('login');
 
 // guest routes
 Route::get('/', function () {
-    return view('pages.guest.landing');
+    return view('pages.guest.landing.landing');
 })->name('home');
 
 Route::get('/kustom', function () {
