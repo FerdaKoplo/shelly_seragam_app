@@ -2,7 +2,7 @@
 @section('title', 'Katalog Seragam')
 @section('content')
 
-<div class="px-16 justify-center my-6 max-w-full">
+<div class="px-16 justify-center my-6 max-w-full z-10">
     <section class="max-w-full py-8 mx-auto">
         {{-- Page Title & Back Button --}}
         <div class="flex items-center gap-4 mb-8">
@@ -12,21 +12,29 @@
             <h1 class="text-4xl font-bebas  tracking-widest">Semua Katalog</h1>
         </div>
 
-        {{-- Search and Filter Row --}}
-        <div class="flex flex-col md:flex-row gap-4 mb-10 items-center">
-            <div class="flex gap-2 w-full md:w-auto">
+
+        <div class="flex md:flex-row gap-4 mb-10 items-center">
+            {{-- Search and Filter Row --}}
+            <div class="flex flex-1 gap-2 md:w-auto">
                 <button class="p-3 border rounded-xl hover:bg-gray-50 shadow-sm">
                     <i class="fa-solid fa-sliders text-black"></i>
                 </button>
-                <div class="relative flex-1 md:w-80">
+                <!-- Wrapper Div now acts as the visual input box -->
+                <div class="flex items-center flex-1 md:w-80 border rounded-xl shadow-sm px-4 py-3 focus-within:ring-2 focus-within:ring-secondary">
+
+                    <!-- Input is now "invisible" (no border, no padding, no ring) -->
                     <input type="text" placeholder="Cari Produk"
-                        class="w-full pl-4 pr-10 py-3 border rounded-xl shadow-sm focus:ring-2 focus:ring-secondary focus:border-transparent outline-none">
-                    <i class="fa-solid fa-magnifying-glass absolute right-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                        class="flex-1 bg-transparent outline-none text-gray-700">
+
+                    <!-- Icon follows the input naturally in the flex row -->
+                    <i class="fa-solid fa-magnifying-glass text-gray-400"></i>
+
                 </div>
+
             </div>
 
             {{-- Pagination Placeholder for Header--}}
-            <div class="ml-auto hidden md:block">
+            <div class="ml-auto hidden md:block ">
                 <div class="flex items-center gap-2">
                     <button class="w-10 h-10 flex items-center justify-center border rounded-lg hover:bg-gray-50 disabled:opacity-50">
                         <i class="fa-solid fa-chevron-left text-xs"></i>
@@ -43,7 +51,6 @@
                     </button>
                 </div>
             </div>
-
         </div>
 
         {{-- Product Grid --}}
