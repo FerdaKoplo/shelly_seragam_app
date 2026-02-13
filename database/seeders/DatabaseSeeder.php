@@ -27,7 +27,7 @@ class DatabaseSeeder extends Seeder
             'nama' => 'Test User Pegawai',
             'username' => 'pegawai',
             'email' => 'testpgw@example.com',
-            'role' => 'Admin',
+            'role' => 'Pegawai',
             'password' => Hash::make('pegawai')
         ]);
     }
