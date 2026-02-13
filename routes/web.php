@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\User\ManagePegawaiController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -52,7 +53,7 @@ Route::prefix('admin')->group(function () {
     Route::get('/manage-katalog', function () {
         return view('pages.user.katalog.index');
     })->name('manage.katalog');
-    
+
     Route::get('/manage-kustom', function () {
         return view('pages.user.kustom.index');
     })->name('manage.kustom');
@@ -68,8 +69,11 @@ Route::prefix('admin')->group(function () {
     })->name('traffic');
 
 
-    Route::get('/manage-pegawai', function () {
-        return view('pages.user.admin.manage-pegawai.index');
-    })->name('manage.pegawai');
-
+    Route::prefix('manage-pegawai')->name('manage.pegawai')->group(function () {
+        Route::get('/', [ManagePegawaiController::class, 'index']);
+        Route::post('/', [ManagePegawaiController::class, 'store'])->name('.store');
+        Route::put('/{user_id}', [ManagePegawaiController::class, 'update'])->name('.update');
+        Route::delete('/{user_id}', [ManagePegawaiController::class, 'destroy'])->name('.destroy');
+    });
+    
 });
