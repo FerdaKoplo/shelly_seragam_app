@@ -47,8 +47,14 @@
                     </button>
 
                     <div class="w-full aspect-square overflow-hidden rounded-xl bg-[#F5F5F5] mb-3">
-                        <img src="{{ $item->fotos->first()?->path ?? asset('images/default-product.jpg') }}"
-                            alt="{{ $item->produk->nama }}" class="w-full h-full object-contain">
+                        @php
+                            $firstPhoto = $item->fotos->first();
+                            // Check if photo exists, otherwise use a default placeholder
+                            $photoUrl = $firstPhoto ? asset('storage/' . $firstPhoto->path) : asset('images/default-product.jpg');
+                        @endphp
+
+                        <img src="{{ $photoUrl }}" alt="{{ $item->produk->nama_produk ?? 'Produk' }}"
+                            class="w-full h-full object-cover">
                     </div>
 
                     <div class="space-y-1 grid grid-cols-1 px-2 pb-3">

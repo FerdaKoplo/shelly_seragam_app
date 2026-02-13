@@ -9,8 +9,8 @@ class DetailProduk extends Model
 {
     use HasFactory;
 
+    protected $table = 'detail_produk';
     protected $primaryKey = 'detail_produk_id';
-
     protected $fillable = [
         'produk_id',
         'nama_detail',

@@ -9,6 +9,8 @@ class PilihanDetailProduk extends Model
 {
     use HasFactory;
 
+    protected $table = 'pilihan_detail_produk';
+
     protected $primaryKey = 'pilihan_detail_id';
 
     protected $fillable = [
