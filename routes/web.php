@@ -2,7 +2,7 @@
 
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\User\ManagePegawaiController;
+use App\Http\Controllers\User\PegawaiController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -70,10 +70,10 @@ Route::prefix('admin')->group(function () {
 
 
     Route::prefix('manage-pegawai')->name('manage.pegawai')->group(function () {
-        Route::get('/', [ManagePegawaiController::class, 'index']);
-        Route::post('/', [ManagePegawaiController::class, 'store'])->name('.store');
-        Route::put('/{user_id}', [ManagePegawaiController::class, 'update'])->name('.update');
-        Route::delete('/{user_id}', [ManagePegawaiController::class, 'destroy'])->name('.destroy');
+        Route::get('/', [PegawaiController::class, 'index']);
+        Route::post('/', [PegawaiController::class, 'store'])->name('.store');
+        Route::put('/{user_id}', [PegawaiController::class, 'update'])->name('.update');
+        Route::delete('/{user_id}', [PegawaiController::class, 'destroy'])->name('.destroy');
     });
     
 });
