@@ -56,7 +56,11 @@ Route::prefix('admin')->group(function () {
         Route::get('/', [KatalogProdukController::class, 'index']);
         Route::get('/create', [KatalogProdukController::class, 'create'])->name('.create');
         Route::post('/', [KatalogProdukController::class, 'store'])->name('.store');
+        Route::get('/{id}/edit', [KatalogProdukController::class, 'edit'])->name('.edit');
+        Route::put('/{id}', [KatalogProdukController::class, 'update'])->name('.update');
 
+        Route::put('/{id}/archive', [KatalogProdukController::class, 'archive'])->name('.archive');
+    Route::put('/{id}/restore', [KatalogProdukController::class, 'restore'])->name('.restore');
     });
 
     // Route::get('/manage-katalog', function () {
