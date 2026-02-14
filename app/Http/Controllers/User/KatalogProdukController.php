@@ -29,10 +29,40 @@ class KatalogProdukController extends Controller
                     ->orWhere('kategori', 'like', '%' . $search . '%');
             });
         }
+        if ($request->filled('filter_kategori')) {
+            $query->where('kategori', $request->filter_kategori);
+        }
 
-        $katalog = $query->paginate(20);
+        if ($request->filled('min_harga')) {
+            $query->where('harga', '>=', $request->min_harga);
+        }
+        if ($request->filled('max_harga')) {
+            $query->where('harga', '<=', $request->max_harga);
+        }
 
-        return view('pages.user.katalog.index', compact('katalog'));
+        if ($request->filled('filter_status')) {
+            switch ($request->filter_status) {
+                case 'ready':
+                    $query->where('stok', '>', 0);
+                    break;
+                case 'empty':
+                    $query->where('stok', '=', 0);
+                    break;
+                case 'archived':
+                    $query->where('stok', '<', 0);
+                    break;
+                default: 
+                    $query->where('stok', '>=', 0);
+                    break;
+            }
+        } else {
+            $query->where('stok', '>=', 0);
+        }
+
+        $categories = ProdukKatalog::select('kategori')->distinct()->pluck('kategori');
+        $katalog = $query->paginate(18)->appends(request()->except('page'));;
+
+        return view('pages.user.katalog.index', compact('katalog', 'categories'));
     }
 
     public function create()
@@ -246,14 +276,32 @@ class KatalogProdukController extends Controller
     }
     public function restore($id)
     {
-        $katalog = ProdukKatalog::where('produk_id', $id)->firstOrFail();
-        $katalog->update(['stok' => 0]); 
-        return back()->with('success', 'Produk dipulihkan.');
+        try {
+
+            $katalog = ProdukKatalog::where('produk_id', $id)->firstOrFail();
+            $katalog->update(['stok' => 0]);
+            return back()->with('success', 'Produk dipulihkan.');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Gagal memulihkan produk.');
+        }
     }
 
     public function destroy($id)
     {
-        //
+        try {
+            $katalog = ProdukKatalog::where('produk_id', $id)->firstOrFail();
+            $produk = $katalog->produk;
+
+            foreach ($produk->fotos as $foto) {
+                Storage::disk('public')->delete($foto->path);
+            }
+
+            $produk->delete();
+
+            return redirect()->route('manage.katalog')->with('success', 'Produk berhasil dihapus.');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Gagal menghapus produk.');
+        }
     }
 
 }

@@ -2,7 +2,7 @@
 @section('title', 'Create - Katalog')
 
 @section('content')
-    <div class="px-6 pb-12" x-data="{
+    <div class="px-6 pb-12 " x-data="{
                                 images: [],
                                 variations: [], 
 

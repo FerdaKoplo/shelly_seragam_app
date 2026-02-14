@@ -2,10 +2,11 @@
 @section('title', 'Katalog')
 @section('content')
 
-    <div class="flex gap-16 flex-col justify-center mt-6 items-center px-10">
+    <div x-data class="flex gap-16 flex-col justify-center  items-center px-10">
         <div class="flex items-center gap-7 w-full">
             <div>
-                <button class="border border-black p-2 rounded-md">
+                <button type="button" @click="$dispatch('open-modal', 'modal-filter-katalog')"
+                    class="border border-black p-2.5 rounded-md hover:bg-gray-50 transition">
                     <svg width="19" height="19" viewBox="0 0 19 19" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path
                             d="M3.36869 0.842173C3.36869 0.378978 2.98971 0 2.52652 0C2.06332 0 1.68435 0.378978 1.68435 0.842173V4.21086H0V9.2639H5.05304V4.21086H3.36869V0.842173ZM6.73738 12.6326C6.73738 13.7274 7.44481 14.6538 8.42173 15.0075V18.5278H10.1061V15.0075C11.083 14.6622 11.7904 13.7358 11.7904 12.6326V10.9482H6.73738V12.6326ZM0 12.6326C0 13.7274 0.707425 14.6538 1.68435 15.0075V18.5278H3.36869V15.0075C4.34561 14.6538 5.05304 13.7274 5.05304 12.6326V10.9482H0V12.6326ZM16.8435 4.21086V0.842173C16.8435 0.378978 16.4645 0 16.0013 0C15.5381 0 15.1591 0.378978 15.1591 0.842173V4.21086H13.4748V9.2639H18.5278V4.21086H16.8435ZM10.1061 0.842173C10.1061 0.378978 9.7271 0 9.2639 0C8.80071 0 8.42173 0.378978 8.42173 0.842173V4.21086H6.73738V9.2639H11.7904V4.21086H10.1061V0.842173ZM13.4748 12.6326C13.4748 13.7274 14.1822 14.6538 15.1591 15.0075V18.5278H16.8435V15.0075C17.8204 14.6622 18.5278 13.7358 18.5278 12.6326V10.9482H13.4748V12.6326Z"
@@ -32,7 +33,7 @@
 
         </div>
 
-        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-16">
+        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-16 ">
             @forelse ($katalog as $item)
                 @php
                     $isArchived = $item->stok < 0;
@@ -88,11 +89,12 @@
                         @endif --}}
                     </div>
 
-                    <div class="space-y-1 grid grid-cols-1 px-2 pb-3"> 
+                    <div class="space-y-1 grid grid-cols-1 px-2 pb-3">
 
                         <div class="{{ $isArchived ? 'opacity-50' : '' }}">
                             <h3 class="font-bold text-xl text-gray-900 truncate">
-                                {{ $item->produk->nama_produk ?? 'Nama Produk' }}</h3>
+                                {{ $item->produk->nama_produk ?? 'Nama Produk' }}
+                            </h3>
                             <p class="text-[10px] text-gray-500">#{{ $item->kategori ?? 'Kategori' }}</p>
                         </div>
 
@@ -102,21 +104,18 @@
                             </p>
 
                             @if($isArchived)
-                                <form action="{{ route('manage.katalog.restore', $item->produk_id) }}" method="POST">
-                                    @csrf
-                                    @method('PUT')
-                                    <button type="submit" title="Pulihkan Produk"
-                                        class="text-black hover:text-green-600 transition">
-                                        <svg width="20" height="20" viewBox="0 0 14 18" fill="none"
-                                            xmlns="http://www.w3.org/2000/svg">
-                                            <path
-                                                d="M0.973384 15.5741C0.973384 16.6449 1.84943 17.5209 2.92015 17.5209H10.7072C11.7779 17.5209 12.654 16.6449 12.654 15.5741V3.89354H0.973384V15.5741ZM13.6274 0.973384H10.2205L9.24715 0H4.38023L3.40684 0.973384H0V2.92015H13.6274V0.973384Z"
-                                                fill="currentColor" />
-                                        </svg>
-                                    </button>
-                                </form>
+                                <button type="button"
+                                    @click="$dispatch('open-modal', 'modal-delete-confirmation'); $dispatch('set-archive-url', '{{ route('manage.katalog.destroy', $item->produk_id) }}')"
+                                    class="text-gray-700 hover:text-red-600 transition" title="Hapus Produk">
+
+                                    <svg width="20" height="20" viewBox="0 0 14 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path
+                                            d="M0.973384 15.5741C0.973384 16.6449 1.84943 17.5209 2.92015 17.5209H10.7072C11.7779 17.5209 12.654 16.6449 12.654 15.5741V3.89354H0.973384V15.5741ZM13.6274 0.973384H10.2205L9.24715 0H4.38023L3.40684 0.973384H0V2.92015H13.6274V0.973384Z"
+                                            fill="currentColor" />
+                                    </svg>
+                                </button>
                             @else
-                                <form action="{{ route('manage.katalog.archive', $item->produk_id) }}" method="POST"
+                                {{-- <form action="{{ route('manage.katalog.archive', $item->produk_id) }}" method="POST"
                                     onsubmit="return confirm('Arsipkan produk ini?')">
                                     @csrf
                                     @method('PUT')
@@ -128,18 +127,27 @@
                                                 fill="currentColor" />
                                         </svg>
                                     </button>
-                                </form>
+                                </form> --}}
+                                <button type="button"
+                                    @click="$dispatch('open-modal', 'modal-archive-confirmation'); $dispatch('set-archive-url', '{{ route('manage.katalog.archive', $item->produk_id) }}')"
+                                    class="text-gray-700 hover:text-red-600 transition" title="Arsip Produk">
+                                    <svg width="20" height="20" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path
+                                            d="M11.5401 5.3262H9.27647V2.6631H6.70214V5.3262H4.4385L7.98931 8.87701L11.5401 5.3262ZM14.2032 0H1.76652C0.781176 0 0 0.79893 0 1.7754V14.2032C0 15.1797 0.781176 15.9786 1.76652 15.9786H14.2032C15.1797 15.9786 15.9786 15.1797 15.9786 14.2032V1.7754C15.9786 0.79893 15.1797 0 14.2032 0ZM14.2032 14.2032H1.7754V11.5401H4.93562C5.54813 12.5965 6.68439 13.3155 7.99818 13.3155C9.31198 13.3155 10.4394 12.5965 11.0607 11.5401H14.2032V14.2032ZM14.2032 9.76471H9.77358C9.77358 10.7412 8.97465 11.5401 7.99818 11.5401C7.02171 11.5401 6.22278 10.7412 6.22278 9.76471H1.7754L1.76652 1.7754H14.2032V9.76471Z"
+                                            fill="currentColor" />
+                                    </svg>
+                                </button>
                             @endif
                         </div>
                     </div>
                 </div>
             @empty
-                <div class="col-span-full text-center py-20 text-gray-500">
+                <div
+                    class="col-span-full flex flex-col items-center justify-center min-h-[70vh] font-medium text-xl text-center py-2 text-black ">
                     <p>Belum Ada Produk Yang Tersedia</p>
                 </div>
             @endforelse
         </div>
-
     </div>
 
     {{-- floating button --}}
@@ -159,6 +167,8 @@
         </button>
     </a>
 
-
+    <x-user.katalog.modals.archive_confirmation />
+    <x-user.katalog.modals.delete_confirmation />
+    <x-user.katalog.modals.filter :categories="$categories" />
 
 @endsection

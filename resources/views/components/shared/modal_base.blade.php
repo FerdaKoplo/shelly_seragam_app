@@ -1,4 +1,4 @@
-@props(['name', 'title', 'maxWidth' => '2xl'])
+@props(['name', 'title', 'maxWidth' => '2xl', 'showCloseButton' => true])
 
 @php
     $maxWidthClass = [
@@ -21,6 +21,7 @@
     }" x-on:open-modal.window="if ($event.detail === name) { show = true; document.body.style.overflowY = 'hidden'; }"
     x-on:close-modal.window="if ($event.detail === name) { closeModal(); }" x-on:keydown.escape.window="closeModal()"
     x-show="show" class="fixed inset-0 z-50 overflow-y-auto" style="display: none;" x-cloak>
+    
     <div x-show="show" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0"
         x-transition:enter-end="opacity-100" x-transition:leave="ease-in duration-200"
         x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
@@ -33,12 +34,16 @@
             x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100" x-transition:leave="ease-in duration-200"
             x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
             x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-            class="relative transform overflow-hidden  bg-white text-left shadow-xl transition-all sm:my-8 w-full {{ $maxWidthClass }}"
+            class="relative transform overflow-hidden bg-white text-left shadow-xl transition-all sm:my-8 w-full {{ $maxWidthClass }}"
             @click.stop>
-            <button type="button" @click="closeModal()"
-                class="absolute top-1 text-2xl right-5 z-10 p-1 text-gray-900 hover:text-gray-500 transition-colors">
-                X
-            </button>
+
+            @if($showCloseButton)
+                <button type="button" @click="closeModal()"
+                    class="absolute top-1 text-2xl right-5 z-10 p-1 text-gray-900 hover:text-gray-500 transition-colors">
+                    X
+                </button>
+            @endif
+
             <div class="px-6 py-4">
                 {{ $slot }}
             </div>

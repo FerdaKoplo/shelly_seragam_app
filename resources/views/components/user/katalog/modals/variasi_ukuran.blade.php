@@ -17,10 +17,8 @@
         },
         
         submit() {
-            // Validate
             if(!this.sizeName) return;
 
-            // Dispatch event to parent
             this.$dispatch('add-size', {
                 name: this.sizeName,
                 sleeve: this.sleeveLength,
@@ -29,7 +27,6 @@
 
             this.closeModal(); 
             
-            // Optional: Reset form
             this.clearName();
         }
     }" class="px-1 pb-2">

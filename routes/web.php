@@ -60,7 +60,9 @@ Route::prefix('admin')->group(function () {
         Route::put('/{id}', [KatalogProdukController::class, 'update'])->name('.update');
 
         Route::put('/{id}/archive', [KatalogProdukController::class, 'archive'])->name('.archive');
-    Route::put('/{id}/restore', [KatalogProdukController::class, 'restore'])->name('.restore');
+        Route::put('/{id}/restore', [KatalogProdukController::class, 'restore'])->name('.restore');
+
+        Route::delete('/{id}', [KatalogProdukController::class, 'destroy'])->name('.destroy');
     });
 
     // Route::get('/manage-katalog', function () {
