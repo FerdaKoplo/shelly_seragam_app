@@ -2,6 +2,11 @@
 
 @section('body')
 @include('components.navigation.top-navbar')
-@yield('content')
+
+<main class="flex-grow flex flex-col">
+    
+    @yield('content')
+</main>
+
 @include('components.shared.footer')
 @endsection

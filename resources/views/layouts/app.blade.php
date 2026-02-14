@@ -12,8 +12,10 @@
         crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 
-<body >
-    @yield('body')
+<body>
+    <div class="flex flex-col min-h-screen">
+        @yield('body')
+    </div>
     <x-shared.notification />
 
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>

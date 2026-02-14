@@ -2,8 +2,8 @@
 @section('title', 'Katalog Seragam')
 @section('content')
 
-<div class="px-16 justify-center my-6 max-w-full">
-    <section class="max-w-full py-8 mx-auto">
+<div class="px-16 justify-center items-center my-6 max-w-full overflow-y-auto flex-grow">
+    
         {{-- Page Title & Back Button --}}
         <div class="flex items-center gap-4 mb-8">
             <a href="{{ route('home') }}" class="p-2 hover:bg-gray-100 rounded-full transition-colors">
@@ -12,7 +12,6 @@
             <h1 class="text-4xl font-bebas  tracking-widest">Semua Katalog</h1>
         </div>
 
-
         <div class="flex md:flex-row gap-4 mb-10 items-center">
             {{-- Search and Filter Row --}}
             <div class="flex flex-1 gap-2 md:w-auto">
@@ -20,7 +19,7 @@
                 <button @click="$dispatch('open-modal', 'filter-katalog')" class="p-3 border rounded-xl hover:bg-gray-50 shadow-sm transition-all">
                     <i class="fa-solid fa-sliders text-black"></i>
                 </button>
-                
+
                 <!-- Wrapper Div now acts as the visual input box -->
                 <div class="flex items-center flex-1 md:w-80 border rounded-xl shadow-sm px-4 py-3 focus-within:ring-2 focus-within:ring-secondary">
 
@@ -57,7 +56,10 @@
 
         {{-- Product Grid --}}
 
-
+        @php
+        $isEmpty = true;
+        @endphp
+        @if (!$isEmpty)
         <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-x-4 gap-y-8">
             @foreach(range(1, 30) as $item)
             <x-cards.product-card.vertical
@@ -66,6 +68,27 @@
                 price="114.000" />
             @endforeach
         </div>
+        @else
+
+
+        <div class="flex-col flex w-full h-full justify-center items-center">
+            <p class="text-black mb-2 font-medium text-3xl">Produk Tidak Ditemukan</p>
+            <p class="text-gray-600 mb-2 font-normal text-[20px]">Tidak menemukan yang kamu cari?</p>
+            <div class="flex w-[50%] justify-center items-center">
+                <x-shared.button href="{{ route('kustom') }}" variant="outline" class="flex flex-grow md:w-auto py-4 ">
+                    <span class="text-xl font-bebas text-[30px] tracking-widest gap-4">
+                        <i class="fa-solid fa-shirt"></i>
+                        Buat Seragammu Sendiri!
+                        <i class=" fa-solid fa-pen"></i>
+                    </span>
+                </x-shared.button>
+            </div>
+        </div>
+
+
+
+        @endif
+
 
 
         {{-- Bottom Pagination 
@@ -73,7 +96,7 @@
             <x-pagination />
         </div>
         --}}
-    </section>
+    
 
     {{-- Floating Hubungi Kami Button --}}
     <div class="fixed bottom-6 right-6 z-50">
