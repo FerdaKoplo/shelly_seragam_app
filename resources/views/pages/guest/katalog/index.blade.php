@@ -99,7 +99,7 @@
     
 
     {{-- Floating Hubungi Kami Button --}}
-    <div class="fixed bottom-6 right-6 z-50">
+    <div class="fixed bottom-[10%] right-[2%] z-50">
 
         <x-shared.button variant="outline" class="w-full md:w-auto py-4 px-4">
             <p class="font-medium text-xl">
