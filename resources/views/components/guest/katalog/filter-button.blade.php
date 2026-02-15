@@ -2,7 +2,6 @@
 
 <button 
     type="button"
-    {{-- We store the initial active state in a data attribute so Alpine can read it --}}
     data-initial-active="{{ $active ? 'true' : 'false' }}"
     data-id="{{ $id }}"
     @click="toggleFilter('{{ $id }}')"

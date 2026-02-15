@@ -2,7 +2,7 @@
 @section('title', 'Katalog Seragam')
 @section('content')
 
-<div  class="px-16 justify-center items-center my-6 max-w-full overflow-y-auto flex-grow">
+<div class="px-16 justify-center items-center my-6 max-w-full overflow-y-auto flex-grow">
 
     {{-- Page Title & Back Button --}}
     <div class="flex items-center gap-4 mb-8">
@@ -58,10 +58,12 @@
     @if (!$isEmpty)
     <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-x-4 gap-y-8">
         @foreach(range(1, 30) as $item)
-        <x-cards.product-card.vertical
-            name="Kemeja Kotak"
-            category="#Kemeja #Katun #Formal"
-            price="114.000" />
+        <a href="{{ route('product.show', 'kemeja-kotak-' . $item) }}" class="block hover:opacity-90 transition">
+            <x-cards.product-card.vertical
+                name="Kemeja Kotak"
+                category="#Kemeja #Katun #Formal"
+                price="114.000" />
+        </a>
         @endforeach
     </div>
     @else
@@ -99,6 +101,6 @@
 
 </div>
 
-<x-guest.katalog.modals.filter-produk-katalog/>
+<x-guest.katalog.modals.filter-produk-katalog />
 
 @endsection
