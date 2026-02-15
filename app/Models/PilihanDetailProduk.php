@@ -18,7 +18,9 @@ class PilihanDetailProduk extends Model
         'opsi',
         'pengaruh_harga'
     ];
-
+    protected $casts = [
+        'opsi' => 'array',
+    ];
     public function detailProduk()
     {
         return $this->belongsTo(DetailProduk::class, 'detail_produk_id', 'detail_produk_id');
