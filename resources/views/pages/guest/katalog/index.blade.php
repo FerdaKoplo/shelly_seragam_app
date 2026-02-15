@@ -16,7 +16,7 @@
         {{-- Search and Filter Row --}}
         <div x-data class="flex flex-1 gap-2 md:w-auto">
 
-            <button @click="$dispatch('open-modal', 'modal-filter-katalog')" class="p-3 border rounded-xl hover:bg-gray-50 shadow-sm transition-all">
+            <button @click="$dispatch('open-modal', 'modal-filter-produk-katalog')" class="p-3 border rounded-xl hover:bg-gray-50 shadow-sm transition-all">
                 <i class="fa-solid fa-sliders text-black"></i>
             </button>
 
@@ -99,6 +99,6 @@
 
 </div>
 
-<x-guest.katalog.modals.filter-katalog/>
+<x-guest.katalog.modals.filter-produk-katalog/>
 
 @endsection

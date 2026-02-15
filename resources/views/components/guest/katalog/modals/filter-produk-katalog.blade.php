@@ -1,4 +1,4 @@
-<x-shared.modal_base name="modal-filter-katalog" title="Filter Produk" maxWidth="3xl">
+<x-shared.modal_base name="modal-filter-produk-katalog" title="Filter Produk" maxWidth="3xl">
     <div x-data="{ 
         filters: [],
         toggleFilter(id) {
