@@ -38,6 +38,20 @@ Route::get('/kustom', function () {
 Route::get('/katalog', function () {
     return view('pages.guest.katalog.index');
 })->name('katalog');
+Route::get('/katalog/{slug}', function ($slug) {
+    // a mock object to simulate a database record
+    $product = (object) [
+        'name' => 'Kemeja Kotak-Kotak Casual',
+        'price' => 114000,
+        'stock' => 100,
+        'description' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+        'tags' => ['#Kemeja', '#Katun', '#Formal'],
+        'slug' => $slug
+    ];
+
+    return view('pages.guest.katalog.detail', compact('product'));
+})->name('product.show');
+
 
 Route::get('/kerannjang', function () {
     return view('pages.guest.keranjang.index');
