@@ -11,6 +11,7 @@ class OrderTransaksiKustom extends Model
 
     protected $primaryKey = 'order_kustom_id';
 
+    protected $table = 'order_transaksi_kustom';
     protected $fillable = [
         'transaksi_id',
         'quantity',

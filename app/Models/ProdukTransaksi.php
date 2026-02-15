@@ -11,6 +11,7 @@ class ProdukTransaksi extends Model
 
     protected $primaryKey = 'produk_transaksi_id';
 
+    protected $table = 'produk_transaksi';
     protected $fillable = [
         'transaksi_id',
         'produk_id',
