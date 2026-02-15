@@ -4,7 +4,7 @@
 
 <div class="max-w-full mx-auto px-4 py-8"
     x-data="{ 
-        activeImage: 'https://placeholder.pics/svg/600x800', 
+        activeImage: 'https://picsum.photos/id/1/1080', 
         quantity: 1,
         selectedSize: 'M',
         selectedColor: 'red',
@@ -18,20 +18,31 @@
         <h1 class="text-4xl font-bebas  tracking-widest">Detail Produk</h1>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
-
+    <div class=" grid grid-cols-1 lg:grid-cols-12 gap-4 mx-auto">
         <div class="lg:col-span-1 flex flex-col space-y-4">
             @foreach(range(1, 4) as $i)
-            <button @click="activeImage = 'https://placeholder.pics/svg/600x800'"
-                class="border transition-all"
-                :class="activeImage === 'https://placeholder.pics/svg/600x800' ? 'border-black' : 'border-transparent hover:border-gray-300'">
-                <img src="https://placeholder.pics/svg/100x120" alt="Thumbnail" class="w-full">
+            @php
+            // Mocking different images using the index
+            $thumbnailUrl = "https://picsum.photos/id/" . $i . "/1080" ;
+            @endphp
+
+            <button
+                @click="activeImage = '{{ $thumbnailUrl }}'"
+                class="border transition-all duration-200 aspect-[3/4] overflow-hidden"
+                :class="activeImage === '{{ $thumbnailUrl }}' ? 'border-black ring-1 ring-black' : 'border-transparent hover:border-gray-300'">
+                <img src="{{ $thumbnailUrl }}" alt="Thumbnail {{ $i }}" class="w-full h-full object-cover">
             </button>
             @endforeach
         </div>
 
         <div class="lg:col-span-6 bg-gray-50 flex items-center justify-center rounded-sm overflow-hidden min-h-[500px]">
-            <img :src="activeImage" alt="{{ $product->name }}" class="max-h-[700px] object-contain transition-all duration-300">
+            <img
+                :key="activeImage" {{-- Adding a key helps Alpine/Browser track the swap --}}
+                :src="activeImage"
+                alt="{{ $product->name }}"
+                class="max-h-[700px] object-fill transition-opacity duration-300"
+                x-transition:enter="opacity-0"
+                x-transition:enter-end="opacity-100">
         </div>
 
         <div class="lg:col-span-5">
