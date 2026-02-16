@@ -27,7 +27,10 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {{-- We will create a loop here later --}}
         @foreach(range(1, 9) as $item)
-        <x-cards.product-card.horizontal />
+        <a href="{{ route('product.show', 'kemeja-kotak-' . $item) }}">
+            <x-cards.product-card.horizontal />
+        </a>
+
         @endforeach
     </div>
 
@@ -40,7 +43,7 @@
         <div class="flex-1 h-4 bg-[#F3C344]"></div>
         <x-shared.button href="{{ route('kustom') }}" variant="outline" class="w-full md:w-auto py-4 px-20">
             <span class="text-xl font-bebas text-[28px] tracking-widest gap-4">
-                <i class="fa-solid fa-shirt"></i> 
+                <i class="fa-solid fa-shirt"></i>
                 Buat Seragammu Sendiri!
                 <i class=" fa-solid fa-pen"></i>
             </span>
