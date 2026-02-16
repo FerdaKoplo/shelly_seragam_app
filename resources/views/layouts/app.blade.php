@@ -14,12 +14,12 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
 </head>
 
-<body>
+<bod>
     <div class="flex flex-col min-h-screen">
         @yield('body')
     </div>
     <x-shared.notification />
 
-</body>
+</bod>
 
 </html>

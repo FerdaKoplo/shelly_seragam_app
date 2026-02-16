@@ -54,7 +54,7 @@ Route::get('/katalog/{slug}', function ($slug) {
 })->name('product.show');
 
 
-Route::get('/kerannjang', function () {
+Route::get('/keranjang', function () {
     return view('pages.guest.keranjang.index');
 })->name('keranjang');
 
