@@ -81,16 +81,9 @@
                     <x-guest.katalog.color-swatch color="#5ce57d" id="green" />
                 </div>
             </div>
-
-            <div class="mb-8">
-                <span class="font-bold text-lg block mb-3">Quantity</span>
-                <div class="flex items-center border border-gray-300 w-24 rounded-md overflow-hidden">
-                    <button @click="if(quantity > 1) quantity--" class="px-3 py-1 text-xl hover:bg-gray-100 transition">-</button>
-                    <input type="text" x-model="quantity" class="w-full text-center border-none focus:ring-0 text-sm font-bold" readonly>
-                    <button @click="quantity++" class="px-3 py-1 text-xl hover:bg-gray-100 transition">+</button>
-                </div>
-            </div>
-
+            {{-- Quantity Button --}}
+            <x-shared.quantity-button model="quantity" :max="$product->stock" />
+            
             <div class="mt-10">
                 <p class="text-5xl font-bold mb-6">
                     Rp<span x-text="(quantity * basePrice).toLocaleString('id-ID')"></span>
