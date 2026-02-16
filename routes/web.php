@@ -83,6 +83,7 @@ Route::prefix('admin')->group(function () {
 
     Route::prefix('statistik-transaksi')->name('statistik.transaksi')->group(function () {
         Route::get('/', [StatistikPenjualanController::class, 'index']);
+        Route::get('/export', [StatistikPenjualanController::class, 'export'])->name('.export');
     });
 
     // Route::get('/manage-katalog', function () {
@@ -100,7 +101,7 @@ Route::prefix('admin')->group(function () {
     // })->name('statistik.transaksi');
 
     Route::get('/traffic', function () {
-        return view('pages.user.admin.statistik-transaksi.index');
+        return view('pages.user.admin.traffic.index');
     })->name('traffic');
 
 

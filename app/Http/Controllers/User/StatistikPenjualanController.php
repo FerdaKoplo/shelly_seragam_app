@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers\User;
 
+use App\Exports\ExportStatistikPenjualan;
 use App\Http\Controllers\Controller;
 use App\Models\Transaksi;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\TransaksiExport;
 
 class StatistikPenjualanController extends Controller
 {
@@ -12,7 +15,7 @@ class StatistikPenjualanController extends Controller
     {
         $query = Transaksi::query();
 
-        $allTransactions = $query->get();
+        $allTransactions = $query->with(['produkTransaksis', 'orderKustoms', 'pengiriman'])->paginate(10)->appends(request()->except('page'));
 
         if ($request->filled('bulan')) {
             $query->whereMonth('tanggal_transaksi', $request->bulan);
@@ -55,5 +58,12 @@ class StatistikPenjualanController extends Controller
             'salesData',
             'totalRevenue'
         ));
+    }
+
+    public function export(Request $request)
+    {
+        $bulan = $request->bulan;
+        $year = date('Y');
+        return Excel::download(new ExportStatistikPenjualan($bulan, $year), 'laporan-transaksi.xlsx');
     }
 }

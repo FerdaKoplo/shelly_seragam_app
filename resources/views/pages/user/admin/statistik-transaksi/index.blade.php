@@ -3,7 +3,7 @@
 @section('content')
 
 
-    <div class="px-12">
+    <div class="px-12 pb-20">
         <div class="flex mt-6 gap-16 ">
             <div class="flex flex-col gap-5 w-full">
                 <div class="relative">
@@ -130,54 +130,65 @@
             </div>
         </div>
 
-        <div class="flex flex-col gap-4">
-            <h1 class="text-4xl">
-                Data Transaksi
-            </h1>
+        <div class="flex items-end justify-between gap-8">
+            <div class="flex flex-col gap-4">
+                <h1 class="text-4xl">
+                    Data Transaksi
+                </h1>
 
-            <div>
-                <table>
-                    <tbody class="divide-y divide-gray-100">
-                        @foreach ($allTransactions as $transaction)
-                            @php
-                                $hasRegular = $transaction->produkTransaksis->count() > 0;
-                                $hasCustom = $transaction->orderKustoms->count() > 0;
+                <div>
+                    <table>
+                        <tbody class="divide-y divide-gray-100">
+                            @foreach ($allTransactions as $transaction)
+                                @php
+                                    $hasRegular = $transaction->produkTransaksis->count() > 0;
+                                    $hasCustom = $transaction->orderKustoms->count() > 0;
 
-                                $jenisProduk = '-';
-                                if ($hasRegular && $hasCustom) {
-                                    $jenisProduk = 'Mix (Katalog + Kustom)';
-                                } elseif ($hasCustom) {
-                                    $jenisProduk = 'Kustom';
-                                } elseif ($hasRegular) {
-                                    $jenisProduk = 'Katalog';
-                                }
-                            @endphp
+                                    $jenisProduk = '-';
+                                    if ($hasRegular && $hasCustom) {
+                                        $jenisProduk = 'Mix (Katalog + Kustom)';
+                                    } elseif ($hasCustom) {
+                                        $jenisProduk = 'Kustom';
+                                    } elseif ($hasRegular) {
+                                        $jenisProduk = 'Katalog';
+                                    }
+                                @endphp
 
-                            <tr class="hover:bg-gray-50 transition">
-                                <td class="px-6 py-4 text-sm font-medium text-gray-900">
-                                    #TRX{{ str_pad($transaction->transaksi_id, 3, '0', STR_PAD_LEFT) }}
-                                </td>
+                                <tr class="hover:bg-gray-50 transition">
+                                    <td class="px-6 py-4 text-sm font-medium text-gray-900">
+                                        #TRX{{ str_pad($transaction->transaksi_id, 3, '0', STR_PAD_LEFT) }}
+                                    </td>
 
-                                <td class="px-6 py-4 text-sm text-gray-600">
-                                    {{ $transaction->nama_customer }}
-                                </td>
+                                    <td class="px-6 py-4 text-sm text-gray-600">
+                                        {{ $transaction->nama_customer }}
+                                    </td>
 
-                                <td class="px-6 py-4 text-sm text-gray-600">
-                                    {{ $jenisProduk }}
-                                </td>
+                                    <td class="px-6 py-4 text-sm text-gray-600">
+                                        {{ $jenisProduk }}
+                                    </td>
 
-                                <td class="px-6 py-4 text-sm text-gray-600">
-                                    {{ $transaction->status  }}
-                                </td>
+                                    <td class="px-6 py-4 text-sm text-gray-600">
+                                        {{ $transaction->status  }}
+                                    </td>
 
-                                <td class="px-6 py-4 text-sm text-gray-600">
-                                    {{ $transaction->pengiriman->status_pengiriman ?? 'Belum Dikirim' }}
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+                                    <td class="px-6 py-4 text-sm text-gray-600">
+                                        {{ $transaction->pengiriman->status_pengiriman ?? 'Belum Dikirim' }}
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+                <div>
+                    {{ $allTransactions->onEachSide(1)->links('vendor.pagination.custom')  }}
+                </div>
             </div>
+
+            <a href="{{ route('statistik.transaksi.export', ['bulan' => request('bulan')]) }}"
+                class="bg-[#27AE60] text-center  text-white px-12 py-3 rounded-md hover:bg-green-700 transition">
+                Unduh Spreadsheet
+            </a>
+
         </div>
     </div>
     <script>

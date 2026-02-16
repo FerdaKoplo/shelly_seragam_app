@@ -1,5 +1,5 @@
 @if ($paginator->hasPages())
-    <nav role="navigation" aria-label="Pagination" class="flex items-center justify-center gap-2 ">
+    <nav role="navigation" aria-label="Pagination" class="flex items-center justify-center gap-2">
         
         @if ($paginator->onFirstPage())
             <span class="flex items-center justify-center w-10 h-10 border border-gray-300 rounded-md text-gray-300 cursor-not-allowed">
@@ -11,13 +11,6 @@
             </a>
         @endif
 
-        @php
-            $start = $paginator->currentPage() - 1; 
-            $end = $paginator->currentPage() + 1;   
-            if($start < 1) $start = 1;
-            if($end > $paginator->lastPage()) $end = $paginator->lastPage();
-        @endphp
-
         <a href="{{ $paginator->url(1) }}" class="flex items-center justify-center w-10 h-10 border {{ $paginator->currentPage() == 1 ? 'border-black bg-black text-white' : 'border-gray-300 text-gray-500 hover:border-black hover:text-black' }} rounded-md transition font-bold">
             1
         </a>
@@ -26,10 +19,10 @@
             <span class="flex items-center justify-center w-10 h-10 text-black font-bold text-lg">...</span>
         @endif
 
-        @foreach(range(2, $paginator->lastPage() - 1) as $page)
-            @if($page >= $paginator->currentPage() - 1 && $page <= $paginator->currentPage() + 1)
-                 @if ($page == $paginator->currentPage())
-                    <span aria-current="page" class="flex items-center justify-center w-10 h-10 border border-black rounded-md bg-white text-black font-bold">
+        @for ($page = 2; $page < $paginator->lastPage(); $page++)
+            @if ($page >= $paginator->currentPage() - 1 && $page <= $paginator->currentPage() + 1)
+                @if ($page == $paginator->currentPage())
+                    <span aria-current="page" class="flex items-center justify-center w-10 h-10 border border-black rounded-md bg-black text-white font-bold">
                         {{ $page }}
                     </span>
                 @else
@@ -38,7 +31,7 @@
                     </a>
                 @endif
             @endif
-        @endforeach
+        @endfor
 
         @if($paginator->currentPage() < $paginator->lastPage() - 2)
             <span class="flex items-center justify-center w-10 h-10 text-black font-bold text-lg">...</span>

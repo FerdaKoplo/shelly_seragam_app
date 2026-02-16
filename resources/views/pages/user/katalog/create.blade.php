@@ -221,9 +221,6 @@
                 </button>
             </div>
         </form>
-
-        {{-- Modals --}}
-
     </div>
 
     <x-user.katalog.modals.variasi_ukuran />
