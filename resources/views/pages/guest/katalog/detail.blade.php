@@ -18,7 +18,7 @@
         <h1 class="text-4xl font-bebas  tracking-widest">Detail Produk</h1>
     </div>
 
-    <div class=" grid grid-cols-1 lg:grid-cols-12 gap-4 mx-auto">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 mx-auto items-start">
         <div class="lg:col-span-1 flex flex-col space-y-4">
             @foreach(range(1, 4) as $i)
             @php
@@ -35,17 +35,17 @@
             @endforeach
         </div>
 
-        <div class="lg:col-span-6 bg-gray-50 flex items-center justify-center rounded-sm overflow-hidden min-h-[500px]">
+        <div class="lg:col-span-6 bg-gray-50 flex items-center justify-center rounded-sm overflow-hidden min-h-[500px] ">
             <img
                 :key="activeImage" {{-- Adding a key helps Alpine/Browser track the swap --}}
                 :src="activeImage"
                 alt="{{ $product->name }}"
-                class="max-h-[700px] object-fill transition-opacity duration-300"
+                class="max-h-[700px] object-fill transition-opacity duration-300 min-w-[700px]"
                 x-transition:enter="opacity-0"
                 x-transition:enter-end="opacity-100">
         </div>
 
-        <div class="lg:col-span-5">
+        <div class="lg:col-span-4 mx-auto">
             <h1 class="text-4xl font-normal text-gray-900 mb-2">{{ $product->name }}</h1>
             <p class="text-5xl font-bold mb-2">Rp{{ number_format($product->price, 0, ',', '.') }}</p>
             <p class="text-gray-600 mb-8">Stok: {{ $product->stock }}</p>
