@@ -63,7 +63,7 @@
                             <div x-data="{ selectedSize: item.size }" x-effect="item.size = selectedSize">
                                 <div class="flex justify-between items-center mb-3">
                                     <span class="font-bold text-lg">Ukuran</span>
-                                    <button type="button" class="text-xs flex items-center text-gray-500 hover:text-black">
+                                    <button type="button" @click="$dispatch('open-modal', 'modal-panduan-ukuran')" class="text-xs flex items-center text-gray-500 hover:text-black">
                                         <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m4 0h1"></path>
                                         </svg>
@@ -158,4 +158,6 @@
 
     </div>
 </div>
+
+<x-guest.katalog.modals.panduan-ukuran />
 @endsection
