@@ -9,7 +9,7 @@
     $baseClasses = "inline-flex items-center justify-center transition-all duration-200 font-medium uppercase tracking-wide border";
     
     $variants = [
-        'primary' => 'bg-black text-white hover:bg-gray-800',
+        'primary' => 'bg-black hover:bg-gray-800',
         'outline' => 'bg-white text-black border-gray-200 hover:border-black',
         'ghost'   => 'border-transparent text-gray-600 hover:text-black',
         'dark'    => 'bg-[#262626] text-white border-[#262626] hover:bg-black',

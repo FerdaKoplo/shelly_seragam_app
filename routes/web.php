@@ -59,6 +59,38 @@ Route::get('/keranjang', function () {
 })->name('keranjang');
 
 
+use Illuminate\Http\Request;
+
+Route::get('/checkout', function (Request $request) {
+    $type = $request->query('type', 'katalog');
+
+    $mockKatalogItems = [
+        ['id' => 1, 'name' => 'Kemeja Kotak', 'price' => 114000, 'quantity' => 2, 'size' => 'S', 'image' => 'product-1.png'],
+        ['id' => 2, 'name' => 'Kemeja Kotak Blue', 'price' => 114000, 'quantity' => 1, 'size' => 'M', 'image' => 'product-1.png'],
+    ];
+
+    $mockCustomData = [
+        'title' => 'Kain: Oxford Navy',
+        'qty' => '12 pcs',
+        'type' => 'Bundle (Atasan + Bawahan)',
+        'price' => 1750000,
+        'file' => 'desain_logo.png'
+    ];
+
+    $shippingOptions = [
+            ['id' => 'reg', 'label' => 'Regular', 'price' => 15000],
+            ['id' => 'exp', 'label' => 'Express', 'price' => 35000],
+    ];
+
+    return view('pages.guest.checkout.checkout', [
+        'type' => $type,
+        'items' => $mockKatalogItems,
+        'customData' => $mockCustomData,
+        'shippingOptions' => $shippingOptions
+    ]);
+})->name('checkout');
+
+
 // user routes
 Route::prefix('admin')->group(function () {
     // Pegawai

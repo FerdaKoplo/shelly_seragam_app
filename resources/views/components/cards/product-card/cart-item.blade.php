@@ -1,4 +1,9 @@
-{{-- resources/views/components/guest/cart/item.blade.php --}}
+{{-- USAGE
+    <template x-for="(item, index) in items" :key="item.id">
+                    <x-cards.product-card.cart-item/>
+                </template>
+    --}}
+    
 <div class="flex flex-col md:flex-row gap-6 border-b border-gray-100 pb-12 last:border-0 relative">
 
     <div class="w-full md:w-40">
@@ -24,6 +29,7 @@
             </div>
             <div class="grid grid-cols-3 gap-2">
                 <template x-for="sz in ['XS', 'S', 'M', 'L', 'XL', 'XXL']">
+
                     <label class="cursor-pointer">
                         <input type="radio"
                             :name="'size-' + item.id"

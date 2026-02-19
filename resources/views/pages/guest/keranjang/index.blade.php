@@ -86,7 +86,7 @@
                     <p class="text-5xl font-black tracking-wider" x-text="formatCurrency(total)"></p>
                 </div>
 
-                <form action="#" method="POST">
+                <form action="{{route('checkout')}}" method="#">
                     @csrf
                     {{-- Hidden inputs to send Alpine state to Backend --}}
                     <input type="hidden" name="cart_data" :value="JSON.stringify(items)">
@@ -96,7 +96,7 @@
                         type="submit"
                         variant="primary"
                         :rounded="false"
-                        class="text-2xl py-6 bg-black hover:bg-secondary hover:text-black tracking-widest">
+                        class="text-2xl py-6 text-white bg-black hover:bg-secondary hover:text-black tracking-widest">
                         Checkout
                     </x-shared.button>
                 </form>
