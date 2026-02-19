@@ -6,6 +6,7 @@ use App\Http\Controllers\User\KatalogProdukController;
 use App\Http\Controllers\User\PegawaiController;
 use App\Http\Controllers\User\StatistikPenjualanController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
 
 /*
 |--------------------------------------------------------------------------
@@ -59,7 +60,6 @@ Route::get('/keranjang', function () {
 })->name('keranjang');
 
 
-use Illuminate\Http\Request;
 
 Route::get('/checkout', function (Request $request) {
     $type = $request->query('type', 'katalog');

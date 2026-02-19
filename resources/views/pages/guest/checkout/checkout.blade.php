@@ -3,46 +3,42 @@
 
 @section('content')
 <div class="container mx-auto px-4 py-8 max-w-7xl"
-    x-data="{ 
-        type: '{{ $type ?? 'katalog' }}', {{-- Default to katalog if not set --}}
+    x-cloak
+    x-data='{ 
+        type: "{{ $type }}", 
+        items: @json($items),
+        customData: @json($customData),
+        shippingOptions: @json($shippingOptions),
         isSubmitting: false,
-        type: '{{ $type }}',
-        
-        items: @json($items ?? []),
-        customData: @json($customData ?? null),
-        shippingOptions: @json($shippingOptions ?? []),
-
         shippingMethod: null,
         shippingCost: 0,
+        notes: "",
+
         selectShipping(option) {
             this.shippingMethod = option.id;
             this.shippingCost = option.price;
         },
 
-        {{-- Shipping State --}}
-        shippingMethod: 'regular',
-        shippingCost: 15000,
-        
-        {{-- Calculations --}}
         get subtotal() {
-            return this.type === 'katalog' 
-                ? this.items.reduce((sum, item) => sum + (item.price * item.quantity), 0)
-                : this.customData.price;
+            if (this.type === "katalog") {
+                return this.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            }
+            return this.customData ? this.customData.price : 0;
         },
+
         get total() { 
             return this.subtotal + this.shippingCost; 
         },
 
         formatCurrency(num) {
-            return 'Rp' + num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+            return "Rp" + num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
         },
 
         async submitOrder() {
+            if(!this.shippingMethod) return alert("Silahkan pilih opsi pengiriman");
             this.isSubmitting = true;
-            // Gateway integration logic here
-            console.log('Processing ' + this.type + ' order...');
         }
-    }">
+    }'>
 
     {{-- Header with Back Button --}}
     <div class="flex items-center gap-4 mb-12">
@@ -56,26 +52,26 @@
 
     {{-- Main Grid --}}
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-16 items-start">
-        
+
         {{-- LEFT COLUMN: Forms --}}
         <div class="lg:col-span-6 space-y-12">
-             @include('pages.guest.checkout.partials.customer-info')
-             @include('pages.guest.checkout.partials.shipping-address')
-             
-             {{-- Only show Midtrans box for Katalog/Standard checkout --}}
-             <div x-show="type === 'katalog'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 transform -translate-y-2">
+            @include('pages.guest.checkout.partials.customer-info')
+            @include('pages.guest.checkout.partials.shipping-address')
+
+            {{-- Only show Midtrans box for Katalog/Standard checkout --}}
+            <div x-show="type === 'katalog'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 transform -translate-y-2">
                 @include('pages.guest.checkout.partials.payment-method')
-             </div>
+            </div>
         </div>
 
         {{-- RIGHT COLUMN: Order Content & Summary --}}
         <div class="lg:col-span-6 space-y-10">
-            
+
             {{-- Product Items (For Katalog) --}}
             <template x-if="type === 'katalog'">
                 <div class="space-y-6 max-h-[60vh] overflow-y-auto pr-2 no-scrollbar">
                     <template x-for="(item, index) in items" :key="item.id">
-                         <x-cards.product-card.cart-item />
+                        <x-cards.product-card.cart-item />
                     </template>
                 </div>
             </template>
