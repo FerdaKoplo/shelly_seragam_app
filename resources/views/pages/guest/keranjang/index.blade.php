@@ -34,64 +34,11 @@
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
-
-
         {{-- Left Column: Cart Items --}}
         <div class="lg:col-span-6">
-            {{--
-        Scrollable Container 
-        max-h-[800px]: limits height so total doesn't disappear
-        scrollbar-hide: keeps the UI clean (optional)
-        pr-4: gives space so the scrollbar doesn't overlap content
-    --}}
             <div class="space-y-12 overflow-y-auto max-h-[70vh] lg:max-h-[85vh] pr-4 no-scrollbar">
                 <template x-for="(item, index) in items" :key="item.id">
-                    <div class="flex flex-col md:flex-row gap-6 border-b border-gray-100 pb-12 last:border-0">
-                        {{-- Product Image & Label --}}
-                        <div class="w-full md:w-40">
-                            <div class="bg-gray-100 rounded-xl p-4 aspect-square flex items-center justify-center mb-2">
-                                <img :src="'/images/' + item.image" class="w-full object-contain">
-                            </div>
-                            <h3 class="font-bold text-lg" x-text="item.name"></h3>
-                            <p class="text-xs text-gray-400">#Kemeja #Katun #Formal</p>
-                            <p class="font-normal mt-1" x-text="formatCurrency(item.price)"></p>
-                        </div>
-
-                        {{-- Controls --}}
-                        <div class="flex-1 space-y-6">
-                            {{-- Size Selector --}}
-                            <div x-data="{ selectedSize: item.size }" x-effect="item.size = selectedSize">
-                                <div class="flex justify-between items-center mb-3">
-                                    <span class="font-bold text-lg">Ukuran</span>
-                                    <button type="button" @click="$dispatch('open-modal', 'modal-panduan-ukuran')" class="text-xs flex items-center text-gray-500 hover:text-black">
-                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m4 0h1"></path>
-                                        </svg>
-                                        Panduan Ukuran
-                                    </button>
-                                </div>
-                                <div class="grid grid-cols-3 gap-2">
-                                    <x-guest.katalog.size-selector id="XS" label="XS" />
-                                    <x-guest.katalog.size-selector id="S" label="S" />
-                                    <x-guest.katalog.size-selector id="M" label="M" />
-                                    <x-guest.katalog.size-selector id="L" label="L" />
-                                    <x-guest.katalog.size-selector id="XL" label="XL" />
-                                    <x-guest.katalog.size-selector id="XXL" label="XXL" />
-                                </div>
-                            </div>
-
-                            {{-- Quantity & Subtotal --}}
-                            <div class="flex justify-between items-end">
-                                <x-shared.quantity-button
-                                    model="item.quantity"
-                                    label="Quantity"
-                                    :min="1" />
-                                <div class="text-right pb-8">
-                                    <p class="text-2xl font-normal" x-text="formatCurrency(item.price * item.quantity)"></p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <x-cards.product-card.cart-item/>
                 </template>
             </div>
         </div>
