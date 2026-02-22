@@ -4,13 +4,16 @@
         <h3 class="font-bold text-xl mb-4">Catatan</h3>
         {{-- Kustom: Shows the specific requirement/static note --}}
         <div x-show="type === 'kustom'" class="text-gray-600 mb-4 italic">
-            <p>Lorem Ipsum Dolor Sit aAmet</p> 
+            <p>Lorem Ipsum Dolor Sit aAmet</p>
         </div>
         {{-- Katalog: Shows the editable textarea --}}
-        <textarea 
-            x-show="type === 'katalog'" 
+
+
+        <textarea
+            x-show="type === 'katalog'"
             x-model="notes"
-            class="w-full bg-slate-100 border-none rounded-xl h-32 focus:ring-black p-4" 
+            rows="6"
+            class="w-full border border-gray-300 rounded-md p-4 focus:ring-1 focus:ring-black outline-none"
             placeholder="Tambahkan catatan untuk pesanan Anda...">
         </textarea>
     </div>
@@ -35,7 +38,7 @@
         <div class="text-right mb-6">
             {{-- Main Large Total --}}
             <h2 class="text-6xl font-black tracking-tighter" x-text="formatCurrency(total)"></h2>
-            
+
             {{-- Kustom Specific Disclaimer --}}
             <p x-show="type === 'kustom'" class="text-gray-400 text-sm mt-2">
                 *Harga estimasi. Admin akan menghubungi untuk konfirmasi.
@@ -49,7 +52,7 @@
             :rounded="false"
             ::disabled="isSubmitting"
             class="w-full text-4xl py-4 bg-secondary text-black hover:bg-black hover:text-white transition-all font-bebas tracking-widest uppercase disabled:opacity-50">
-            
+
             <div class="flex items-center justify-center gap-3">
                 {{-- Spinner shown during gateway handshake --}}
                 <template x-if="isSubmitting">
@@ -58,7 +61,7 @@
                         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
                 </template>
-                
+
                 <span x-show="!isSubmitting && type === 'katalog'">Bayar</span>
                 <span x-show="!isSubmitting && type === 'kustom'">Buat Pesanan</span>
                 <span x-show="isSubmitting">Memproses...</span>

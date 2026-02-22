@@ -62,6 +62,7 @@ Route::get('/keranjang', function () {
 
 
 Route::get('/checkout', function (Request $request) {
+
     $type = $request->query('type', 'katalog');
 
     $mockKatalogItems = [
