@@ -4,9 +4,11 @@
 
 {{-- 1. Hero Section --}}
 
-<div class=" flex w-full bg-orange-400 text-orange-400 text-[4px]"> Cina </div>
+{{-- <div class=" flex w-full bg-orange-400 text-orange-400 text-[4px]"> Cina </div> --}}
+<div class="w-full h-2 bg-orange-400"></div>
 @include('pages.guest.landing.partials.hero')
-<div class=" flex w-full bg-black text-[6px]"> Nigga </div>
+{{-- <div class=" flex w-full bg-black text-[6px]"> Nigga </div> --}}
+<div class="w-full h-2 bg-black"></div>
 
 {{-- 2. Stats Banner --}}
 @include('pages.guest.landing.partials.stats')
