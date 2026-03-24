@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\User\KatalogProdukController;
+use App\Http\Controllers\User\ManageKustomisasiController;
 use App\Http\Controllers\User\PegawaiController;
 use App\Http\Controllers\User\StatistikPenjualanController;
 use Illuminate\Support\Facades\Route;
@@ -79,8 +80,8 @@ Route::get('/checkout', function (Request $request) {
     ];
 
     $shippingOptions = [
-            ['id' => 'reg', 'label' => 'Regular', 'price' => 15000],
-            ['id' => 'exp', 'label' => 'Express', 'price' => 35000],
+        ['id' => 'reg', 'label' => 'Regular', 'price' => 15000],
+        ['id' => 'exp', 'label' => 'Express', 'price' => 35000],
     ];
 
     return view('pages.guest.checkout.checkout', [
@@ -119,19 +120,14 @@ Route::prefix('admin')->group(function () {
         Route::get('/export', [StatistikPenjualanController::class, 'export'])->name('.export');
     });
 
-    // Route::get('/manage-katalog', function () {
-    //     return view('pages.user.katalog.index');
-    // })->name('manage.katalog');
-
-    Route::get('/manage-kustom', function () {
-        return view('pages.user.kustom.index');
-    })->name('manage.kustom');
-
-
-    // Admin
-    // Route::get('/statistik-transaksi', function () {
-    //     return view('pages.user.admin.statistik-transaksi.index');
-    // })->name('statistik.transaksi');
+    Route::prefix('manage-kustom')->name('manage.kustom')->group(function () {
+        Route::get('/', [ManageKustomisasiController::class, 'index'])->name('');
+        Route::get('/create', [ManageKustomisasiController::class, 'create'])->name('.create');
+        Route::post('/', [ManageKustomisasiController::class, 'store'])->name('.store');
+        Route::get('/{id}/edit', [ManageKustomisasiController::class, 'edit'])->name('.edit');
+        Route::put('/{id}', [ManageKustomisasiController::class, 'update'])->name('.update');
+        Route::delete('/{id}', [ManageKustomisasiController::class, 'destroy'])->name('.destroy');
+    });
 
     Route::get('/traffic', function () {
         return view('pages.user.admin.traffic.index');

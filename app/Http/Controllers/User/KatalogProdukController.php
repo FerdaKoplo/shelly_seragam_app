@@ -60,7 +60,7 @@ class KatalogProdukController extends Controller
         }
 
         $categories = ProdukKatalog::select('kategori')->distinct()->pluck('kategori');
-        $katalog = $query->paginate(18)->appends(request()->except('page'));;
+        $katalog = $query->paginate(18)->appends(request()->except('page'));
 
         return view('pages.user.katalog.index', compact('katalog', 'categories'));
     }

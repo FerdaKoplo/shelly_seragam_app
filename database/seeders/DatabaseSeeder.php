@@ -33,10 +33,9 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
             ProdukSeeder::class,
+            TransaksiSeeder::class,
+            ProdukKustomSeeder::class
         ]);
 
-        $this->call([
-            TransaksiSeeder::class,
-        ]);
     }
 }
