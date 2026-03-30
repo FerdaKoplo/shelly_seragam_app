@@ -27,9 +27,9 @@ class LoginController extends Controller
             $request->session()->regenerate();
 
             if (Auth::user()->role == 'Admin') {
-                return redirect()->route('manage.transaksi');
-            } else {
                 return redirect()->route('statistik.transaksi');
+            } else {
+                return redirect()->route('manage.transaksi');
             }
         }
 

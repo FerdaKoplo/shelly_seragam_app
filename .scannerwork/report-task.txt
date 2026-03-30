@@ -1,0 +1,6 @@
+projectKey=ShellySeragam
+serverUrl=http://localhost:9000
+serverVersion=26.2.0.119303
+dashboardUrl=http://localhost:9000/dashboard?id=ShellySeragam
+ceTaskId=2190eb93-39e0-4485-a0c8-610fb37c91a8
+ceTaskUrl=http://localhost:9000/api/ce/task?id=2190eb93-39e0-4485-a0c8-610fb37c91a8
