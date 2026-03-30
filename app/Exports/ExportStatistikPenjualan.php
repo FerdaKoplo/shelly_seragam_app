@@ -23,7 +23,12 @@ class ExportStatistikPenjualan implements FromCollection, WithHeadings, WithMapp
     }
     public function collection()
     {
-        $query = Transaksi::query()->whereYear('tanggal_transaksi', $this->year);
+
+        try {
+            $query = Transaksi::query()->whereYear('tanggal_transaksi', $this->year);
+        } catch (\exception $e) {
+            return back()->with('error', 'Gagal mendapatkan tanggal transaksi ' . $e->getMessage());
+        }
 
         if ($this->bulan) {
             $query->whereMonth('tanggal_transaksi', $this->bulan);
@@ -47,14 +52,25 @@ class ExportStatistikPenjualan implements FromCollection, WithHeadings, WithMapp
 
     public function map($transaksi): array
     {
+        if ($transaksi->produkTransaksis->count() > 0) {
+            $jenisProduk = 'Katalog';
+        } elseif ($transaksi->orderKustoms->count() > 0) {
+            $jenisProduk = 'Kustom';
+        } else {
+            $jenisProduk = 'Tidak Diketahui';
+        }
+
+        $statusPengiriman = $transaksi->pengiriman
+            ? $transaksi->pengiriman->status_pengiriman
+            : 'Belum Dikirim';
         return [
             $transaksi->transaksi_id,
             $transaksi->nama_customer,
             $transaksi->tanggal_transaksi,
-            $transaksi->produkTransaksis->count() > 0 ? 'Katalog' : ($transaksi->orderKustoms->count() > 0 ? 'Kustom' : 'Tidak Diketahui'),
+            $jenisProduk,
             $transaksi->total_harga,
             $transaksi->status,
-            $transaksi->pengiriman ? $transaksi->pengiriman->status_pengiriman : 'Belum Dikirim',
+            $statusPengiriman,
         ];
     }
 }
