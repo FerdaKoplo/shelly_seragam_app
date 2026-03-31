@@ -28,6 +28,14 @@ class DatabaseSeeder extends Seeder
             'username' => 'pegawai',
             'email' => 'testpgw@example.com',
             'role' => 'Pegawai',
+            'password' => Hash::make('testpegawai')
+        ]);
+
+        \App\Models\User::create([
+            'nama' => 'Budi Santoso',
+            'username' => 'budi.santoso',
+            'email' => 'budisantoso@example.com',
+            'role' => 'Pegawai',
             'password' => Hash::make('pegawai')
         ]);
 

@@ -20,7 +20,7 @@
             this.formData.nama = p.nama;
             this.formData.username = p.username;
             this.formData.password = ''; // Leave password blank for security
-            this.pegawaiIsActive = (p.status === 'aktif');
+            this.pegawaiIsActive = (p.status === 'Active');
             this.actionUrl = '/manage-pegawai/' + p.user_id;
         },
 
@@ -42,8 +42,8 @@
                 class="border border-gray-300 rounded px-4 py-2 w-64 focus:outline-none focus:ring-1 focus:ring-gray-400">
             <select name="status" class="border border-gray-300 rounded px-4 py-2 bg-white">
                 <option value="">Semua Status</option>
-                <option value="aktif">Aktif</option>
-                <option value="non-aktif">Non-Aktif</option>
+                <option value="Active">Aktif</option>
+                <option value="Inactive">Non-Aktif</option>
             </select>
             <button type="submit" class="bg-gray-700 text-white px-4 py-2 rounded">Filter</button>
         </form>
@@ -135,7 +135,7 @@
 
             <div class="flex justify-end gap-0 pt-2">
                 {{-- Actual hidden input for the database --}}
-                <input type="hidden" name="status" :value="pegawaiIsActive ? 'aktif' : 'non-aktif'">
+                <input type="hidden" name="status" :value="pegawaiIsActive ? 'Active' : 'Inactive'">
 
                 <button type="button" @click="pegawaiIsActive = false"
                     class="border px-4 py-1 text-xs rounded-l transition-colors"
