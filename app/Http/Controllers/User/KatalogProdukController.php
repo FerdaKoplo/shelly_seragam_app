@@ -141,7 +141,6 @@ class KatalogProdukController extends Controller
             }
 
             DB::commit();
-            dd("product created");
             return redirect()->route('manage.katalog')->with('success', 'Produk berhasil ditambahkan!');
         } catch (\Exception $e) {
             DB::rollBack();
