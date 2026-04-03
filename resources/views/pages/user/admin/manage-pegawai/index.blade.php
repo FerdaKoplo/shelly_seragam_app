@@ -45,7 +45,7 @@
                 <option value="Active" {{ request('status') == 'Active' ? 'selected' : '' }}>Aktif</option>
                 <option value="Inactive" {{ request('status') == 'Inactive' ? 'selected' : '' }}>Non-Aktif</option>
             </select>
-            <button type="submit" class="bg-gray-700 text-white px-4 py-2 rounded">Filter</button>
+            <button type="submit" id="submitFilter" class="bg-gray-700 text-white px-4 py-2 rounded">Filter</button>
         </form>
 
     </div>
