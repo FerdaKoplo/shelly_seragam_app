@@ -1,8 +1,6 @@
 @extends('layouts.user.layout')
 @section('title', 'Statistik Transaksi')
 @section('content')
-
-
     <div class="px-12 pb-20">
         <div class="flex mt-6 gap-16 ">
             <div class="flex flex-col gap-5 w-full">
@@ -27,9 +25,7 @@
                                         d="M9.36413 12.75C8.59433 14.0833 6.66983 14.0833 5.90003 12.75L0.270868 3C-0.498933 1.66667 0.463317 -1.54465e-06 2.00292 -1.41006e-06L13.2612 -4.25822e-07C14.8008 -2.91226e-07 15.7631 1.66667 14.9933 3L9.36413 12.75Z"
                                         fill="#1A1919" />
                                 </svg>
-
                             </div>
-
                         </div>
                     </form>
                 </div>
@@ -139,6 +135,12 @@
                 <div>
                     <table>
                         <tbody class="divide-y divide-gray-100">
+                            <th>ID</th>
+                            <th>Nama Customer</th>
+                            <th>Jenis Produk</th>
+                            <th>Jenis Produk</th>
+                            <th>Jenis Produk</th>
+
                             @foreach ($allTransactions as $transaction)
                                 @php
                                     $hasRegular = $transaction->produkTransaksis->count() > 0;
@@ -195,12 +197,10 @@
         document.addEventListener('DOMContentLoaded', function () {
             const ctx = document.getElementById('salesChart').getContext('2d');
 
-            // 1. Data Setup
             const labels = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
 
-            // This is your actual data (e.g., from Laravel)
             const salesData = @json($salesData);
-            const maxValue = Math.max(...salesData) > 0 ? Math.max(...salesData) + 10 : 100; // fallback to 100 if empty
+            const maxValue = Math.max(...salesData) > 0 ? Math.max(...salesData) + 10 : 100; 
             const backgroundData = salesData.map(() => maxValue);
 
             new Chart(ctx, {
@@ -211,23 +211,21 @@
                         {
                             label: 'Penjualan',
                             data: salesData,
-                            backgroundColor: '#EBCD5E', // The Gold/Yellow color
+                            backgroundColor: '#EBCD5E', 
                             hoverBackgroundColor: '#DKB940',
                             barThickness: 12,
-                            borderRadius: 20, // Makes it fully rounded
-                            borderSkipped: false, // Ensures bottom is also rounded
+                            borderRadius: 20, 
+                            borderSkipped: false, 
                             order: 1
                         },
                         {
-                            // THE BACKGROUND TRACK (Light Blue)
                             label: 'Target',
                             data: backgroundData,
-                            backgroundColor: '#F2F7FF', // Very light blue/gray
+                            backgroundColor: '#F2F7FF', 
                             hoverBackgroundColor: '#F2F7FF',
-                            barThickness: 12, // Must match the dataset above
+                            barThickness: 12, 
                             borderRadius: 20,
                             borderSkipped: false,
-                            // Important: Draw this BEHIND
                             order: 2
                         }
                     ]
@@ -243,7 +241,7 @@
 
                     plugins: {
                         legend: {
-                            display: false // Hide the legend box at the top
+                            display: false 
                         },
                         tooltip: {
                             filter: function (tooltipItem) {
@@ -256,13 +254,13 @@
                     },
                     scales: {
                         x: {
-                            stacked: true, // Helps with alignment
+                            stacked: true, 
                             grid: {
-                                display: false, // Hide X grid lines
+                                display: false, 
                                 drawBorder: false
                             },
                             ticks: {
-                                color: '#9CA3AF', // Gray text
+                                color: '#9CA3AF', 
                                 font: {
                                     size: 11
                                 }
@@ -270,10 +268,10 @@
                         },
                         y: {
                             beginAtZero: true,
-                            max: maxValue, // Ensure Y axis fits the background bar
+                            max: maxValue, 
                             grid: {
-                                color: '#F3F4F6', // Very light gray grid lines
-                                borderDash: [5, 5], // Dashed lines
+                                color: '#F3F4F6', 
+                                borderDash: [5, 5], 
                                 drawBorder: false
                             },
                             ticks: {

@@ -2,6 +2,7 @@
 @section('title', 'Create - Katalog')
 
 @section('content')
+<x-shared.notification />
     <div class="px-6 pb-12 " x-data="{
                                 images: [],
                                 variations: [], 
@@ -216,6 +217,7 @@
                 </div>
 
                 <button type="submit"
+                    id="submitProduk"
                     class="w-full bg-[#323232] text-white py-3 rounded-md font-medium hover:opacity-90 transition">
                     Tambahkan Produk
                 </button>

@@ -26,6 +26,7 @@
 
                 <div class="flex items-center w-full gap-5">
                     <input type="text" placeholder="Username"
+                    id="usernameInput"
                         name="username"
                         class="flex-1 placeholder:text-[#D0D0D0] p-2 rounded-lg border-black border  outline-none w-full">
                     <svg width="19" height="19" viewBox="0 0 19 19" fill="none" xmlns="http://www.w3.org/2000/svg">

@@ -9,6 +9,8 @@ class ProdukKustom extends Model
 {
     use HasFactory;
 
+        protected $table = 'produk_kustom';
+
     protected $primaryKey = 'kustom_id';
 
     protected $fillable = [

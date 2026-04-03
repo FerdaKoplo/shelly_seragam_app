@@ -18,6 +18,7 @@
     x-show="show" 
     x-transition.opacity.duration.300ms
     style="display: none;" 
+    id="notificationOverlay"
     class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
 >
     <div 

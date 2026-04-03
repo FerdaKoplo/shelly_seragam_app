@@ -28,15 +28,22 @@ class DatabaseSeeder extends Seeder
             'username' => 'pegawai',
             'email' => 'testpgw@example.com',
             'role' => 'Pegawai',
+            'password' => Hash::make('testpegawai')
+        ]);
+
+        \App\Models\User::create([
+            'nama' => 'Budi Santoso',
+            'username' => 'budi.santoso',
+            'email' => 'budisantoso@example.com',
+            'role' => 'Pegawai',
             'password' => Hash::make('pegawai')
         ]);
 
         $this->call([
             ProdukSeeder::class,
+            TransaksiSeeder::class,
+            ProdukKustomSeeder::class
         ]);
 
-        $this->call([
-            TransaksiSeeder::class,
-        ]);
     }
 }

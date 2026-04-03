@@ -51,7 +51,7 @@ class KatalogProdukController extends Controller
                 case 'archived':
                     $query->where('stok', '<', 0);
                     break;
-                default: 
+                default:
                     $query->where('stok', '>=', 0);
                     break;
             }
@@ -60,7 +60,7 @@ class KatalogProdukController extends Controller
         }
 
         $categories = ProdukKatalog::select('kategori')->distinct()->pluck('kategori');
-        $katalog = $query->paginate(18)->appends(request()->except('page'));;
+        $katalog = $query->paginate(18)->appends(request()->except('page'));
 
         return view('pages.user.katalog.index', compact('katalog', 'categories'));
     }
@@ -117,11 +117,11 @@ class KatalogProdukController extends Controller
                             $data = json_decode($item['data'], true);
 
 
-                            $opsiValue = json_encode($data);
+                            // $opsiValue = json_encode($data);
 
                             PilihanDetailProduk::create([
                                 'detail_produk_id' => $detail->detail_produk_id,
-                                'opsi' => $opsiValue,
+                                'opsi' => $data, //
                                 'pengaruh_harga' => 0,
                             ]);
                         }
@@ -141,9 +141,7 @@ class KatalogProdukController extends Controller
             }
 
             DB::commit();
-
             return redirect()->route('manage.katalog')->with('success', 'Produk berhasil ditambahkan!');
-
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error($e);
@@ -165,6 +163,10 @@ class KatalogProdukController extends Controller
             foreach ($detail->pilihanDetails as $pilihan) {
 
                 $data = $pilihan->opsi;
+
+                 if (!is_array($data)) {
+                    $data = json_decode($data, true) ?? [];
+                }
 
 
                 $data['type'] = $type;
@@ -254,7 +256,6 @@ class KatalogProdukController extends Controller
 
             DB::commit();
             return redirect()->route('manage.katalog')->with('success', 'Produk berhasil diperbarui!');
-
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error($e);
@@ -303,5 +304,4 @@ class KatalogProdukController extends Controller
             return back()->with('error', 'Gagal menghapus produk.');
         }
     }
-
 }

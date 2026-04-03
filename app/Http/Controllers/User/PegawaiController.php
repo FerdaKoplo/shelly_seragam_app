@@ -65,7 +65,6 @@ class PegawaiController extends Controller
             'status'   => 'required|in:Active,Inactive',
         ]);
 
-        // Only update password if provided
         if ($request->filled('password')) {
             $data['password'] = bcrypt($request->password);
         }

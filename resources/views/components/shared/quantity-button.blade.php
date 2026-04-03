@@ -2,7 +2,8 @@
     'label' => 'Quantity',
     'min' => 1,
     'max' => 99,
-    'model' => 'quantity' {{-- Default variable name --}}
+    'model' => 'quantity' 
+    // {{-- Default variable name --}}
 ])
 
 <div class="mb-8">

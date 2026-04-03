@@ -5,14 +5,13 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
-use function PHPUnit\Framework\isEmpty;
 
 class LoginController extends Controller
 {
     public function __invoke(Request $request)
     {
     
-        $validate = $request->validate([
+        $request->validate([
             'username' => 'required|string',
             'password' => 'required|string|max:255'
         ], [
@@ -27,9 +26,9 @@ class LoginController extends Controller
             $request->session()->regenerate();
 
             if (Auth::user()->role == 'Admin') {
-                return redirect()->route('manage.transaksi');
-            } else {
                 return redirect()->route('statistik.transaksi');
+            } else {
+                return redirect()->route('manage.transaksi');
             }
         }
 
