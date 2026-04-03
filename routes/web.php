@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\User\KatalogProdukController;
 use App\Http\Controllers\User\ManageKustomisasiController;
 use App\Http\Controllers\User\PegawaiController;
@@ -21,11 +21,12 @@ use Illuminate\Http\Request;
 */
 
 // auth
-
 Route::get('/login', function () {
     return view('pages.auth.login');
 });
 Route::post('/login', LoginController::class)->name('login');
+
+Route::post('/logout', LogoutController::class)->middleware('auth')->name('logout');
 
 
 

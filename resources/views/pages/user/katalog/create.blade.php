@@ -2,6 +2,7 @@
 @section('title', 'Create - Katalog')
 
 @section('content')
+<x-shared.notification />
     <div class="px-6 pb-12 " x-data="{
                                 images: [],
                                 variations: [], 

@@ -23,16 +23,23 @@
             </div>
 
             <div class="flex flex-col gap-3">
-                <x-shared.button variant="outline" class="justify-between text-sm" href="https://maps.app.goo.gl/SM9DLWgfabvBqfbx8">
-                    Lihat di Google Maps <span>📍</span>
+                <x-shared.button variant="outline" class="justify-between text-sm"
+                    href="https://maps.app.goo.gl/SM9DLWgfabvBqfbx8" target="_blank" rel="noopener noreferrer">
+                    Lihat di Google Maps <span aria-hidden="true">📍</span>
                 </x-shared.button>
-                <x-shared.button variant="outline" class="justify-between text-sm" href="https://wa.me/+6282139101450">
-                    Hubungi Kami <span>💬</span>
+
+                <x-shared.button variant="outline" class="justify-between text-sm"
+                    href="https://wa.me/6287893385014?text=Halo%20Shelly%20Seragam%2C%20saya%20ingin%20konsultasi."
+                    target="_blank" rel="noopener noreferrer" aria-label="Hubungi Shelly Seragam via WhatsApp">
+                    Hubungi Kami <span aria-hidden="true">💬</span>
                 </x-shared.button>
             </div>
         </div>
 
-        <div class="absolute top-1/2 -left-4 md:-left-8 transform -translate-y-1/2 cursor-pointer text-3xl opacity-50">❮</div>
-        <div class="absolute top-1/2 -right-4 md:-right-8 transform -translate-y-1/2 cursor-pointer text-3xl opacity-50">❯</div>
+        <div class="absolute top-1/2 -left-4 md:-left-8 transform -translate-y-1/2 cursor-pointer text-3xl opacity-50">❮
+        </div>
+        <div
+            class="absolute top-1/2 -right-4 md:-right-8 transform -translate-y-1/2 cursor-pointer text-3xl opacity-50">
+            ❯</div>
     </div>
 </section>

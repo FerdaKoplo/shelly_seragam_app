@@ -20,8 +20,8 @@
             this.formData.nama = p.nama;
             this.formData.username = p.username;
             this.formData.password = ''; // Leave password blank for security
-            this.pegawaiIsActive = (p.status === 'aktif');
-            this.actionUrl = '/manage-pegawai/' + p.user_id;
+            this.pegawaiIsActive = (p.status === 'Active');
+            this.actionUrl = '/admin/manage-pegawai/' + p.user_id;
         },
 
         resetForm() {
@@ -38,14 +38,14 @@
     {{-- TABLE HEADER --}}
     <div class="flex justify-between items-center mb-6">
         <form action="{{ route('manage.pegawai') }}" method="GET" class="flex gap-4">
-            <input type="text" name="search" placeholder="Cari Nama/Username..."
+            <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari Nama/Username..."
                 class="border border-gray-300 rounded px-4 py-2 w-64 focus:outline-none focus:ring-1 focus:ring-gray-400">
             <select name="status" class="border border-gray-300 rounded px-4 py-2 bg-white">
                 <option value="">Semua Status</option>
-                <option value="aktif">Aktif</option>
-                <option value="non-aktif">Non-Aktif</option>
+                <option value="Active" {{ request('status') == 'Active' ? 'selected' : '' }}>Aktif</option>
+                <option value="Inactive" {{ request('status') == 'Inactive' ? 'selected' : '' }}>Non-Aktif</option>
             </select>
-            <button type="submit" class="bg-gray-700 text-white px-4 py-2 rounded">Filter</button>
+            <button type="submit" id="submitFilter" class="bg-gray-700 text-white px-4 py-2 rounded">Filter</button>
         </form>
 
     </div>
@@ -100,6 +100,7 @@
     {{-- PAGINATION --}}
     <div class="mt-4">
         {{-- {{ $pegawai->links() }} --}}
+        {{ $pegawai->appends(request()->query())->links() }}
     </div>
 
     {{-- FORM --}}
@@ -135,7 +136,7 @@
 
             <div class="flex justify-end gap-0 pt-2">
                 {{-- Actual hidden input for the database --}}
-                <input type="hidden" name="status" :value="pegawaiIsActive ? 'aktif' : 'non-aktif'">
+                <input type="hidden" name="status" :value="pegawaiIsActive ? 'Active' : 'Inactive'">
 
                 <button type="button" @click="pegawaiIsActive = false"
                     class="border px-4 py-1 text-xs rounded-l transition-colors"

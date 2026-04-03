@@ -3,7 +3,10 @@
         SHELLY ADMIN PANEL
     </h1>
 
-    <button class="font-bold text-warningPrimary">
-        <p>Logout</p>
-    </button>
+    <form method="POST" action="{{ route('logout') }}">
+        @csrf
+        <button type="submit" data-cy="logout-button" class="font-bold text-warningPrimary">
+            Logout
+        </button>
+    </form>
 </nav>

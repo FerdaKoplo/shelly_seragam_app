@@ -141,9 +141,8 @@ class KatalogProdukController extends Controller
             }
 
             DB::commit();
-
+            dd("product created");
             return redirect()->route('manage.katalog')->with('success', 'Produk berhasil ditambahkan!');
-
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error($e);
@@ -258,7 +257,6 @@ class KatalogProdukController extends Controller
 
             DB::commit();
             return redirect()->route('manage.katalog')->with('success', 'Produk berhasil diperbarui!');
-
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error($e);
@@ -307,5 +305,4 @@ class KatalogProdukController extends Controller
             return back()->with('error', 'Gagal menghapus produk.');
         }
     }
-
 }
