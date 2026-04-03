@@ -102,7 +102,7 @@ Route::prefix('admin')->group(function () {
 
 
     Route::prefix('manage-katalog')->name('manage.katalog')->group(function () {
-        Route::get('/', [KatalogProdukController::class, 'index']);
+        Route::get('/', [KatalogProdukController::class, 'index'])->name('');
         Route::get('/create', [KatalogProdukController::class, 'create'])->name('.create');
         Route::post('/', [KatalogProdukController::class, 'store'])->name('.store');
         Route::get('/{id}/edit', [KatalogProdukController::class, 'edit'])->name('.edit');

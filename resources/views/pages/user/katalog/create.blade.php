@@ -216,6 +216,7 @@
                 </div>
 
                 <button type="submit"
+                    id="submitProduk"
                     class="w-full bg-[#323232] text-white py-3 rounded-md font-medium hover:opacity-90 transition">
                     Tambahkan Produk
                 </button>

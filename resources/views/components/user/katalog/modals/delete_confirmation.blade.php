@@ -25,7 +25,7 @@
                 @method('DELETE')
                 <button type="submit"
                     class="w-full py-2.5 rounded-md bg-[#323232] text-white font-medium hover:opacity-90 transition shadow-md">
-                    Hapu
+                    Hapus
                 </button>
             </form>
         </div>
