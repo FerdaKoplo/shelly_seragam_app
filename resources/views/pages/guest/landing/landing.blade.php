@@ -33,12 +33,18 @@
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {{-- We will create a loop here later --}}
-            @foreach (range(1, 9) as $item)
-                <a href="{{ route('product.show', 'kemeja-kotak-' . $item) }}">
-                    <x-cards.product-card.horizontal />
+
+            @forelse ($katalogTerbaru as $item)
+                @php
+                    $image = optional($item->fotos->first())->path ?? 'placeholder.jpg';
+                @endphp
+                <a href="{{ route('product.show', $item->katalog_id) }}">
+                    <x-cards.product-card.horizontal :name="$item->produk->nama_produk" :price="number_format($item->harga, 0, ',', '.')" image="placeholder.jpg" />
                 </a>
-            @endforeach
+            @empty
+                <p class="text-gray-500">Belum ada katalog.</p>
+            @endforelse
+
         </div>
 
     </section>

@@ -8,6 +8,8 @@ use App\Http\Controllers\User\PegawaiController;
 use App\Http\Controllers\User\StatistikPenjualanController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Guest\LandingController;
+use App\Http\Controllers\Guest\KatalogController;
 
 /*
 |--------------------------------------------------------------------------
@@ -28,41 +30,30 @@ Route::post('/login', LoginController::class)->name('login');
 
 Route::post('/logout', LogoutController::class)->middleware('auth')->name('logout');
 
-
-
 // guest routes
-Route::get('/', function () {
-    return view('pages.guest.landing.landing');
-})->name('home');
 
+// Home (landing) -> DB
+Route::get('/', [LandingController::class, 'index'])->name('home');
+
+// Kustom (masih statis view)
 Route::get('/kustom', function () {
     return view('pages.guest.kustom.index');
 })->name('kustom');
 
-Route::get('/katalog', function () {
-    return view('pages.guest.katalog.index');
-})->name('katalog');
-Route::get('/katalog/{slug}', function ($slug) {
-    // a mock object to simulate a database record
-    $product = (object) [
-        'name' => 'Kemeja Kotak-Kotak Casual',
-        'price' => 114000,
-        'stock' => 100,
-        'description' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-        'tags' => ['#Kemeja', '#Katun', '#Formal'],
-        'slug' => $slug
-    ];
+// Katalog list -> DB
+Route::get('/katalog', [KatalogController::class, 'index'])->name('katalog');
 
-    return view('pages.guest.katalog.detail', compact('product'));
-})->name('product.show');
+// Katalog detail -> DB (ganti dari {slug} mock jadi {id})
+Route::get('/katalog/{id}', [KatalogController::class, 'show'])
+    ->whereNumber('id')
+    ->name('product.show');
 
-
+// Keranjang (masih statis view)
 Route::get('/keranjang', function () {
     return view('pages.guest.keranjang.index');
 })->name('keranjang');
 
-
-
+// Checkout (masih mock, nanti bisa integrasi bertahap)
 Route::get('/checkout', function (Request $request) {
 
     $type = $request->query('type', 'katalog');
@@ -92,7 +83,6 @@ Route::get('/checkout', function (Request $request) {
         'shippingOptions' => $shippingOptions
     ]);
 })->name('checkout');
-
 
 // user routes
 Route::prefix('admin')->group(function () {
