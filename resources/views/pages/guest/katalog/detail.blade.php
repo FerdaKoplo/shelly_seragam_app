@@ -2,53 +2,76 @@
 @section('title', 'Katalog Seragam')
 @section('content')
 
+@php
+    $firstFoto = $item->fotos->first();
+    $fallbackImage = 'https://picsum.photos/id/1/1080';
+    
+    $firstImageUrl = $firstFoto ? asset('storage/' . $firstFoto->path) : $fallbackImage;
+
+    $basePrice = (float) $item->harga;
+@endphp
+
 <div class="max-w-full mx-auto px-4 py-8"
-    x-data="{ 
-        activeImage: 'https://picsum.photos/id/1/1080', 
+    x-data="{
+        activeImage: '{{ $firstImageUrl }}',
         quantity: 1,
         selectedSize: 'M',
         selectedColor: 'red',
-        basePrice: {{ $product->price }}
-     }">
+        basePrice: {{ $basePrice }}
+    }">
 
     <div class="flex items-center gap-4 mb-8">
         <a href="{{ route('katalog') }}" class="p-2 hover:bg-gray-100 rounded-full transition-colors">
             <i class="fa-solid fa-chevron-left text-xl"></i>
         </a>
-        <h1 class="text-4xl font-bebas  tracking-widest">Detail Produk</h1>
+        <h1 class="text-4xl font-bebas tracking-widest">Detail Produk</h1>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 mx-auto items-start">
-        <div class="lg:col-span-1 flex flex-col space-y-4">
-            @foreach(range(1, 4) as $i)
-            @php
-            // Mocking different images using the index
-            $thumbnailUrl = "https://picsum.photos/id/" . $i . "/1080" ;
-            @endphp
 
-            <button
-                @click="activeImage = '{{ $thumbnailUrl }}'"
-                class="border transition-all duration-200 aspect-[3/4] overflow-hidden"
-                :class="activeImage === '{{ $thumbnailUrl }}' ? 'border-black ring-1 ring-black' : 'border-transparent hover:border-gray-300'">
-                <img src="{{ $thumbnailUrl }}" alt="Thumbnail {{ $i }}" class="w-full h-full object-cover">
-            </button>
-            @endforeach
+        {{-- Thumbnails --}}
+        <div class="lg:col-span-1 flex flex-col space-y-4">
+            @forelse($item->fotos as $foto)
+                @php $url = asset('storage/' . $foto->path); @endphp
+
+                <button
+                    type="button"
+                    @click="activeImage = '{{ $url }}'"
+                    class="border transition-all duration-200 aspect-[3/4] overflow-hidden"
+                    :class="activeImage === '{{ $url }}' ? 'border-black ring-1 ring-black' : 'border-transparent hover:border-gray-300'">
+                    <img src="{{ $url }}" alt="Thumbnail" class="w-full h-full object-cover">
+                </button>
+            @empty
+                {{-- fallback kalau belum ada foto --}}
+                @foreach(range(1, 4) as $i)
+                    @php $thumbnailUrl = "https://picsum.photos/id/" . $i . "/1080"; @endphp
+                    <button
+                        type="button"
+                        @click="activeImage = '{{ $thumbnailUrl }}'"
+                        class="border transition-all duration-200 aspect-[3/4] overflow-hidden"
+                        :class="activeImage === '{{ $thumbnailUrl }}' ? 'border-black ring-1 ring-black' : 'border-transparent hover:border-gray-300'">
+                        <img src="{{ $thumbnailUrl }}" alt="Thumbnail {{ $i }}" class="w-full h-full object-cover">
+                    </button>
+                @endforeach
+            @endforelse
         </div>
 
-        <div class="lg:col-span-6 bg-gray-50 flex items-center justify-center rounded-sm overflow-hidden min-h-[500px] ">
+        {{-- Main image --}}
+        <div class="lg:col-span-6 bg-gray-50 flex items-center justify-center rounded-sm overflow-hidden min-h-[500px]">
             <img
-                :key="activeImage" {{-- Adding a key helps Alpine/Browser track the swap --}}
+                :key="activeImage"
                 :src="activeImage"
-                alt="{{ $product->name }}"
+                alt="{{ $item->produk->nama_produk }}"
                 class="max-h-[700px] object-fill transition-opacity duration-300 min-w-[700px]"
                 x-transition:enter="opacity-0"
                 x-transition:enter-end="opacity-100">
         </div>
 
+        {{-- Product info --}}
         <div class="lg:col-span-4 mx-auto">
-            <h1 class="text-4xl font-normal text-gray-900 mb-2">{{ $product->name }}</h1>
-            <p class="text-5xl font-bold mb-2">Rp{{ number_format($product->price, 0, ',', '.') }}</p>
-            <p class="text-gray-600 mb-8">Stok: {{ $product->stock }}</p>
+            <h1 class="text-4xl font-normal text-gray-900 mb-2">{{ $item->produk->nama_produk }}</h1>
+            <p class="text-5xl font-bold mb-2">Rp{{ number_format($item->harga, 0, ',', '.') }}</p>
+            <p class="text-gray-600 mb-8">Stok: {{ $item->stok }}</p>
 
             <div class="mb-6">
                 <div class="flex justify-between items-center mb-3">
@@ -81,9 +104,10 @@
                     <x-guest.katalog.color-swatch color="#5ce57d" id="green" />
                 </div>
             </div>
+
             {{-- Quantity Button --}}
-            <x-shared.quantity-button model="quantity" :max="$product->stock" />
-            
+            <x-shared.quantity-button model="quantity" :max="$item->stok" />
+
             <div class="mt-10">
                 <p class="text-5xl font-bold mb-6">
                     Rp<span x-text="(quantity * basePrice).toLocaleString('id-ID')"></span>
@@ -105,12 +129,12 @@
         <p class="text-gray-500 mb-2">Terjual : 1.231.214</p>
         <h3 class="font-bold mb-2">Deskripsi</h3>
         <p class="text-gray-600 leading-relaxed mb-6">
-            {{ $product->description }}
+            {{ $item->produk->deskripsi }}
         </p>
+
         <div class="flex gap-2 font-bold text-black uppercase tracking-wider text-sm">
-            @foreach($product->tags as $tag)
-            <span>{{ $tag }}</span>
-            @endforeach
+            <span>#{{ $item->kategori }}</span>
+            <span>#{{ $item->produk->jenis_produk }}</span>
         </div>
     </div>
 </div>
