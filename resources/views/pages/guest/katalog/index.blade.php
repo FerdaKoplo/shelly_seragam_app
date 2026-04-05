@@ -36,16 +36,6 @@
         {{-- Product Grid --}}
         @if ($katalog->count())
             <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-x-4 gap-y-8">
-                {{-- @foreach ($katalog as $item)
-                <a href="{{ route('product.show', $item->katalog_id) }}" class="block hover:opacity-90 transition">
-                    <x-cards.product-card.vertical
-                        :name="$item->produk->nama_produk"
-                        :category="'#' . $item->kategori"
-                        :price="number_format($item->harga, 0, ',', '.')"
-                        image="placeholder.jpg"
-                    />
-                </a>
-            @endforeach --}}
                 @foreach ($katalog as $item)
                     @php
                         $firstFoto = $item->fotos->first();
@@ -95,6 +85,7 @@
 
     </div>
 
-    <x-guest.katalog.modals.filter-produk-katalog />
+    {{-- <x-guest.katalog.modals.filter-produk-katalog /> --}}
+    <x-guest.katalog.modals.filter-produk-katalog :categories="$categories" />
 
 @endsection
