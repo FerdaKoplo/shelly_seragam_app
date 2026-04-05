@@ -1,26 +1,101 @@
 <x-shared.modal_base name="modal-filter-produk-katalog" title="Filter Produk" maxWidth="3xl">
-    <div x-data="{ 
-        filters: [],
-        toggleFilter(id) {
-            if (this.filters.includes(id)) {
-                this.filters = this.filters.filter(f => f !== id);
-            } else {
-                this.filters.push(id);
-            }
-        },
-        resetFilters() {
-            this.filters = [];
-        },
-        applyFilters() {
-            console.log('Applying filters:', this.filters);
-            // You can redirect here: window.location.href = '/katalog?filter=' + this.filters.join(',');
-            this.closeModal();
-        },
-        
-    }">
-        <div class="space-y-6 text-left">
+    <div
+        x-data="{
+            filters: [],
 
-            {{-- Pakaian Untuk Section --}}
+            groups: {
+                kategori: ['kategori-semua','seragam','formal','atasan','jas','batik','setelan'],
+                ukuran: ['size-semua','size-s','size-m','size-l','size-xl','size-xxl'],
+                sort: ['relevan','highest-price','lowest-price','newest','best-selling'],
+                stok: ['stok-ready','stok-empty'],
+            },
+
+            toggleFilter(id) {
+                // kalau id termasuk salah satu group, treat sebagai single-select group
+                for (const [groupName, ids] of Object.entries(this.groups)) {
+                    if (ids.includes(id)) {
+                        // remove semua id lain dalam group yang sama
+                        this.filters = this.filters.filter(f => !ids.includes(f));
+                        break;
+                    }
+                }
+
+                // toggle id on/off
+                if (this.filters.includes(id)) {
+                    this.filters = this.filters.filter(f => f !== id);
+                } else {
+                    this.filters.push(id);
+                }
+            },
+
+            resetFilters() {
+                const url = new URL(window.location.href);
+
+                // tetap pertahankan search & min/max harga kalau user sudah isi via URL
+                const keep = new URLSearchParams();
+                ['search','min_harga','max_harga'].forEach((k) => {
+                    const v = url.searchParams.get(k);
+                    if (v !== null && v !== '') keep.set(k, v);
+                });
+
+                const query = keep.toString();
+                window.location.href = query ? (`/katalog?${query}`) : '/katalog';
+            },
+
+            applyFilters() {
+                const url = new URL(window.location.href);
+
+                // bersihkan param filter dulu
+                ['filter_kategori','filter_status','sort','filter_ukuran'].forEach((k) => url.searchParams.delete(k));
+
+                // kategori (sesuai DB; controller pakai exact match)
+                const kategoriMap = {
+                    seragam: 'Seragam',
+                    formal: 'Formal',
+                    atasan: 'Atasan',
+                    jas: 'Jas',
+                    batik: 'Batik',
+                    setelan: 'Setelan',
+                };
+                for (const id of this.filters) {
+                    if (kategoriMap[id]) {
+                        url.searchParams.set('filter_kategori', kategoriMap[id]);
+                        break;
+                    }
+                }
+
+                // stok/ketersediaan -> filter_status (sesuai controller)
+                if (this.filters.includes('stok-ready')) url.searchParams.set('filter_status', 'ready');
+                if (this.filters.includes('stok-empty')) url.searchParams.set('filter_status', 'empty');
+                // kalau tidak ada stok-selected, default backend sudah: stok >= 0
+
+                // sort (sesuai controller)
+                if (this.filters.includes('highest-price')) url.searchParams.set('sort', 'price_high');
+                else if (this.filters.includes('lowest-price')) url.searchParams.set('sort', 'price_low');
+                else if (this.filters.includes('newest')) url.searchParams.set('sort', 'newest');
+                // relevan / best-selling belum didukung controller -> skip
+
+                // ukuran (siapkan dulu; backend menyusul)
+                const sizeMap = {
+                    'size-s': 'S',
+                    'size-m': 'M',
+                    'size-l': 'L',
+                    'size-xl': 'XL',
+                    'size-xxl': 'XXL',
+                };
+                for (const id of this.filters) {
+                    if (sizeMap[id]) {
+                        url.searchParams.set('filter_ukuran', sizeMap[id]);
+                        break;
+                    }
+                }
+
+                window.location.href = url.toString();
+            },
+        }"
+    >
+        <div class="space-y-6 text-left">
+            {{-- Pakaian Untuk (belum di-handle backend; tetap UI saja dulu) --}}
             <div>
                 <h4 class="font-bold text-gray-900 mb-3">Pakaian Untuk</h4>
                 <div class="flex flex-wrap gap-3">
@@ -29,7 +104,7 @@
                 </div>
             </div>
 
-            {{-- Kategori Section --}}
+            {{-- Kategori --}}
             <div>
                 <h4 class="font-bold text-gray-900 mb-3">Kategori</h4>
                 <div class="flex flex-wrap gap-3">
@@ -40,14 +115,23 @@
                     <x-guest.katalog.filter-button label="Jas" id="jas" />
                     <x-guest.katalog.filter-button label="Batik" id="batik" />
                     <x-guest.katalog.filter-button label="Setelan" id="setelan" />
-                    <button class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center">
-                        <i class="fa-solid fa-chevron-right text-xs"></i>
-                    </button>
                 </div>
             </div>
 
+            {{-- Ketersediaan (ini yang dibutuhkan untuk CUS002) --}}
+            <div>
+                <h4 class="font-bold text-gray-900 mb-3">Ketersediaan</h4>
+                <div class="flex flex-wrap gap-3">
+                    <x-guest.katalog.filter-button label="Stok Ready" id="stok-ready" />
+                    <x-guest.katalog.filter-button label="Stok Habis" id="stok-empty" />
+                </div>
+                <p class="text-xs text-gray-500 mt-2">
+                    Default: semua produk yang tidak diarsipkan (stok &gt;= 0).
+                </p>
+            </div>
+
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {{-- Material Kain Section --}}
+                {{-- Material Kain (belum di-handle backend; tetap UI saja dulu) --}}
                 <div>
                     <h4 class="font-bold text-gray-900 mb-3">Material Kain</h4>
                     <div class="grid grid-cols-3 gap-2">
@@ -60,7 +144,7 @@
                     </div>
                 </div>
 
-                {{-- Ukuran Section --}}
+                {{-- Ukuran (param disiapkan; backend menyusul) --}}
                 <div>
                     <h4 class="font-bold text-gray-900 mb-3">Ukuran</h4>
                     <div class="grid grid-cols-3 gap-2">
@@ -74,7 +158,7 @@
                 </div>
             </div>
 
-            {{-- Urutkan Section --}}
+            {{-- Urutkan --}}
             <div>
                 <h4 class="font-bold text-gray-900 mb-3">Urutkan</h4>
                 <div class="flex flex-wrap gap-3">
@@ -84,14 +168,19 @@
                     <x-guest.katalog.filter-button label="Terbaru" id="newest" />
                     <x-guest.katalog.filter-button label="Paling Laris" id="best-selling" />
                 </div>
+                <p class="text-xs text-gray-500 mt-2">
+                    Saat ini yang dipakai: Terbaru / Harga Tertinggi / Harga Terendah.
+                </p>
             </div>
         </div>
 
+        {{-- debug chips terpilih --}}
         <div x-show="filters.length > 0" class="mt-8 pt-6 border-t border-gray-100">
             <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Filter Terpilih:</p>
             <div class="flex flex-wrap gap-2">
                 <template x-for="filterId in filters" :key="filterId">
-                    <span class="inline-flex items-center gap-1 px-3 py-1 bg-gray-100 text-gray-800 text-xs font-bold rounded-full border border-gray-200">
+                    <span
+                        class="inline-flex items-center gap-1 px-3 py-1 bg-gray-100 text-gray-800 text-xs font-bold rounded-full border border-gray-200">
                         <span x-text="filterId"></span>
                         <button @click="toggleFilter(filterId)" class="hover:text-red-500 transition-colors">
                             <i class="fa-solid fa-xmark ml-1"></i>
@@ -103,7 +192,8 @@
 
         <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end gap-3">
             <div class="flex justify-end gap-3 w-full">
-                <button @click="resetFilters()" class="px-8 py-2 font-bold text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
+                <button @click="resetFilters()"
+                    class="px-8 py-2 font-bold text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
                     Hapus Filter
                 </button>
                 <button @click="applyFilters()"
