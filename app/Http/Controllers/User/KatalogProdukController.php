@@ -22,12 +22,19 @@ class KatalogProdukController extends Controller
         if ($request->filled('search')) {
             $search = $request->search;
 
-            $query->where(function ($q) use ($search) {
-                $q->whereHas('produk', function ($subQ) use ($search) {
+            // $query->where(function ($q) use ($search) {
+            //     $q->whereHas('produk', function ($subQ) use ($search) {
+            //         $subQ->where('nama_produk', 'like', '%' . $search . '%');
+            //     })
+            //         ->orWhere('kategori', 'like', '%' . $search . '%');
+            // });
+            if ($request->filled('search')) {
+                $search = $request->search;
+
+                $query->whereHas('produk', function ($subQ) use ($search) {
                     $subQ->where('nama_produk', 'like', '%' . $search . '%');
-                })
-                    ->orWhere('kategori', 'like', '%' . $search . '%');
-            });
+                });
+            }
         }
         if ($request->filled('filter_kategori')) {
             $query->where('kategori', $request->filter_kategori);
@@ -164,7 +171,7 @@ class KatalogProdukController extends Controller
 
                 $data = $pilihan->opsi;
 
-                 if (!is_array($data)) {
+                if (!is_array($data)) {
                     $data = json_decode($data, true) ?? [];
                 }
 
