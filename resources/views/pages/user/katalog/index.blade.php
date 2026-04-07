@@ -16,7 +16,7 @@
             </div>
 
             <form method="GET" action="{{ route('manage.katalog') }}" class="flex-1 relative">
-                <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari Produk"
+                <input type="text" id="searchInput" name="search" value="{{ request('search') }}" placeholder="Cari Produk"
                     class="w-full p-2 rounded-md  border border-black focus:outline-none">
                 <div class="absolute right-4 top-1/2 transform -translate-y-1/2">
                     <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
