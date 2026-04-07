@@ -1,7 +1,8 @@
 <div x-data="{ 
         show: false, 
         message: 'Something went wrong', 
-        title: 'Error' 
+        title: 'Error',
+        type: ''
     }" x-init="
         @if($errors->any())
             show = true;
