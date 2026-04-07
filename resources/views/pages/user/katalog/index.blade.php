@@ -5,7 +5,7 @@
     <div x-data class="flex gap-16 flex-col justify-center  items-center px-10">
         <div class="flex items-center gap-7 w-full">
             <div>
-                <button type="button" @click="$dispatch('open-modal', 'modal-filter-katalog')"
+                <button id="btn-filter-katalog" type="button" @click="$dispatch('open-modal', 'modal-filter-katalog')"
                     class="border border-black p-2.5 rounded-md hover:bg-gray-50 transition">
                     <svg width="19" height="19" viewBox="0 0 19 19" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path
@@ -41,13 +41,13 @@
                     $photoUrl = $firstPhoto ? asset('storage/' . $firstPhoto->path) : asset('images/default-product.jpg');
                 @endphp
 
-                <div class="bg-white shadow-md rounded-2xl relative group hover:shadow-lg transition">
+                <div data-cy="produk-card" + data-archived="true/false" + data-produk-id class="bg-white shadow-md rounded-2xl relative group hover:shadow-lg transition">
 
                     @if($isArchived)
                         <form action="{{ route('manage.katalog.restore', $item->produk_id) }}" method="POST">
                             @csrf
                             @method('PUT')
-                            <button type="submit" class="absolute top-0 right-0  p-3 rounded-full transition z-10"
+                            <button data-cy="btn-restore-produk" type="submit" class="absolute top-0 right-0  p-3 rounded-full transition z-10"
                                 title="Pulihkan Produk">
                                 <svg width="20" height="20" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path
@@ -58,7 +58,7 @@
                             </button>
                         </form>
                     @else
-                        <a href="{{ route('manage.katalog.edit', $item->produk_id) }}"
+                        <a data-cy="btn-edit-produk" href="{{ route('manage.katalog.edit', $item->produk_id) }}"
                             class="absolute top-0 right-0 bg-white p-3 rounded-full shadow-md hover:bg-gray-100 transition z-10">
                             <svg width="20" height="20" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path
@@ -89,10 +89,9 @@
                         @endif --}}
                     </div>
 
-                    <div class="space-y-1 grid grid-cols-1 px-2 pb-3">
-
+                    <div  class="space-y-1 grid grid-cols-1 px-2 pb-3">
                         <div class="{{ $isArchived ? 'opacity-50' : '' }}">
-                            <h3 class="font-bold text-xl text-gray-900 truncate">
+                            <h3 data-cy="produk-nama" class="font-bold text-xl text-gray-900 truncate">
                                 {{ $item->produk->nama_produk ?? 'Nama Produk' }}
                             </h3>
                             <p class="text-[10px] text-gray-500">#{{ $item->kategori ?? 'Kategori' }}</p>
@@ -106,7 +105,7 @@
                             @if($isArchived)
                                 @auth
                                     @if(auth()->user()->role === 'Admin')
-                                        <button type="button"
+                                        <button type="button" data-cy="btn-delete-produk"
                                             @click="$dispatch('open-modal', 'modal-delete-confirmation'); $dispatch('set-archive-url', '{{ route('manage.katalog.destroy', $item->produk_id) }}')"
                                             class="text-gray-700 hover:text-red-600 transition" title="Hapus Produk">
 
@@ -121,7 +120,7 @@
 
 
                             @else
-                                <button type="button"
+                                <button data-cy="btn-archive-produk" type="button"
                                     @click="$dispatch('open-modal', 'modal-archive-confirmation'); $dispatch('set-archive-url', '{{ route('manage.katalog.archive', $item->produk_id) }}')"
                                     class="text-gray-700 hover:text-red-600 transition" title="Arsip Produk">
                                     <svg width="20" height="20" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -145,7 +144,7 @@
 
     {{-- floating button --}}
     <a href="{{ route('manage.katalog.create') }}">
-        <button
+        <button id="btn-tambah-produk-baru"
             class="z-50 fixed bottom-8 flex font-inter items-center gap-3 right-4 px-5 bg-white border border-black text-black p-3 rounded-full shadow-md ">
             <p>
                 Tambahkan Produk Baru

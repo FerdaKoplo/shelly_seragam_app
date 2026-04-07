@@ -241,12 +241,12 @@
 
 
                 <div class="flex flex-col gap-3">
-                    <button type="submit"
+                    <button type="submit" id="btn-simpan-perubahan"
                         class="w-full bg-[#323232] text-white py-3 rounded-md font-medium hover:opacity-90 transition">
                         Simpan Perubahan
                     </button>
                     {{-- placeholder for arsip --}}
-                    <button type="button"
+                    <button type="button" id="btn-arsipkan-produk" data-cy="btn-archive-produk-edit"
                         class="w-full border border-black py-3 rounded-md font-medium hover:bg-gray-50 transition">
                         Arsipkan Produk
                     </button>
