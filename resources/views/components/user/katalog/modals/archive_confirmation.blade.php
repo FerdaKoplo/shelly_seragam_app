@@ -15,12 +15,12 @@
         </div>
 
         <div class="w-full space-y-3">
-            <button type="button" @click="closeModal()"
+            <button type="button" @click="closeModal()" id="archiveModalDismiss"
                 class="w-full py-2.5 rounded-md border border-black text-black font-medium hover:bg-gray-50 transition">
                 Batal
             </button>
 
-            <form :action="url" method="POST" class="w-full">
+            <form :action="url" method="POST" class="w-full" id="archiveModalConfirm">
                 @csrf
                 @method('PUT')
                 <button type="submit"
