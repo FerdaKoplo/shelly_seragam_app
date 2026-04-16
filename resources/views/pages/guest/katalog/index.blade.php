@@ -45,7 +45,7 @@
         $imageUrl = $firstFoto ? asset('storage/' . $firstFoto->path) : $fallbackImage;
         @endphp
 
-        <a data-cy="product-item-{{ $item->katalog_id }}" href="{{ route('product.show', $item->katalog_id) }}" class="block hover:opacity-90 transition">
+        <a data-cy="product-item" href="{{ route('product.show', $item->katalog_id) }}" class="block hover:opacity-90 transition">
             <x-cards.product-card.vertical :name="$item->produk->nama_produk" :category="'#' . $item->kategori" :price="number_format($item->harga, 0, ',', '.')"
                 :image="$imageUrl" />
         </a>

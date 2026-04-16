@@ -92,8 +92,7 @@
 
                 window.location.href = url.toString();
             },
-        }"
-    >
+        }">
         <div class="space-y-6 text-left">
             {{-- Pakaian Untuk (belum di-handle backend; tetap UI saja dulu) --}}
             <div>
@@ -148,12 +147,12 @@
                 <div>
                     <h4 class="font-bold text-gray-900 mb-3">Ukuran</h4>
                     <div class="grid grid-cols-3 gap-2">
-                        <x-guest.katalog.filter-button :data-cy="'filter-' + id" label="All Size" id="size-semua" />
-                        <x-guest.katalog.filter-button :data-cy="'filter-' + id" label="S" id="size-s" />
-                        <x-guest.katalog.filter-button :data-cy="'filter-' + id" label="M" id="size-m" />
-                        <x-guest.katalog.filter-button :data-cy="'filter-' + id" label="L" id="size-l" />
-                        <x-guest.katalog.filter-button :data-cy="'filter-' + id" label="XL" id="size-xl" />
-                        <x-guest.katalog.filter-button l:data-cy="'filter-' + id" abel="XXL" id="size-xxl" />
+                        <x-guest.katalog.filter-button label="All Size" id="size-semua" />
+                        <x-guest.katalog.filter-button label="S" id="size-s" />
+                        <x-guest.katalog.filter-button label="M" id="size-m" />
+                        <x-guest.katalog.filter-button label="L" id="size-l" />
+                        <x-guest.katalog.filter-button label="XL" id="size-xl" />
+                        <x-guest.katalog.filter-button label="XXL" id="size-xxl" />
                     </div>
                 </div>
             </div>
@@ -193,12 +192,12 @@
         <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end gap-3">
             <div class="flex justify-end gap-3 w-full">
                 <button @click="resetFilters()"
-                 data-cy="btn-reset-filter"
+                    data-cy="btn-reset-filter"
                     class="px-8 py-2 font-bold text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
                     Hapus Filter
                 </button>
                 <button @click="applyFilters()"
-                  data-cy="btn-apply-filter"
+                    data-cy="btn-apply-filter"
                     class="px-8 py-2 font-bold text-white bg-[#333333] rounded-md hover:bg-black transition-colors">
                     Terapkan Filter
                 </button>

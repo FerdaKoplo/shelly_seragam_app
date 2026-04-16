@@ -1,7 +1,7 @@
 @props(['label', 'id', 'active' => false])
 
 <button
-    :data-cy="'filter-' + id"
+    data-cy="filter-{{ $id }}"
     type="button"
     data-initial-active="{{ $active ? 'true' : 'false' }}"
     data-id="{{ $id }}"
