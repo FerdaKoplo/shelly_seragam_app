@@ -17,7 +17,7 @@ class ProdukSeeder extends Seeder
     {
         $faker = Faker::create('id_ID'); 
 
-        $kategoris = ['Seragam Sekolah', 'Seragam Kantor', 'Kaos', 'Jaket', 'Celana', 'Aksesoris'];
+        $kategoris = ['Atasan', 'Seragam Sekolah', 'Seragam Kantor', 'Kaos', 'Jaket', 'Celana', 'Aksesoris'];
         
         for ($i = 0; $i < 100; $i++) {
             $now = Carbon::now();
