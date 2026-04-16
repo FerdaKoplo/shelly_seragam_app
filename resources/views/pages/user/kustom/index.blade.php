@@ -26,8 +26,8 @@
 
             x-data="{ active: '{{ $sections[0] ?? '' }}' }">
 
-            <div class="border border-black  py-3 rounded-2xl px-4 gap-4 flex pr-12" data-cy="btn-add-kustom">
-                <a href="{{ route('manage.kustom.create') }}"
+            <div class="border border-black  py-3 rounded-2xl px-4 gap-4 flex pr-12" >
+                <a href="{{ route('manage.kustom.create') }}" data-cy="btn-add-kustom"
                     class="inline-flex items-center py-1.5 px-14 bg-white border border-dashed border-black text-black rounded-lg font-medium text-lg hover:bg-gray-50 transition">
                     +
                 </a>

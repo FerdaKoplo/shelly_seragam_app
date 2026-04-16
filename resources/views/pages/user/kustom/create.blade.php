@@ -12,8 +12,8 @@ $existingSections = \App\Models\ProdukKustom::pluck('spesifikasi_khusus')->toArr
 @endphp
 
 <div class="flex justify-start mt-6 px-10 pb-20">
+    </template>
     <div class="w-full flex flex-col gap-6">
-
         <div class="flex items-center gap-4">
             <a href="{{ route('manage.kustom') }}" class="text-gray-400 hover:text-black transition">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -83,7 +83,7 @@ $existingSections = \App\Models\ProdukKustom::pluck('spesifikasi_khusus')->toArr
                         x-transition:enter-end="opacity-100 scale-100"
                         class="border-2 border-dashed border-gray-300 rounded-xl p-6 flex flex-col gap-5 relative">
 
-                        <button type="button" @click="sec.showKombinasi = false" data-cy="btn-add-aspek-utama"
+                        <button type="button" @click="sec.showKombinasi = false"
                             class="absolute top-3 right-4 text-gray-400 hover:text-black font-bold text-sm">X</button>
 
                         <h3 class="text-2xl font-bold">Kombinasi Jenis Kain</h3>
@@ -92,6 +92,7 @@ $existingSections = \App\Models\ProdukKustom::pluck('spesifikasi_khusus')->toArr
                         <div class="flex gap-3 flex-wrap items-center">
                             @foreach($allCounts as $n)
                             <button type="button"
+                                data-cy="toggle-kombinasi-{{ $n }}"
                                 @click="toggleCount(sIdx, {{ $n }})"
                                 :class="sec.enabledCounts.includes({{ $n }})
                                         ? 'bg-black text-white border-black'
@@ -159,6 +160,7 @@ $existingSections = \App\Models\ProdukKustom::pluck('spesifikasi_khusus')->toArr
                 <button type="button"
                     @click="tambahAspek(sIdx)"
                     x-show="!sec.showKombinasi || !sec.showBordir"
+                    data-cy="btn-add-aspek-utama"
                     class="w-full border border-dashed border-gray-400 rounded-xl py-4 text-sm text-gray-500 hover:bg-gray-50 transition">
                     Tambahkan Aspek Utama
                 </button>
