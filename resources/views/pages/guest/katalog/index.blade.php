@@ -38,6 +38,7 @@
             <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-x-4 gap-y-8">
                 @foreach ($katalog as $item)
                     @php
+                    $fallbackImage = "https://picsum.photos/seed/picsum/200/300";
                         $firstFoto = $item->fotos->first();
                         $fc;$item->katalog_id . '/600/800';
                         $imageUrl = $firstFoto ? asset('storage/' . $firstFoto->path) : $fallbackImage;
