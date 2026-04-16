@@ -1,7 +1,8 @@
 <div x-data="{ 
         show: false, 
         message: 'Something went wrong', 
-        title: 'Error' 
+        title: 'Error',
+        type: ''
     }" x-init="
         @if($errors->any())
             show = true;
@@ -21,7 +22,7 @@
     class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
     <div @click.outside="show = false" :class="type === 'success' ? 'bg-green-100' : 'bg-warningSecondary'"
         class="relative w-[400px] rounded-2xl shadow-xl p-8 py-12 flex flex-col items-center justify-center text-center">
-        <button @click="show = false" :class="type === 'success' ? 'text-green-600' : 'text-warningPrimary'"
+        <button id="btnDismiss" @click="show = false" :class="type === 'success' ? 'text-green-600' : 'text-warningPrimary'"
             class="absolute top-1 font-semibold right-4 hover:opacity-75 transition">
             <p class="font-inter">X</p>
         </button>

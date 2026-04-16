@@ -69,6 +69,7 @@
 
             <div class="flex justify-center pt-4">
                 <button type="submit"
+                id="btnLogin"
                     class="bg-neutral w-full text-white px-12 py-4 rounded-lg uppercase tracking-widest font-semibold">
                     Login
                 </button>

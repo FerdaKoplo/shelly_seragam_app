@@ -39,6 +39,25 @@ class DatabaseSeeder extends Seeder
             'password' => Hash::make('pegawai')
         ]);
 
+
+        \App\Models\User::create([
+            'nama' => 'Temp Pegawai',
+            'username' => 'temp_pegawai',
+            'email' => 'temp_pegawai@example.com',
+            'role' => 'Pegawai',
+            'password' => Hash::make('pegawai')
+        ]);
+
+
+        \App\Models\User::create([
+            'nama' => 'Ahmad Fauzi',
+            'username' => 'ahmad.fauzi',
+            'email' => 'ahmad.fauzi@example.com',
+            'role' => 'Pegawai',
+            'password' => Hash::make('pegawai')
+        ]);
+
+
         $this->call([
             ProdukSeeder::class,
             TransaksiSeeder::class,

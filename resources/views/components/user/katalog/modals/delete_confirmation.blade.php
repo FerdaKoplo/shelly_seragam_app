@@ -16,6 +16,7 @@
 
         <div class="w-full space-y-3">
             <button type="button" @click="closeModal()"
+            id="deleteModalDismiss"
                 class="w-full py-2.5 rounded-md border border-black text-black font-medium hover:bg-gray-50 transition">
                 Batal
             </button>
@@ -24,6 +25,7 @@
                 @csrf
                 @method('DELETE')
                 <button type="submit"
+                id="deleteModalConfirm"
                     class="w-full py-2.5 rounded-md bg-[#323232] text-white font-medium hover:opacity-90 transition shadow-md">
                     Hapus
                 </button>
