@@ -49,7 +49,7 @@ class KatalogProdukController extends Controller
                     $query->where('stok', '=', 0);
                     break;
                 case 'archived':
-                    $query->where('stok', '<', 0);
+                    $query->where('status', 'Arsip');
                     break;
                 default:
                     $query->where('stok', '>=', 0);
@@ -116,7 +116,6 @@ class KatalogProdukController extends Controller
                         foreach ($items as $item) {
                             $data = json_decode($item['data'], true);
 
-
                             // $opsiValue = json_encode($data);
 
                             PilihanDetailProduk::create([
@@ -141,7 +140,9 @@ class KatalogProdukController extends Controller
             }
 
             DB::commit();
+
             return redirect()->route('manage.katalog')->with('success', 'Produk berhasil ditambahkan!');
+
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error($e);
@@ -167,7 +168,6 @@ class KatalogProdukController extends Controller
                  if (!is_array($data)) {
                     $data = json_decode($data, true) ?? [];
                 }
-
 
                 $data['type'] = $type;
                 $existingVariations[] = $data;
@@ -256,6 +256,7 @@ class KatalogProdukController extends Controller
 
             DB::commit();
             return redirect()->route('manage.katalog')->with('success', 'Produk berhasil diperbarui!');
+
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error($e);
@@ -268,7 +269,7 @@ class KatalogProdukController extends Controller
     {
         try {
             $katalog = ProdukKatalog::where('produk_id', $id)->firstOrFail();
-            $katalog->update(['stok' => -1]);
+            $katalog->update(['status' => 'Arsip']);
 
             return redirect()->route('manage.katalog')->with('success', 'Produk berhasil diarsipkan.');
         } catch (\Exception $e) {
@@ -280,7 +281,7 @@ class KatalogProdukController extends Controller
         try {
 
             $katalog = ProdukKatalog::where('produk_id', $id)->firstOrFail();
-            $katalog->update(['stok' => 0]);
+            $katalog->update(['status' => 'Tersedia']);
             return back()->with('success', 'Produk dipulihkan.');
         } catch (\Exception $e) {
             return back()->with('error', 'Gagal memulihkan produk.');
@@ -304,4 +305,5 @@ class KatalogProdukController extends Controller
             return back()->with('error', 'Gagal menghapus produk.');
         }
     }
+
 }

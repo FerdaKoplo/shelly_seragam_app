@@ -3,8 +3,9 @@
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\User\KatalogProdukController;
-use App\Http\Controllers\User\ManageKustomisasiController;
+use App\Http\Controllers\User\KelolaTransaksiController;
 use App\Http\Controllers\User\PegawaiController;
+use App\Http\Controllers\User\ManageKustomisasiController;
 use App\Http\Controllers\User\StatistikPenjualanController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
@@ -128,6 +129,14 @@ Route::prefix('admin')->group(function () {
         Route::get('/{id}/edit', [ManageKustomisasiController::class, 'edit'])->name('.edit');
         Route::put('/{id}', [ManageKustomisasiController::class, 'update'])->name('.update');
         Route::delete('/{id}', [ManageKustomisasiController::class, 'destroy'])->name('.destroy');
+    });
+
+    Route::prefix('manage-transaksi')->name('manage.transaksi')->group(function () {
+        Route::get('/', [KelolaTransaksiController::class, 'index']);
+        Route::get('/check-resi', [KelolaTransaksiController::class, 'checkResi'])->name('.check-resi');
+        Route::get('/get-ongkir', [KelolaTransaksiController::class, 'getOngkir'])->name('.get-ongkir');
+        Route::post('/', [KelolaTransaksiController::class, 'store'])->name('.store');
+        Route::put('/{id}', [KelolaTransaksiController::class, 'update'])->name('.update');
     });
 
     Route::get('/traffic', function () {

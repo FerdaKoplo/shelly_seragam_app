@@ -9,7 +9,7 @@ class AttachmentTransaksiKustom extends Model
 {
     use HasFactory;
 
-
+    protected $table = 'attachment_transaksi_kustom';
     protected $primaryKey = 'attachment_id';
 
     protected $fillable = [

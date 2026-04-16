@@ -16,20 +16,13 @@ class TransaksiSeeder extends Seeder
     {
         $faker = Faker::create('id_ID'); // Use Indonesian locale for realistic data
 
-        $userIds = DB::table('user')->pluck('user_id')->toArray();
         $productIds = DB::table('produk')->pluck('produk_id')->toArray();
-
-        if (empty($userIds) || empty($productIds)) {
-            $this->command->warn("Please seed 'user' and 'produk' tables first.");
-            return;
-        }
 
         foreach (range(1, 20) as $i) {
 
             $statusOptions = ["Created", "Paid", "Delivered", "Done"];
 
             $transaksiId = DB::table('transaksi')->insertGetId([
-                'user_id' => $faker->randomElement($userIds),
                 'nama_customer' => $faker->name,
                 'no_hp_customer' => $faker->phoneNumber,
                 'alamat_customer' => $faker->address,

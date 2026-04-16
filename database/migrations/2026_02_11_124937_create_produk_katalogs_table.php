@@ -18,8 +18,9 @@ return new class extends Migration
                 ->on('produk')
                 ->onDelete('cascade');
             $table->string('kategori');
-            $table->decimal('harga');
+            $table->decimal('harga', 15, 2);
             $table->integer('stok');
+            $table->enum('status', ['Tersedia', 'Arsip','Habis']);
             $table->timestamps();
         });
     }

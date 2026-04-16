@@ -13,10 +13,10 @@ return new class extends Migration
     {
         Schema::create('transaksi', function (Blueprint $table) {
             $table->id('transaksi_id');
-            $table->foreignId('user_id')
-               ->references('user_id')
-                ->on('user')
-                ->onDelete('cascade');
+            // $table->foreignId('user_id')
+            //    ->references('user_id')
+            //     ->on('user')
+            //     ->onDelete('cascade');
             $table->string('nama_customer');
             $table->string('no_hp_customer');
             $table->text('alamat_customer');

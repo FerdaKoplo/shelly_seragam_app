@@ -17,7 +17,8 @@ class ProdukKatalog extends Model
         'produk_id',
         'kategori',
         'harga',
-        'stok'
+        'stok',
+        'status'
     ];
 
     public function produk()
