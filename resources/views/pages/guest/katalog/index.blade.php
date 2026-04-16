@@ -39,7 +39,7 @@
                 @foreach ($katalog as $item)
                     @php
                         $firstFoto = $item->fotos->first();
-                        $fallbackImage = 'https://picsum.photos/seed/katalog-' . $item->katalog_id . '/600/800';
+                        $fc;$item->katalog_id . '/600/800';
                         $imageUrl = $firstFoto ? asset('storage/' . $firstFoto->path) : $fallbackImage;
                     @endphp
 
