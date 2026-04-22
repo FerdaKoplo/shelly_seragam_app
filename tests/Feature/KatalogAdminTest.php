@@ -141,7 +141,6 @@ class KatalogAdminTest extends TestCase
         $response->assertStatus(302);
         $response->assertSessionHasErrors('harga');
 
-        // $response->assertSessionHasErrors('harga');
     }
 
     // TC-WBT-ADM003-02
