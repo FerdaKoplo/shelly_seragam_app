@@ -16,7 +16,7 @@ class LoginControllerTest extends TestCase
     {
         parent::setUp();
 
-        // Seed users manually (since you showed explicit structure)
+        // Seed users manually to test
         User::create([
             'nama' => 'Test User Admin',
             'username' => 'admin',
@@ -46,7 +46,7 @@ class LoginControllerTest extends TestCase
         $this->assertAuthenticated();
         $responseAdmin->assertRedirect(route('statistik.transaksi'));
 
-        auth()->logout(); // reset session so next login isn't polluted
+        auth()->logout(); // reset session 
 
         // Pegawai login
         $responsePegawai = $this->post('/login', [
