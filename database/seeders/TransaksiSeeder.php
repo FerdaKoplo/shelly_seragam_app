@@ -6,6 +6,7 @@ use DB;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Faker\Factory as Faker;
+use Illuminate\Support\Facades\Hash;
 
 class TransaksiSeeder extends Seeder
 {
@@ -14,7 +15,25 @@ class TransaksiSeeder extends Seeder
      */
     public function run()
     {
-        $faker = Faker::create('id_ID'); // Use Indonesian locale for realistic data
+$faker = Faker::create('id_ID');
+
+        // 1. GET EXISTING PEGAWAI IDs
+        $pegawaiIds = DB::table('user')->where('role', 'Pegawai')->pluck('user_id')->toArray();
+
+        // Fallback: If no Pegawai exists yet, create one so the seeder doesn't break
+        if (empty($pegawaiIds)) {
+            $dummyId = DB::table('user')->insertGetId([
+                'nama' => 'Dummy Pegawai',
+                'username' => 'dummy.pegawai.' . rand(1, 100),
+                'email' => 'dummy' . rand(1, 100) . '@example.com',
+                'role' => 'Pegawai',
+                'status' => 'Active',
+                'password' => Hash::make('password'),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+            $pegawaiIds = [$dummyId];
+        }
 
         $productIds = DB::table('produk')->pluck('produk_id')->toArray();
 
@@ -23,6 +42,7 @@ class TransaksiSeeder extends Seeder
             $statusOptions = ["Created", "Paid", "Delivered", "Done"];
 
             $transaksiId = DB::table('transaksi')->insertGetId([
+                'pegawai_id' => $faker->randomElement($pegawaiIds), // <-- ADDED THIS LINE
                 'nama_customer' => $faker->name,
                 'no_hp_customer' => $faker->phoneNumber,
                 'alamat_customer' => $faker->address,
@@ -47,7 +67,7 @@ class TransaksiSeeder extends Seeder
                     'ukuran_dipilih' => $faker->randomElement(['S, M, L', 'All Size', 'Custom List']),
                     'tipe_kustom' => $faker->randomElement($tipeOptions),
                     'catatan' => $faker->sentence,
-                    'detail_pilihan_kustomisasi' => json_encode(['kain' => 'cotton', 'sablon' => 'DTF']), // Example JSON text
+                    'detail_pilihan_kustomisasi' => json_encode(['kain' => 'cotton', 'sablon' => 'DTF']), 
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);

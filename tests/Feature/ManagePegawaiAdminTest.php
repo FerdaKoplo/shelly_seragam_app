@@ -104,7 +104,7 @@ class ManagePegawaiAdminTest extends TestCase
     // TC-WBT-ADM002-04
     public function test_destroy_fails_when_user_has_active_transactions()
     {
-        $pegawai = User::create([
+      $pegawai = User::create([
             'nama' => 'Budi Santoso',
             'username' => 'budi.santoso_trx',
             'email' => 'buditrx@example.com',
@@ -114,8 +114,16 @@ class ManagePegawaiAdminTest extends TestCase
         ]);
 
         DB::table('transaksi')->insert([
-            'transaksi_id' => 'TRX-20260101-001',
-            'user_id' => $pegawai->user_id,
+            'pegawai_id'        => $pegawai->user_id,
+            'nama_customer'     => 'Dummy Customer',
+            'no_hp_customer'    => '081234567890',
+            'alamat_customer'   => 'Jl. Testing',
+            'no_resi_customer'  => 'RESI-TEST001',
+            'status'            => 'Created',
+            'tanggal_transaksi' => now()->toDateString(),
+            'total_harga'       => 150000,
+            'created_at'        => now(),
+            'updated_at'        => now(),
         ]);
 
         $response = $this->delete(route('manage.pegawai.destroy', $pegawai->user_id));

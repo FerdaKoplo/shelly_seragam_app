@@ -17,6 +17,10 @@ return new class extends Migration
             //    ->references('user_id')
             //     ->on('user')
             //     ->onDelete('cascade');
+            $table->foreignId('pegawai_id')
+                  ->references('user_id')
+                  ->on('user')
+                  ->onDelete('restrict');
             $table->string('nama_customer');
             $table->string('no_hp_customer');
             $table->text('alamat_customer');
