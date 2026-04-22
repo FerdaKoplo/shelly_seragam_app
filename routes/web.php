@@ -106,7 +106,6 @@ Route::prefix('admin')->group(function () {
         Route::delete('/{id}', [KatalogProdukController::class, 'destroy'])->name('.destroy');
     });
 
-
     Route::prefix('statistik-transaksi')->name('statistik.transaksi')->group(function () {
         Route::get('/', [StatistikPenjualanController::class, 'index']);
         Route::get('/export', [StatistikPenjualanController::class, 'export'])->name('.export');

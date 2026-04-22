@@ -276,6 +276,9 @@ class KatalogProdukController extends Controller
     {
         try {
             $katalog = ProdukKatalog::where('produk_id', $id)->firstOrFail();
+            if ($katalog->status === 'Arsip') {
+                return back()->with('error', 'Item sudah dalam status arsip.');
+            }
             $katalog->update(['status' => 'Arsip']);
 
             return redirect()->route('manage.katalog')->with('success', 'Produk berhasil diarsipkan.');
@@ -301,9 +304,13 @@ class KatalogProdukController extends Controller
             $katalog = ProdukKatalog::where('produk_id', $id)->firstOrFail();
             $produk = $katalog->produk;
 
+            if ($katalog->status !== 'Arsip') {
+                return back()->with('error', 'Hanya item terarsip yang boleh dihapus.');
+            }
             foreach ($produk->fotos as $foto) {
                 Storage::disk('public')->delete($foto->path);
             }
+
 
             $produk->delete();
 
