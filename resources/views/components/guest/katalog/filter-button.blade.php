@@ -1,6 +1,7 @@
 @props(['label', 'id', 'active' => false])
 
-<button 
+<button
+    data-cy="filter-{{ $id }}"
     type="button"
     data-initial-active="{{ $active ? 'true' : 'false' }}"
     data-id="{{ $id }}"
@@ -10,7 +11,6 @@
     ]) }}
     :class="filters.includes('{{ $id }}') 
         ? 'border-black bg-white text-black ring-1 ring-black' 
-        : 'border-gray-300 bg-white text-gray-600 hover:border-gray-400'"
->
+        : 'border-gray-300 bg-white text-gray-600 hover:border-gray-400'">
     {{ $label }}
 </button>

@@ -1,4 +1,4 @@
-<x-shared.modal_base name="modal-filter-produk-katalog" title="Filter Produk" maxWidth="3xl">
+<x-shared.modal_base name="modal-filter-produk-katalog" data-cy="modal-filter" title="Filter Produk" maxWidth="3xl">
     <div
         x-data="{
             filters: [],
@@ -92,8 +92,7 @@
 
                 window.location.href = url.toString();
             },
-        }"
-    >
+        }">
         <div class="space-y-6 text-left">
             {{-- Pakaian Untuk (belum di-handle backend; tetap UI saja dulu) --}}
             <div>
@@ -193,10 +192,12 @@
         <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end gap-3">
             <div class="flex justify-end gap-3 w-full">
                 <button @click="resetFilters()"
+                    data-cy="btn-reset-filter"
                     class="px-8 py-2 font-bold text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
                     Hapus Filter
                 </button>
                 <button @click="applyFilters()"
+                    data-cy="btn-apply-filter"
                     class="px-8 py-2 font-bold text-white bg-[#333333] rounded-md hover:bg-black transition-colors">
                     Terapkan Filter
                 </button>
