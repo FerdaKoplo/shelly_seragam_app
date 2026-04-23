@@ -81,7 +81,7 @@ $basePrice = (float) $item->harga;
             <div class="mb-6">
                 <div class="flex justify-between items-center mb-3">
                     <span class="font-bold text-lg">Ukuran</span>
-                    <button @click="$dispatch('open-modal', 'modal-panduan-ukuran')" class="text-xs flex items-center text-gray-500 hover:text-black">
+                    <button data-cy="btn-size-guide" @click="$dispatch('open-modal', 'modal-panduan-ukuran')" class="text-xs flex items-center text-gray-500 hover:text-black">
                         <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m4 0h1"></path>
                         </svg>
@@ -114,12 +114,12 @@ $basePrice = (float) $item->harga;
             <x-shared.quantity-button model="quantity" :max="$item->stok" />
 
             <div class="mt-10">
-                <p class="text-5xl font-bold mb-6">
+                <p data-cy="total-price" class="text-5xl font-bold mb-6">
                     Rp<span x-text="(quantity * basePrice).toLocaleString('id-ID')"></span>
                 </p>
 
                 <div class="flex flex-col space-y-3">
-                    <x-shared.button  data-cy="btn-add-to-cart" variant="outline" :rounded="false">
+                    <x-shared.button data-cy="btn-add-to-cart" variant="outline" :rounded="false">
                         Add To Cart
                     </x-shared.button>
                     <x-shared.button data-cy="btn-checkout" variant="dark" :rounded="false">

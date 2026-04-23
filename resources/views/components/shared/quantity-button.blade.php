@@ -23,7 +23,7 @@
 
         <input
             data-cy="qty-value"
-            type="text"
+            type="number"
             x-model="{{ $model }}"
             class="w-full text-center border-none focus:ring-0 text-sm font-bold bg-transparent pointer-events-none"
             readonly>
