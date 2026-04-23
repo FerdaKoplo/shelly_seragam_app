@@ -6,6 +6,10 @@
     // {{-- Default variable name --}}
 ])
 
+@php
+    $effectiveMax = max((int) $min, (int) $max);
+@endphp
+
 <div class="mb-8">
     @if($label)
         <span class="font-bold text-lg block mb-3">{{ $label }}</span>
@@ -30,9 +34,9 @@
 
         <button 
             type="button"
-            @click="if({{ $model }} < {{ $max }}) {{ $model }}++" 
+            @click="if({{ $model }} < {{ $effectiveMax }}) {{ $model }}++" 
             class="px-3 py-1 text-xl hover:bg-gray-100 transition disabled:opacity-30"
-            :disabled="{{ $model }} >= {{ $max }}"
+            :disabled="{{ $model }} >= {{ $effectiveMax }}"
         >
             +
         </button>
