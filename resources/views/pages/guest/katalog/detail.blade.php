@@ -5,10 +5,12 @@
 @php
     $firstFoto = $item->fotos->first();
     $fallbackImage = 'https://picsum.photos/id/1/1080';
-    
+
     $firstImageUrl = $firstFoto ? asset('storage/' . $firstFoto->path) : $fallbackImage;
 
     $basePrice = (float) $item->harga;
+    $isPreOrder = (int) $item->stok <= 0;
+    $maxQuantity = $isPreOrder ? 99 : (int) $item->stok;
 @endphp
 
 <div class="max-w-full mx-auto px-4 py-8"
@@ -71,7 +73,11 @@
         <div class="lg:col-span-4 mx-auto">
             <h1 class="text-4xl font-normal text-gray-900 mb-2">{{ $item->produk->nama_produk }}</h1>
             <p class="text-5xl font-bold mb-2">Rp{{ number_format($item->harga, 0, ',', '.') }}</p>
-            <p class="text-gray-600 mb-8">Stok: {{ $item->stok }}</p>
+            @if ($isPreOrder)
+                <p class="text-amber-700 font-medium mb-1">Stok habis. Namun anda tetap bisa melakukan Pre-Order</p>
+            @else
+                <p class="text-gray-600 mb-8">Stok: {{ $item->stok }}</p>
+            @endif
 
             <div class="mb-6">
                 <div class="flex justify-between items-center mb-3">
@@ -106,7 +112,7 @@
             </div>
 
             {{-- Quantity Button --}}
-            <x-shared.quantity-button model="quantity" :max="$item->stok" />
+            <x-shared.quantity-button model="quantity" :max="$maxQuantity" />
 
             <div class="mt-10">
                 <p class="text-5xl font-bold mb-6">
@@ -114,11 +120,17 @@
                 </p>
 
                 <div class="flex flex-col space-y-3">
-                    <x-shared.button variant="outline" :rounded="false">
-                        Add To Cart
+                    <x-shared.button
+                        variant="outline"
+                        :rounded="false"
+                        :href="$isPreOrder ? route('checkout', ['type' => 'katalog', 'mode' => 'preorder']) : route('keranjang')">
+                        {{ $isPreOrder ? 'Pre-Order Sekarang' : 'Add To Cart' }}
                     </x-shared.button>
-                    <x-shared.button variant="dark" :rounded="false">
-                        Checkout
+                    <x-shared.button
+                        variant="dark"
+                        :rounded="false"
+                        :href="route('checkout', ['type' => 'katalog', 'mode' => $isPreOrder ? 'preorder' : 'normal'])">
+                        {{ $isPreOrder ? 'Checkout Pre-Order' : 'Checkout' }}
                     </x-shared.button>
                 </div>
             </div>
