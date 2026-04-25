@@ -71,6 +71,7 @@ Route::prefix('keranjang')->name('cart.')->group(function () {
  */
 Route::match(['GET', 'POST'], '/checkout', function (Request $request) {
     $type = $request->input('type', $request->query('type', 'katalog'));
+    $checkoutNotes = (string) $request->input('notes', $request->session()->get('cart_notes', ''));
 
     // mock data katalog (sementara)
     $mockKatalogItems = [
@@ -105,7 +106,7 @@ Route::match(['GET', 'POST'], '/checkout', function (Request $request) {
         'file_name' => $uploadedName,
         'file_url' => $uploadedUrl,
 
-        'notes' => $request->input('notes', $request->session()->get('cart_notes')),
+        'notes' => $checkoutNotes,
         'size' => $request->input('size'),
     ];
 
@@ -113,6 +114,7 @@ Route::match(['GET', 'POST'], '/checkout', function (Request $request) {
         'type' => $type,
         'items' => $mockKatalogItems,
         'customData' => $mockCustomData,
+        'checkoutNotes' => $checkoutNotes,
         'shippingOptions' => $shippingOptions,
     ]);
 })->name('checkout');
