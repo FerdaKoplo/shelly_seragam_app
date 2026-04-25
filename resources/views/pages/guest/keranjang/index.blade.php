@@ -4,20 +4,13 @@
 @section('content')
 <div class="container mx-auto px-4 py-8 max-w-7xl"
     x-data="{ 
-        {{-- Mock Data: Easily replaceable with $cartItems->toJson() --}}
-        items: [
-            { id: 1, name: 'Kemeja Kotak', price: 114000, quantity: 2, size: 'S', image: 'product-1.png' },
-            { id: 2, name: 'Kemeja Kotak', price: 114000, quantity: 2, size: 'S', image: 'product-1.png' },
-            { id: 3, name: 'Kemeja Kotak', price: 114000, quantity: 2, size: 'S', image: 'product-1.png' }
-        ],
+        items: {{ Illuminate\Support\Js::from($items) }},
         notes: '',
-        
-        {{-- Helper to calculate total --}}
+
         get total() {
             return this.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
         },
 
-        {{-- Format IDR Currency --}}
         formatCurrency(num) {
             return 'Rp' + num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
         }
@@ -36,11 +29,18 @@
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
         {{-- Left Column: Cart Items --}}
         <div class="lg:col-span-6">
-            <div class="space-y-12 overflow-y-auto max-h-[70vh] lg:max-h-[85vh] pr-4 no-scrollbar">
-                <template x-for="(item, index) in items" :key="item.id">
-                    <x-cards.product-card.cart-item/>
-                </template>
-            </div>
+            <template x-if="items.length === 0">
+                <div class="border rounded-xl p-6 text-gray-600">
+                    Keranjang masih kosong. Tambahkan produk dari katalog.
+                </div>
+            </template>
+            <template x-if="items.length > 0">
+                <div class="space-y-12 overflow-y-auto max-h-[70vh] lg:max-h-[85vh] pr-4 no-scrollbar">
+                    <template x-for="(item, index) in items" :key="item.id">
+                        <x-cards.product-card.cart-item/>
+                    </template>
+                </div>
+            </template>
         </div>
         {{-- Right Column: Recommendations & Checkout --}}
         <div class="lg:col-span-6 space-y-10">
@@ -86,7 +86,7 @@
                     <p class="text-5xl font-black tracking-wider" x-text="formatCurrency(total)"></p>
                 </div>
 
-                <form action="{{route('checkout')}}" method="#">
+                <form action="{{ route('checkout') }}" method="POST">
                     @csrf
                     {{-- Hidden inputs to send Alpine state to Backend --}}
                     <input type="hidden" name="cart_data" :value="JSON.stringify(items)">

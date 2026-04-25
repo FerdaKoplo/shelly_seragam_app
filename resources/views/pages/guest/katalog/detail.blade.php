@@ -120,12 +120,25 @@
                 </p>
 
                 <div class="flex flex-col space-y-3">
-                    <x-shared.button
-                        variant="outline"
-                        :rounded="false"
-                        :href="$isPreOrder ? route('checkout', ['type' => 'katalog', 'mode' => 'preorder']) : route('keranjang')">
-                        {{ $isPreOrder ? 'Pre-Order Sekarang' : 'Add To Cart' }}
-                    </x-shared.button>
+                    @if ($isPreOrder)
+                        <x-shared.button
+                            variant="outline"
+                            :rounded="false"
+                            :href="route('checkout', ['type' => 'katalog', 'mode' => 'preorder'])">
+                            Pre-Order Sekarang
+                        </x-shared.button>
+                    @else
+                        <form action="{{ route('cart.add', ['katalog_id' => $item->katalog_id]) }}" method="POST">
+                            @csrf
+                            <input type="hidden" name="quantity" :value="quantity">
+                            <x-shared.button
+                                type="submit"
+                                variant="outline"
+                                :rounded="false">
+                                Add To Cart
+                            </x-shared.button>
+                        </form>
+                    @endif
                     <x-shared.button
                         variant="dark"
                         :rounded="false"

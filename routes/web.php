@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\LogoutController;
+use App\Http\Controllers\Guest\CartController;
 use App\Http\Controllers\Guest\KatalogController;
 use App\Http\Controllers\Guest\LandingController;
 use App\Http\Controllers\User\KatalogProdukController;
@@ -40,18 +41,32 @@ Route::get('/katalog/{id}', [KatalogController::class, 'show'])
     ->whereNumber('id')
     ->name('product.show');
 
-Route::get('/keranjang', function () {
-    return view('pages.guest.keranjang.index');
-})->name('keranjang');
+/**
+ * Keranjang
+ */
+Route::get('/keranjang', [CartController::class, 'index'])->name('keranjang');
+
+Route::prefix('keranjang')->name('cart.')->group(function () {
+    Route::post('/add/{katalog_id}', [CartController::class, 'add'])
+        ->whereNumber('katalog_id')
+        ->name('add');
+
+    Route::patch('/update/{katalog_id}', [CartController::class, 'update'])
+        ->whereNumber('katalog_id')
+        ->name('update');
+
+    Route::delete('/remove/{katalog_id}', [CartController::class, 'remove'])
+        ->whereNumber('katalog_id')
+        ->name('remove');
+
+    Route::delete('/clear', [CartController::class, 'clear'])
+        ->name('clear');
+});
 
 /**
  * Checkout
- * - GET: untuk katalog / akses langsung
- * - POST: untuk kustom (termasuk upload file)
  */
 Route::match(['GET', 'POST'], '/checkout', function (Request $request) {
-    // kalau POST dari halaman kustom, input('type') ada dan bernilai "kustom"
-    // kalau GET dari katalog, biasanya pakai query string ?type=katalog
     $type = $request->input('type', $request->query('type', 'katalog'));
 
     // mock data katalog (sementara)
@@ -60,18 +75,15 @@ Route::match(['GET', 'POST'], '/checkout', function (Request $request) {
         ['id' => 2, 'name' => 'Kemeja Kotak Blue', 'price' => 114000, 'quantity' => 1, 'size' => 'M', 'image' => 'product-1.png'],
     ];
 
-    // default shipping
     $shippingOptions = [
         ['id' => 'reg', 'label' => 'Regular', 'price' => 15000],
         ['id' => 'exp', 'label' => 'Express', 'price' => 35000],
     ];
 
-    // handle upload hanya untuk POST kustom
     $uploadedUrl = null;
     $uploadedName = null;
 
     if ($request->isMethod('post') && $request->hasFile('design_file')) {
-        // validasi basic (optional tapi recommended)
         $request->validate([
             'design_file' => ['file', 'max:10240', 'mimes:png,jpg,jpeg,svg,pdf'],
         ]);
@@ -81,18 +93,15 @@ Route::match(['GET', 'POST'], '/checkout', function (Request $request) {
         $uploadedName = $request->file('design_file')->getClientOriginalName();
     }
 
-    // data custom buat ringkasan checkout
     $mockCustomData = [
         'title' => 'Kustom',
         'qty' => ($request->input('total_quantity', 1)) . ' pcs',
         'type' => $request->input('category', 'bundle'),
         'price' => (int) $request->input('estimated_total', 1750000),
 
-        // supaya bisa ditampilkan di checkout
         'file_name' => $uploadedName,
         'file_url' => $uploadedUrl,
 
-        // tambahan optional kalau kamu mau tampilkan juga:
         'notes' => $request->input('notes'),
         'size' => $request->input('size'),
     ];

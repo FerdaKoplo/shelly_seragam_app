@@ -8,8 +8,7 @@
 
     <div class="w-full md:w-40">
         <div class="bg-gray-100 rounded-xl p-4 aspect-square flex items-center justify-center mb-2">
-            {{-- Image path logic can be customized here --}}
-            <img :src="'/storage/products/' + item.image" class="w-full object-contain" :alt="item.name">
+            <img :src="item.image_url || item.image || 'https://picsum.photos/id/1/600/800'" class="w-full object-contain" :alt="item.name">
         </div>
         <h3 class="font-bold text-lg" x-text="item.name"></h3>
         <p class="font-normal mt-1" x-text="formatCurrency(item.price)"></p>
