@@ -6,6 +6,27 @@
     x-data="{ 
         items: {{ Illuminate\Support\Js::from($items) }},
         notes: '',
+        isSubmitting: false,
+
+        shouldWarnOnLeave() {
+            return this.items.length > 0 && !this.isSubmitting;
+        },
+
+        initLeaveGuard() {
+            const handler = (event) => {
+                if (!this.shouldWarnOnLeave()) {
+                    return;
+                }
+
+                event.preventDefault();
+                event.returnValue = '';
+            };
+
+            window.addEventListener('beforeunload', handler);
+            this.$el.addEventListener('alpine:destroy', () => {
+                window.removeEventListener('beforeunload', handler);
+            }, { once: true });
+        },
 
         get total() {
             return this.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
@@ -14,7 +35,8 @@
         formatCurrency(num) {
             return 'Rp' + num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
         }
-    }">
+    }"
+    x-init="initLeaveGuard()">
 
     {{-- Header Section --}}
     <div class="flex items-center gap-4 mb-10">
@@ -29,6 +51,11 @@
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
         {{-- Left Column: Cart Items --}}
         <div class="lg:col-span-6">
+            <template x-if="items.length > 0">
+                <div class="mb-6 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+                    Peringatan: item keranjang bisa hilang jika Anda meninggalkan aplikasi sebelum menyelesaikan checkout.
+                </div>
+            </template>
             <template x-if="items.length === 0">
                 <div class="border rounded-xl p-6 text-gray-600">
                     Keranjang masih kosong. Tambahkan produk dari katalog.
@@ -86,7 +113,7 @@
                     <p class="text-5xl font-black tracking-wider" x-text="formatCurrency(total)"></p>
                 </div>
 
-                <form action="{{ route('checkout') }}" method="POST">
+                <form action="{{ route('checkout') }}" method="POST" @submit="isSubmitting = true">
                     @csrf
                     {{-- Hidden inputs to send Alpine state to Backend --}}
                     <input type="hidden" name="cart_data" :value="JSON.stringify(items)">
