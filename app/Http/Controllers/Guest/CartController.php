@@ -69,11 +69,19 @@ class CartController extends Controller
 
     public function update(Request $request, int $katalog_id)
     {
-        $qty = (int) $request->input('quantity', 1);
-
         $cart = $request->session()->get('cart', []);
         if (!isset($cart[$katalog_id])) {
             return redirect()->route('keranjang');
+        }
+
+        $action = $request->input('action');
+
+        if ($action === 'increment') {
+            $qty = ((int) $cart[$katalog_id]['quantity']) + 1;
+        } elseif ($action === 'decrement') {
+            $qty = ((int) $cart[$katalog_id]['quantity']) - 1;
+        } else {
+            $qty = (int) $request->input('quantity', 1);
         }
 
         if ($qty <= 0) {

@@ -36,7 +36,8 @@
             return 'Rp' + num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
         }
     }"
-    x-init="initLeaveGuard()">
+    x-init="initLeaveGuard()"
+    @submit.capture="isSubmitting = true">
 
     {{-- Header Section --}}
     <div class="flex items-center gap-4 mb-10">
