@@ -34,7 +34,7 @@
                 <div class="flex flex-col">
                     <span class="text-sm" x-text="customData.file_name ?? customData.file"></span>
                     <a class="text-xs underline text-gray-600" :href="customData.file_url" target="_blank">
-                        Lihat / Download
+                        Lihat detail
                     </a>
                 </div>
             </div>
