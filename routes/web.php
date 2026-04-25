@@ -86,7 +86,7 @@ Route::match(['GET', 'POST'], '/checkout', function (Request $request) {
         'title' => 'Kustom',
         'qty' => ($request->input('total_quantity', 1)) . ' pcs',
         'type' => $request->input('category', 'bundle'),
-        'price' => 1750000,
+        'price' => (int) $request->input('estimated_total', 1750000),
 
         // supaya bisa ditampilkan di checkout
         'file_name' => $uploadedName,
