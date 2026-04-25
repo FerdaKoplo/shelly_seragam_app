@@ -97,6 +97,17 @@
                     Peringatan: item keranjang bisa hilang jika Anda meninggalkan aplikasi sebelum menyelesaikan checkout.
                 </div>
             </template>
+            <template x-if="items.length > 0">
+                <form action="{{ route('cart.clear') }}" method="POST" class="mb-6"
+                    onsubmit="return confirm('Kosongkan seluruh item di keranjang?')">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit"
+                        class="inline-flex items-center rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-700 hover:bg-red-100">
+                        Kosongkan Keranjang
+                    </button>
+                </form>
+            </template>
             <template x-if="items.length === 0">
                 <div class="border rounded-xl p-6 text-gray-600">
                     Keranjang masih kosong. Tambahkan produk dari katalog.

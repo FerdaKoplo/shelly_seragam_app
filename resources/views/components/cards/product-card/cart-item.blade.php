@@ -12,6 +12,14 @@
         </div>
         <h3 class="font-bold text-lg" x-text="item.name"></h3>
         <p class="font-normal mt-1" x-text="formatCurrency(item.price)"></p>
+        <form :action="'{{ url('/keranjang/remove') }}/' + item.katalog_id" method="POST" class="mt-3"
+            onsubmit="return confirm('Hapus item ini dari keranjang?')">
+            @csrf
+            @method('DELETE')
+            <button type="submit" class="text-sm font-medium text-red-600 hover:text-red-700">
+                Hapus Item
+            </button>
+        </form>
     </div>
 
     <div class="flex-1 space-y-6">
