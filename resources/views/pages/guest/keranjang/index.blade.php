@@ -5,8 +5,10 @@
 <div class="container mx-auto px-4 py-8 max-w-7xl"
     x-data="{ 
         items: {{ Illuminate\Support\Js::from($items) }},
-        notes: '',
+        notes: {{ Illuminate\Support\Js::from($notes) }},
         isSubmitting: false,
+        noteSaveTimeout: null,
+        noteSaveState: 'idle',
 
         shouldWarnOnLeave() {
             return this.items.length > 0 && !this.isSubmitting;
@@ -26,6 +28,44 @@
             this.$el.addEventListener('alpine:destroy', () => {
                 window.removeEventListener('beforeunload', handler);
             }, { once: true });
+        },
+
+        queueSaveNotes() {
+            if (this.noteSaveTimeout) {
+                clearTimeout(this.noteSaveTimeout);
+            }
+
+            this.noteSaveState = 'saving';
+            this.noteSaveTimeout = setTimeout(() => {
+                this.saveNotes();
+            }, 500);
+        },
+
+        async saveNotes() {
+            try {
+                const response = await fetch('{{ route('cart.notes.update') }}', {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    },
+                    body: JSON.stringify({ notes: this.notes }),
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to save notes');
+                }
+
+                this.noteSaveState = 'saved';
+                setTimeout(() => {
+                    if (this.noteSaveState === 'saved') {
+                        this.noteSaveState = 'idle';
+                    }
+                }, 1200);
+            } catch (error) {
+                this.noteSaveState = 'error';
+            }
         },
 
         get total() {
@@ -104,8 +144,12 @@
                 <label class="text-xl font-bold mb-4 block">Catatan</label>
                 <textarea
                     x-model="notes"
+                    @input="queueSaveNotes()"
                     class="w-full border-black rounded-xl h-40 focus:ring-black focus:border-black bg-slate-200 p-4"
                     placeholder="Tambahkan catatan untuk pesanan Anda..."></textarea>
+                <p class="mt-2 text-xs text-gray-600" x-show="noteSaveState === 'saving'">Menyimpan catatan...</p>
+                <p class="mt-2 text-xs text-green-700" x-show="noteSaveState === 'saved'">Catatan tersimpan.</p>
+                <p class="mt-2 text-xs text-red-700" x-show="noteSaveState === 'error'">Gagal menyimpan catatan. Coba lagi.</p>
             </div>
 
             {{-- Final Summary & Action --}}

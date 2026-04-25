@@ -55,6 +55,9 @@ Route::prefix('keranjang')->name('cart.')->group(function () {
         ->whereNumber('katalog_id')
         ->name('update');
 
+    Route::patch('/notes', [CartController::class, 'updateNotes'])
+        ->name('notes.update');
+
     Route::delete('/remove/{katalog_id}', [CartController::class, 'remove'])
         ->whereNumber('katalog_id')
         ->name('remove');
@@ -102,7 +105,7 @@ Route::match(['GET', 'POST'], '/checkout', function (Request $request) {
         'file_name' => $uploadedName,
         'file_url' => $uploadedUrl,
 
-        'notes' => $request->input('notes'),
+        'notes' => $request->input('notes', $request->session()->get('cart_notes')),
         'size' => $request->input('size'),
     ];
 

@@ -28,6 +28,7 @@ class CartController extends Controller
         return view('pages.guest.keranjang.index', [
             'items' => $items,
             'subtotal' => $subtotal,
+            'notes' => (string) $request->session()->get('cart_notes', ''),
         ]);
     }
 
@@ -104,9 +105,31 @@ class CartController extends Controller
         return redirect()->route('keranjang');
     }
 
+    public function updateNotes(Request $request)
+    {
+        $validated = $request->validate([
+            'notes' => ['nullable', 'string', 'max:1000'],
+        ]);
+
+        $notes = trim((string) ($validated['notes'] ?? ''));
+
+        if ($notes === '') {
+            $request->session()->forget('cart_notes');
+        } else {
+            $request->session()->put('cart_notes', $notes);
+        }
+
+        if ($request->expectsJson()) {
+            return response()->json(['ok' => true]);
+        }
+
+        return redirect()->route('keranjang');
+    }
+
     public function clear(Request $request)
     {
         $request->session()->forget('cart');
+        $request->session()->forget('cart_notes');
         return redirect()->route('keranjang');
     }
 }
