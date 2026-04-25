@@ -73,11 +73,26 @@ Route::match(['GET', 'POST'], '/checkout', function (Request $request) {
     $type = $request->input('type', $request->query('type', 'katalog'));
     $checkoutNotes = (string) $request->input('notes', $request->session()->get('cart_notes', ''));
 
-    // mock data katalog (sementara)
-    $mockKatalogItems = [
-        ['id' => 1, 'name' => 'Kemeja Kotak', 'price' => 114000, 'quantity' => 2, 'size' => 'S', 'image' => 'product-1.png'],
-        ['id' => 2, 'name' => 'Kemeja Kotak Blue', 'price' => 114000, 'quantity' => 1, 'size' => 'M', 'image' => 'product-1.png'],
-    ];
+    $katalogItems = array_map(function ($item) {
+        $rawImage = $item['image'] ?? null;
+        $isAbsolute = is_string($rawImage)
+            && (str_starts_with($rawImage, 'http://') || str_starts_with($rawImage, 'https://'));
+
+        $item['image_url'] = $isAbsolute
+            ? $rawImage
+            : ($rawImage ? asset('storage/' . ltrim($rawImage, '/')) : 'https://picsum.photos/id/1/600/800');
+
+        return [
+            'id' => $item['id'] ?? $item['katalog_id'] ?? null,
+            'katalog_id' => $item['katalog_id'] ?? $item['id'] ?? null,
+            'name' => $item['name'] ?? 'Produk',
+            'price' => (int) ($item['price'] ?? 0),
+            'quantity' => (int) ($item['quantity'] ?? 1),
+            'size' => $item['size'] ?? null,
+            'image' => $item['image'] ?? null,
+            'image_url' => $item['image_url'],
+        ];
+    }, array_values($request->session()->get('cart', [])));
 
     $shippingOptions = [
         ['id' => 'reg', 'label' => 'Regular', 'price' => 15000],
@@ -127,7 +142,7 @@ Route::match(['GET', 'POST'], '/checkout', function (Request $request) {
 
     return view('pages.guest.checkout.checkout', [
         'type' => $type,
-        'items' => $mockKatalogItems,
+        'items' => $katalogItems,
         'customData' => $mockCustomData,
         'checkoutNotes' => $checkoutNotes,
         'shippingOptions' => $shippingOptions,
