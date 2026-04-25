@@ -35,7 +35,7 @@
     </div>
 
     {{-- 3. Form Setup --}}
-    <form action="{{ route('checkout') }}" method=#" enctype="multipart/form-data">
+    <form action="{{ route('checkout') }}" method="POST" enctype="multipart/form-data">
         @csrf
 
         {{-- Hidden inputs to capture global Alpine state --}}
