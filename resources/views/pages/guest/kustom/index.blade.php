@@ -8,6 +8,7 @@
         category: 'bundle',
         selectedSize: 'M',
         quantity: 1,
+        selectedFiles: [],
 
         // subtotal per section (per pcs) — diupdate oleh partial via event section-estimate
         sectionTotals: { atasan: 0, bawahan: 0 },
@@ -34,6 +35,26 @@
         get estimateTotal() {
             const qty = Number(this.quantity) || 1;
             return this.estimatePerPcs * qty;
+        },
+
+        handleFileSelection(event) {
+            const files = Array.from(event.target.files || []);
+            this.selectedFiles = files.map((file) => ({
+                name: file.name,
+                size: file.size,
+            }));
+        },
+
+        formatFileSize(bytes) {
+            if (!bytes) return '0 B';
+            const units = ['B', 'KB', 'MB', 'GB'];
+            let size = bytes;
+            let i = 0;
+            while (size >= 1024 && i < units.length - 1) {
+                size /= 1024;
+                i++;
+            }
+            return `${size.toFixed(size >= 10 ? 0 : 1)} ${units[i]}`;
         }
     }"
     x-on:section-estimate.window="
@@ -100,13 +121,33 @@
                 <label class="block text-sm font-medium mb-2">* Upload Design, Badge & keperluan lainnya</label>
                 <div class="border-2 border-dashed border-gray-300 rounded-xl p-10 text-center flex flex-col items-center justify-center bg-gray-50/50">
                     <i class="fas fa-cloud-upload-alt text-2xl mb-2 text-gray-400"></i>
-                    <p class="text-sm text-gray-500 font-medium">Choose a file or drag & drop it here</p>
-                    <p class="text-xs text-gray-400 mt-1 mb-4">SVG, JPEG, PNG formats, up to 10MB</p>
+                    <p class="text-sm text-gray-500 font-medium">Choose files or drag & drop them here</p>
+                    <p class="text-xs text-gray-400 mt-1 mb-4">JPG, PNG, SVG, CDR formats, up to 10MB per file</p>
                     <label class="cursor-pointer bg-white border border-gray-300 px-6 py-2 rounded-lg text-sm font-medium hover:bg-gray-50">
-                        Browse File
-                        <input type="file" name="design_file" class="hidden">
+                        Browse Files
+                        <input type="file" name="design_files[]" accept=".jpg,.jpeg,.png,.svg,.cdr" multiple class="hidden"
+                            @change="handleFileSelection($event)">
                     </label>
                 </div>
+                <template x-if="selectedFiles.length > 0">
+                    <div class="mt-3 rounded-lg border border-gray-200 bg-white p-3">
+                        <p class="text-xs font-semibold text-gray-500 mb-2">File dipilih:</p>
+                        <ul class="space-y-1">
+                            <template x-for="(f, idx) in selectedFiles" :key="idx">
+                                <li class="text-sm text-gray-700 flex items-center justify-between gap-3">
+                                    <span x-text="f.name" class="truncate"></span>
+                                    <span x-text="formatFileSize(f.size)" class="text-xs text-gray-500 shrink-0"></span>
+                                </li>
+                            </template>
+                        </ul>
+                    </div>
+                </template>
+                @error('design_files')
+                    <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                @enderror
+                @error('design_files.*')
+                    <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                @enderror
             </div>
         </div>
 

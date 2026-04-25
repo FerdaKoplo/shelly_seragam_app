@@ -84,17 +84,33 @@ Route::match(['GET', 'POST'], '/checkout', function (Request $request) {
         ['id' => 'exp', 'label' => 'Express', 'price' => 35000],
     ];
 
-    $uploadedUrl = null;
-    $uploadedName = null;
+    $uploadedFiles = [];
 
-    if ($request->isMethod('post') && $request->hasFile('design_file')) {
+    if ($request->isMethod('post') && $request->hasFile('design_files')) {
+        $allowedExtensions = ['jpg', 'jpeg', 'png', 'svg', 'cdr'];
         $request->validate([
-            'design_file' => ['file', 'max:10240', 'mimes:png,jpg,jpeg,svg,pdf'],
+            'design_files' => ['array'],
+            'design_files.*' => [
+                'file',
+                'max:10240',
+                function ($attribute, $value, $fail) use ($allowedExtensions) {
+                    $extension = strtolower($value->getClientOriginalExtension());
+                    if (!in_array($extension, $allowedExtensions, true)) {
+                        $fail('Format file tidak didukung. Gunakan .jpg, .png, .svg, atau .cdr');
+                    }
+                },
+            ],
         ]);
 
-        $path = $request->file('design_file')->store('uploads/kustom', 'public');
-        $uploadedUrl = Storage::disk('public')->url($path);
-        $uploadedName = $request->file('design_file')->getClientOriginalName();
+        foreach ($request->file('design_files', []) as $file) {
+            $extension = strtolower($file->getClientOriginalExtension());
+            $path = $file->store('uploads/kustom', 'public');
+            $uploadedFiles[] = [
+                'name' => $file->getClientOriginalName(),
+                'url' => Storage::disk('public')->url($path),
+                'extension' => $extension,
+            ];
+        }
     }
 
     $mockCustomData = [
@@ -103,8 +119,7 @@ Route::match(['GET', 'POST'], '/checkout', function (Request $request) {
         'type' => $request->input('category', 'bundle'),
         'price' => (int) $request->input('estimated_total', 1750000),
 
-        'file_name' => $uploadedName,
-        'file_url' => $uploadedUrl,
+        'attachments' => $uploadedFiles,
 
         'notes' => $checkoutNotes,
         'size' => $request->input('size'),

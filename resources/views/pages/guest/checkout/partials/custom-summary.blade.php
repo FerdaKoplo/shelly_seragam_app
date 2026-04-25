@@ -16,31 +16,33 @@
     <div class="space-y-2">
         <p class="font-bold">Lampiran:</p>
 
-        <template x-if="customData.file_url">
-            <div class="flex items-center gap-3 bg-white p-3 rounded-lg border border-gray-200 w-fit">
-                <!-- preview image jika png/jpg/jpeg -->
-                <template x-if="/\.(png|jpg|jpeg)$/i.test(customData.file_url)">
-                    <img :src="customData.file_url" alt="Lampiran"
-                         class="w-10 h-10 rounded object-cover border" />
-                </template>
+        <template x-if="(customData.attachments || []).length > 0">
+            <div class="space-y-2">
+                <template x-for="(attachment, idx) in customData.attachments" :key="idx">
+                    <div class="flex items-center gap-3 bg-white p-3 rounded-lg border border-gray-200">
+                        <template x-if="/\.(png|jpg|jpeg)$/i.test(attachment.url)">
+                            <img :src="attachment.url" alt="Lampiran"
+                                class="w-10 h-10 rounded object-cover border" />
+                        </template>
 
-                <!-- fallback icon jika bukan image -->
-                <template x-if="!/\.(png|jpg|jpeg)$/i.test(customData.file_url)">
-                    <div class="w-10 h-10 bg-gray-200 rounded flex items-center justify-center text-xs text-gray-600">
-                        FILE
+                        <template x-if="!/\.(png|jpg|jpeg)$/i.test(attachment.url)">
+                            <div class="w-10 h-10 bg-gray-200 rounded flex items-center justify-center text-xs text-gray-600">
+                                FILE
+                            </div>
+                        </template>
+
+                        <div class="flex flex-col">
+                            <span class="text-sm" x-text="attachment.name"></span>
+                            <a class="text-xs underline text-gray-600" :href="attachment.url" target="_blank">
+                                Lihat detail
+                            </a>
+                        </div>
                     </div>
                 </template>
-
-                <div class="flex flex-col">
-                    <span class="text-sm" x-text="customData.file_name ?? customData.file"></span>
-                    <a class="text-xs underline text-gray-600" :href="customData.file_url" target="_blank">
-                        Lihat detail
-                    </a>
-                </div>
             </div>
         </template>
 
-        <template x-if="!customData.file_url">
+        <template x-if="(customData.attachments || []).length === 0">
             <div class="text-sm text-gray-500">
                 Tidak ada lampiran.
             </div>
