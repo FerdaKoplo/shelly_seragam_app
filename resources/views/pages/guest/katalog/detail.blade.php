@@ -3,12 +3,14 @@
 @section('content')
 
 @php
-$firstFoto = $item->fotos->first();
-$fallbackImage = 'https://picsum.photos/id/1/1080';
+    $firstFoto = $item->fotos->first();
+    $fallbackImage = 'https://picsum.photos/id/1/1080';
 
-$firstImageUrl = $firstFoto ? asset('storage/' . $firstFoto->path) : $fallbackImage;
+    $firstImageUrl = $firstFoto ? asset('storage/' . $firstFoto->path) : $fallbackImage;
 
 $basePrice = (float) $item->harga;
+    $isPreOrder = (int) $item->stok <= 0;
+    $maxQuantity = $isPreOrder ? 99 : (int) $item->stok;
 @endphp
 
 <div
@@ -76,7 +78,11 @@ $basePrice = (float) $item->harga;
         <div class="lg:col-span-4 mx-auto">
             <h1  data-cy="product-name" class="text-4xl font-normal text-gray-900 mb-2">{{ $item->produk->nama_produk }}</h1>
             <p data-cy="product-price" class="text-5xl font-bold mb-2">Rp{{ number_format($item->harga, 0, ',', '.') }}</p>
-            <p data-cy="product-stock" class="text-gray-600 mb-8">Stok: {{ $item->stok }}</p>
+            @if ($isPreOrder)
+                <p class="text-amber-700 font-medium mb-1">Stok habis. Namun anda tetap bisa melakukan Pre-Order</p>
+            @else
+                <p data-cy="product-stock" class="text-gray-600 mb-8">Stok: {{ $item->stok }}</p>
+            @endif
 
             <div class="mb-6">
                 <div class="flex justify-between items-center mb-3">
@@ -111,7 +117,7 @@ $basePrice = (float) $item->harga;
             </div>
 
             {{-- Quantity Button --}}
-            <x-shared.quantity-button model="quantity" :max="$item->stok" />
+            <x-shared.quantity-button model="quantity" :max="$maxQuantity" />
 
             <div class="mt-10">
                 <p data-cy="total-price" class="text-5xl font-bold mb-6">
@@ -119,11 +125,30 @@ $basePrice = (float) $item->harga;
                 </p>
 
                 <div class="flex flex-col space-y-3">
-                    <x-shared.button data-cy="btn-add-to-cart" variant="outline" :rounded="false">
-                        Add To Cart
-                    </x-shared.button>
-                    <x-shared.button data-cy="btn-checkout" variant="dark" :rounded="false">
-                        Checkout
+                    @if ($isPreOrder)
+                        <x-shared.button
+                            data-cy="btn-add-to-cart" variant="outline"
+                            :rounded="false"
+                            :href="route('checkout', ['type' => 'katalog', 'mode' => 'preorder'])">
+                            Pre-Order Sekarang
+                        </x-shared.button>
+                    @else
+                        <form action="{{ route('cart.add', ['katalog_id' => $item->katalog_id]) }}" method="POST">
+                            @csrf
+                            <input type="hidden" name="quantity" :value="quantity">
+                            <x-shared.button
+                                type="submit"
+                                variant="outline"
+                                :rounded="false">
+                                Add To Cart
+                            </x-shared.button>
+                        </form>
+                    @endif
+                    <x-shared.button
+                        data-cy="btn-checkout" variant="dark"
+                        :rounded="false"
+                        :href="route('checkout', ['type' => 'katalog', 'mode' => $isPreOrder ? 'preorder' : 'normal'])">
+                        {{ $isPreOrder ? 'Checkout Pre-Order' : 'Checkout' }}
                     </x-shared.button>
                 </div>
             </div>

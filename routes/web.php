@@ -2,25 +2,22 @@
 
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\LogoutController;
+use App\Http\Controllers\Guest\CartController;
+use App\Http\Controllers\Guest\KatalogController;
+use App\Http\Controllers\Guest\LandingController;
 use App\Http\Controllers\User\KatalogProdukController;
 use App\Http\Controllers\User\KelolaTransaksiController;
-use App\Http\Controllers\User\PegawaiController;
 use App\Http\Controllers\User\ManageKustomisasiController;
+use App\Http\Controllers\User\PegawaiController;
 use App\Http\Controllers\User\StatistikPenjualanController;
-use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Guest\LandingController;
-use App\Http\Controllers\Guest\KatalogController;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Storage;
 
 /*
 |--------------------------------------------------------------------------
 | Web Routes
 |--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "web" middleware group. Make something great!
-|
 */
 
 // auth
@@ -32,66 +29,131 @@ Route::post('/login', LoginController::class)->name('login');
 Route::post('/logout', LogoutController::class)->middleware('auth')->name('logout');
 
 // guest routes
-
-// Home (landing) -> DB
 Route::get('/', [LandingController::class, 'index'])->name('home');
 
-// Kustom (masih statis view)
 Route::get('/kustom', function () {
     return view('pages.guest.kustom.index');
 })->name('kustom');
 
-// Katalog list -> DB
 Route::get('/katalog', [KatalogController::class, 'index'])->name('katalog');
 
-// Katalog detail -> DB (ganti dari {slug} mock jadi {id})
 Route::get('/katalog/{id}', [KatalogController::class, 'show'])
     ->whereNumber('id')
     ->name('product.show');
 
-// Keranjang (masih statis view)
-Route::get('/keranjang', function () {
-    return view('pages.guest.keranjang.index');
-})->name('keranjang');
+/**
+ * Keranjang
+ */
+Route::get('/keranjang', [CartController::class, 'index'])->name('keranjang');
 
-// Checkout (masih mock, nanti bisa integrasi bertahap)
-Route::get('/checkout', function (Request $request) {
+Route::prefix('keranjang')->name('cart.')->group(function () {
+    Route::post('/add/{katalog_id}', [CartController::class, 'add'])
+        ->whereNumber('katalog_id')
+        ->name('add');
 
-    $type = $request->query('type', 'katalog');
+    Route::patch('/update/{katalog_id}', [CartController::class, 'update'])
+        ->whereNumber('katalog_id')
+        ->name('update');
 
-    $mockKatalogItems = [
-        ['id' => 1, 'name' => 'Kemeja Kotak', 'price' => 114000, 'quantity' => 2, 'size' => 'S', 'image' => 'product-1.png'],
-        ['id' => 2, 'name' => 'Kemeja Kotak Blue', 'price' => 114000, 'quantity' => 1, 'size' => 'M', 'image' => 'product-1.png'],
-    ];
+    Route::patch('/notes', [CartController::class, 'updateNotes'])
+        ->name('notes.update');
 
-    $mockCustomData = [
-        'title' => 'Kain: Oxford Navy',
-        'qty' => '12 pcs',
-        'type' => 'Bundle (Atasan + Bawahan)',
-        'price' => 1750000,
-        'file' => 'desain_logo.png'
-    ];
+    Route::delete('/remove/{katalog_id}', [CartController::class, 'remove'])
+        ->whereNumber('katalog_id')
+        ->name('remove');
+
+    Route::delete('/clear', [CartController::class, 'clear'])
+        ->name('clear');
+});
+
+/**
+ * Checkout
+ */
+Route::match(['GET', 'POST'], '/checkout', function (Request $request) {
+    $type = $request->input('type', $request->query('type', 'katalog'));
+    $checkoutNotes = (string) $request->input('notes', $request->session()->get('cart_notes', ''));
+
+    $katalogItems = array_map(function ($item) {
+        $rawImage = $item['image'] ?? null;
+        $isAbsolute = is_string($rawImage)
+            && (str_starts_with($rawImage, 'http://') || str_starts_with($rawImage, 'https://'));
+
+        $item['image_url'] = $isAbsolute
+            ? $rawImage
+            : ($rawImage ? asset('storage/' . ltrim($rawImage, '/')) : 'https://picsum.photos/id/1/600/800');
+
+        return [
+            'id' => $item['id'] ?? $item['katalog_id'] ?? null,
+            'katalog_id' => $item['katalog_id'] ?? $item['id'] ?? null,
+            'name' => $item['name'] ?? 'Produk',
+            'price' => (int) ($item['price'] ?? 0),
+            'quantity' => (int) ($item['quantity'] ?? 1),
+            'size' => $item['size'] ?? null,
+            'image' => $item['image'] ?? null,
+            'image_url' => $item['image_url'],
+        ];
+    }, array_values($request->session()->get('cart', [])));
 
     $shippingOptions = [
         ['id' => 'reg', 'label' => 'Regular', 'price' => 15000],
         ['id' => 'exp', 'label' => 'Express', 'price' => 35000],
     ];
 
+    $uploadedFiles = [];
+
+    if ($request->isMethod('post') && $request->hasFile('design_files')) {
+        $allowedExtensions = ['jpg', 'jpeg', 'png', 'svg', 'cdr'];
+        $request->validate([
+            'design_files' => ['array'],
+            'design_files.*' => [
+                'file',
+                'max:10240',
+                function ($attribute, $value, $fail) use ($allowedExtensions) {
+                    $extension = strtolower($value->getClientOriginalExtension());
+                    if (!in_array($extension, $allowedExtensions, true)) {
+                        $fail('Format file tidak didukung. Gunakan .jpg, .png, .svg, atau .cdr');
+                    }
+                },
+            ],
+        ]);
+
+        foreach ($request->file('design_files', []) as $file) {
+            $extension = strtolower($file->getClientOriginalExtension());
+            $path = $file->store('uploads/kustom', 'public');
+            $uploadedFiles[] = [
+                'name' => $file->getClientOriginalName(),
+                'url' => Storage::disk('public')->url($path),
+                'extension' => $extension,
+            ];
+        }
+    }
+
+    $mockCustomData = [
+        'title' => 'Kustom',
+        'qty' => ($request->input('total_quantity', 1)) . ' pcs',
+        'type' => $request->input('category', 'bundle'),
+        'price' => (int) $request->input('estimated_total', 1750000),
+
+        'attachments' => $uploadedFiles,
+
+        'notes' => $checkoutNotes,
+        'size' => $request->input('size'),
+    ];
+
     return view('pages.guest.checkout.checkout', [
         'type' => $type,
-        'items' => $mockKatalogItems,
+        'items' => $katalogItems,
         'customData' => $mockCustomData,
-        'shippingOptions' => $shippingOptions
+        'checkoutNotes' => $checkoutNotes,
+        'shippingOptions' => $shippingOptions,
     ]);
 })->name('checkout');
 
 // user routes
 Route::prefix('admin')->group(function () {
-    // Pegawai
     Route::get('/manage-transaksi', function () {
         return view('pages.user.transaksi.index');
     })->name('manage.transaksi');
-
 
     Route::prefix('manage-katalog')->name('manage.katalog')->group(function () {
         Route::get('/', [KatalogProdukController::class, 'index'])->name('');
@@ -132,12 +194,10 @@ Route::prefix('admin')->group(function () {
         return view('pages.user.admin.traffic.index');
     })->name('traffic');
 
-
     Route::prefix('manage-pegawai')->name('manage.pegawai')->group(function () {
         Route::get('/', [PegawaiController::class, 'index']);
         Route::post('/', [PegawaiController::class, 'store'])->name('.store');
         Route::put('/{user_id}', [PegawaiController::class, 'update'])->name('.update');
         Route::delete('/{user_id}', [PegawaiController::class, 'destroy'])->name('.destroy');
     });
-
 });

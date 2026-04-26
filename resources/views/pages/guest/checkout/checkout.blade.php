@@ -12,7 +12,7 @@
         isSubmitting: false,
         shippingMethod: null,
         shippingCost: 0,
-        notes: "",
+        notes: @json($checkoutNotes),
 
         selectShipping(option) {
             this.shippingMethod = option.id;
