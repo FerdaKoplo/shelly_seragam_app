@@ -9,6 +9,7 @@
         selectedSize: 'M',
         quantity: 1,
         selectedFiles: [],
+        warnings: [],
 
         // subtotal per section (per pcs) — diupdate oleh partial via event section-estimate
         sectionTotals: { atasan: 0, bawahan: 0 },
@@ -36,14 +37,24 @@
             const qty = Number(this.quantity) || 1;
             return this.estimatePerPcs * qty;
         },
-
-        handleFileSelection(event) {
+      handleFileSelection(event) {
             const files = Array.from(event.target.files || []);
-            this.selectedFiles = files.map((file) => ({
-                name: file.name,
-                size: file.size,
-            }));
+            const MAX_SIZE = 5 * 1024 * 1024; // 5MB in bytes
+            this.warnings = [];
+            files.forEach((file) => {
+                if (file.size > MAX_SIZE) {
+                 this.warnings.push(`${file.name} exceeds 5MB (${(file.size / 1024 / 1024).toFixed(2)}MB) and was skipped.`);
+                } else {
+                    this.selectedFiles.push({
+                        name: file.name,
+                        size: file.size,
+                    });
+                }
+            });
+               
         },
+
+      
 
         formatFileSize(bytes) {
             if (!bytes) return '0 B';
@@ -59,8 +70,7 @@
     }"
     x-on:section-estimate.window="
         sectionTotals[$event.detail.prefix] = Number($event.detail.total || 0)
-    "
->
+    ">
     <div class="flex items-center gap-4 mb-8">
         <a href="javascript:history.back()" class="text-2xl font-bold">
             <i class="fas fa-chevron-left text-lg"></i>
@@ -95,7 +105,7 @@
         @csrf
 
         {{-- Hidden inputs to capture global Alpine state --}}
-        <input type="hidden" name="type" value="kustom" >
+        <input type="hidden" name="type" value="kustom">
         <input type="hidden" name="category" :value="category" data-cy="input-category">
         <input type="hidden" name="size" :value="selectedSize" data-cy="input-size">
         <input type="hidden" name="total_quantity" :value="quantity" data-cy="input-quantity">
@@ -132,10 +142,18 @@
                             @change="handleFileSelection($event)">
                     </label>
                 </div>
+
+                <template x-if="warnings.length">
+                    <ul  data-cy="warnings">
+                        <template x-for="warning in warnings">
+                            <li x-text="warning" style="color: red;"></li>
+                        </template>
+                    </ul>
+                </template>
                 <template x-if="selectedFiles.length > 0">
                     <div class="mt-3 rounded-lg border border-gray-200 bg-white p-3">
                         <p class="text-xs font-semibold text-gray-500 mb-2">File dipilih:</p>
-                        <ul class="space-y-1">
+                        <ul  data-cy="file-lists" class="space-y-1">
                             <template x-for="(f, idx) in selectedFiles" :key="idx">
                                 <li class="text-sm text-gray-700 flex items-center justify-between gap-3">
                                     <span x-text="f.name" class="truncate"></span>
@@ -146,10 +164,10 @@
                     </div>
                 </template>
                 @error('design_files')
-                    <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                 @enderror
                 @error('design_files.*')
-                    <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                 @enderror
             </div>
         </div>
@@ -165,7 +183,7 @@
                     </div>
                     <div class="flex gap-2">
                         @foreach(['XS', 'S', 'M', 'L', 'XL', 'XXL'] as $size)
-                            <x-guest.katalog.size-selector :label="$size" :id="$size" class="w-16" />
+                        <x-guest.katalog.size-selector :label="$size" :id="$size" class="w-16" />
                         @endforeach
                     </div>
                 </div>
@@ -179,8 +197,7 @@
                             data-cy="qty-input" type="number"
                             min="1"
                             x-model.number="quantity"
-                            class="w-12 text-center font-bold border-none focus:ring-0"
-                        >
+                            class="w-12 text-center font-bold border-none focus:ring-0">
 
                         <button type="button" data-cy="qty-increment" @click="quantity++" class="px-2 font-bold">+</button>
                     </div>
@@ -191,7 +208,7 @@
                 <div class="text-4xl font-bold mb-1" x-text="formatCurrency(estimateTotal)"></div>
                 <p class="text-xs text-gray-400 mb-6">*Harga estimasi. Admin akan menghubungi untuk konfirmasi.</p>
 
-                <x-shared.button  data-cy="btn-checkout" type="submit" variant="primary" :rounded="false" class="w-full text-4xl py-4 bg-secondary text-black hover:bg-black hover:text-white transition-all font-bebas tracking-widest uppercase disabled:opacity-50">
+                <x-shared.button data-cy="btn-checkout" type="submit" variant="primary" :rounded="false" class="w-full text-4xl py-4 bg-secondary text-black hover:bg-black hover:text-white transition-all font-bebas tracking-widest uppercase disabled:opacity-50">
                     CHECKOUT
                 </x-shared.button>
             </div>
