@@ -5,13 +5,17 @@
 @php
     $firstFoto = $item->fotos->first();
     $fallbackImage = 'https://picsum.photos/id/1/1080';
-    
+
     $firstImageUrl = $firstFoto ? asset('storage/' . $firstFoto->path) : $fallbackImage;
 
-    $basePrice = (float) $item->harga;
+$basePrice = (float) $item->harga;
+    $isPreOrder = (int) $item->stok <= 0;
+    $maxQuantity = $isPreOrder ? 99 : (int) $item->stok;
 @endphp
 
-<div class="max-w-full mx-auto px-4 py-8"
+<div
+    data-cy="product-detail"
+    class="max-w-full mx-auto px-4 py-8"
     x-data="{
         activeImage: '{{ $firstImageUrl }}',
         quantity: 1,
@@ -21,7 +25,7 @@
     }">
 
     <div class="flex items-center gap-4 mb-8">
-        <a href="{{ route('katalog') }}" class="p-2 hover:bg-gray-100 rounded-full transition-colors">
+        <a data-cy="btn-back" href="{{ route('katalog') }}" class="p-2 hover:bg-gray-100 rounded-full transition-colors">
             <i class="fa-solid fa-chevron-left text-xl"></i>
         </a>
         <h1 class="text-4xl font-bebas tracking-widest">Detail Produk</h1>
@@ -32,33 +36,36 @@
         {{-- Thumbnails --}}
         <div class="lg:col-span-1 flex flex-col space-y-4">
             @forelse($item->fotos as $foto)
-                @php $url = asset('storage/' . $foto->path); @endphp
+            @php $url = asset('storage/' . $foto->path); @endphp
 
-                <button
-                    type="button"
-                    @click="activeImage = '{{ $url }}'"
-                    class="border transition-all duration-200 aspect-[3/4] overflow-hidden"
-                    :class="activeImage === '{{ $url }}' ? 'border-black ring-1 ring-black' : 'border-transparent hover:border-gray-300'">
-                    <img src="{{ $url }}" alt="Thumbnail" class="w-full h-full object-cover">
-                </button>
+            <button
+                type="button"
+                data-cy="thumbnail-{{ $loop->index }}"
+                @click="activeImage = '{{ $url }}'"
+                class="border transition-all duration-200 aspect-[3/4] overflow-hidden"
+                :class="activeImage === '{{ $url }}' ? 'border-black ring-1 ring-black' : 'border-transparent hover:border-gray-300'">
+                <img src="{{ $url }}" alt="Thumbnail" class="w-full h-full object-cover">
+            </button>
             @empty
-                {{-- fallback kalau belum ada foto --}}
-                @foreach(range(1, 4) as $i)
-                    @php $thumbnailUrl = "https://picsum.photos/id/" . $i . "/1080"; @endphp
-                    <button
-                        type="button"
-                        @click="activeImage = '{{ $thumbnailUrl }}'"
-                        class="border transition-all duration-200 aspect-[3/4] overflow-hidden"
-                        :class="activeImage === '{{ $thumbnailUrl }}' ? 'border-black ring-1 ring-black' : 'border-transparent hover:border-gray-300'">
-                        <img src="{{ $thumbnailUrl }}" alt="Thumbnail {{ $i }}" class="w-full h-full object-cover">
-                    </button>
-                @endforeach
+            {{-- fallback kalau belum ada foto --}}
+            @foreach(range(1, 4) as $i)
+            @php $thumbnailUrl = "https://picsum.photos/id/" . $i . "/1080"; @endphp
+            <button
+                type="button"
+                data-cy="thumbnail-fallback-{{ $i }}"
+                @click="activeImage = '{{ $thumbnailUrl }}'"
+                class="border transition-all duration-200 aspect-[3/4] overflow-hidden"
+                :class="activeImage === '{{ $thumbnailUrl }}' ? 'border-black ring-1 ring-black' : 'border-transparent hover:border-gray-300'">
+                <img src="{{ $thumbnailUrl }}" alt="Thumbnail {{ $i }}" class="w-full h-full object-cover">
+            </button>
+            @endforeach
             @endforelse
         </div>
 
         {{-- Main image --}}
         <div class="lg:col-span-6 bg-gray-50 flex items-center justify-center rounded-sm overflow-hidden min-h-[500px]">
             <img
+            data-cy="main-image"
                 :key="activeImage"
                 :src="activeImage"
                 alt="{{ $item->produk->nama_produk }}"
@@ -69,14 +76,18 @@
 
         {{-- Product info --}}
         <div class="lg:col-span-4 mx-auto">
-            <h1 class="text-4xl font-normal text-gray-900 mb-2">{{ $item->produk->nama_produk }}</h1>
-            <p class="text-5xl font-bold mb-2">Rp{{ number_format($item->harga, 0, ',', '.') }}</p>
-            <p class="text-gray-600 mb-8">Stok: {{ $item->stok }}</p>
+            <h1  data-cy="product-name" class="text-4xl font-normal text-gray-900 mb-2">{{ $item->produk->nama_produk }}</h1>
+            <p data-cy="product-price" class="text-5xl font-bold mb-2">Rp{{ number_format($item->harga, 0, ',', '.') }}</p>
+            @if ($isPreOrder)
+                <p class="text-amber-700 font-medium mb-1">Stok habis. Namun anda tetap bisa melakukan Pre-Order</p>
+            @else
+                <p data-cy="product-stock" class="text-gray-600 mb-8">Stok: {{ $item->stok }}</p>
+            @endif
 
             <div class="mb-6">
                 <div class="flex justify-between items-center mb-3">
                     <span class="font-bold text-lg">Ukuran</span>
-                    <button @click="$dispatch('open-modal', 'modal-panduan-ukuran')" class="text-xs flex items-center text-gray-500 hover:text-black">
+                    <button data-cy="btn-size-guide" @click="$dispatch('open-modal', 'modal-panduan-ukuran')" class="text-xs flex items-center text-gray-500 hover:text-black">
                         <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m4 0h1"></path>
                         </svg>
@@ -106,19 +117,38 @@
             </div>
 
             {{-- Quantity Button --}}
-            <x-shared.quantity-button model="quantity" :max="$item->stok" />
+            <x-shared.quantity-button model="quantity" :max="$maxQuantity" />
 
             <div class="mt-10">
-                <p class="text-5xl font-bold mb-6">
+                <p data-cy="total-price" class="text-5xl font-bold mb-6">
                     Rp<span x-text="(quantity * basePrice).toLocaleString('id-ID')"></span>
                 </p>
 
                 <div class="flex flex-col space-y-3">
-                    <x-shared.button variant="outline" :rounded="false">
-                        Add To Cart
-                    </x-shared.button>
-                    <x-shared.button variant="dark" :rounded="false">
-                        Checkout
+                    @if ($isPreOrder)
+                        <x-shared.button
+                            data-cy="btn-add-to-cart" variant="outline"
+                            :rounded="false"
+                            :href="route('checkout', ['type' => 'katalog', 'mode' => 'preorder'])">
+                            Pre-Order Sekarang
+                        </x-shared.button>
+                    @else
+                        <form action="{{ route('cart.add', ['katalog_id' => $item->katalog_id]) }}" method="POST">
+                            @csrf
+                            <input type="hidden" name="quantity" :value="quantity">
+                            <x-shared.button
+                                type="submit"
+                                variant="outline"
+                                :rounded="false">
+                                Add To Cart
+                            </x-shared.button>
+                        </form>
+                    @endif
+                    <x-shared.button
+                        data-cy="btn-checkout" variant="dark"
+                        :rounded="false"
+                        :href="route('checkout', ['type' => 'katalog', 'mode' => $isPreOrder ? 'preorder' : 'normal'])">
+                        {{ $isPreOrder ? 'Checkout Pre-Order' : 'Checkout' }}
                     </x-shared.button>
                 </div>
             </div>
@@ -126,15 +156,15 @@
     </div>
 
     <div class="mt-16 max-w-4xl">
-        <p class="text-gray-500 mb-2">Terjual : 1.231.214</p>
+        <p  data-cy="product-sold" class="text-gray-500 mb-2">Terjual : 1.231.214</p>
         <h3 class="font-bold mb-2">Deskripsi</h3>
-        <p class="text-gray-600 leading-relaxed mb-6">
+        <p  data-cy="product-description" class="text-gray-600 leading-relaxed mb-6">
             {{ $item->produk->deskripsi }}
         </p>
 
         <div class="flex gap-2 font-bold text-black uppercase tracking-wider text-sm">
-            <span>#{{ $item->kategori }}</span>
-            <span>#{{ $item->produk->jenis_produk }}</span>
+            <span  data-cy="product-category">#{{ $item->kategori }}</span>
+            <span  data-cy="product-type">#{{ $item->produk->jenis_produk }}</span>
         </div>
     </div>
 </div>

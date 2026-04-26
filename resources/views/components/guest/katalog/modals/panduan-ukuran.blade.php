@@ -53,10 +53,6 @@
             </div>
         </div>
 
-        <div class="mt-8 sm:hidden">
-            <button @click="$dispatch('close-modal', 'size-guide-modal')" class="w-full py-3 bg-zinc-900 text-white rounded-lg font-bold">
-                Tutup
-            </button>
-        </div>
+        
     </div>
 </x-shared.modal_base>
