@@ -40,8 +40,14 @@
       handleFileSelection(event) {
             const files = Array.from(event.target.files || []);
             const MAX_SIZE = 5 * 1024 * 1024; // 5MB in bytes
+            const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/svg+xml', 'image/cdr']; 
             this.warnings = [];
             files.forEach((file) => {
+         
+                if (!ALLOWED_TYPES.includes(file.type)) {
+                    this.warnings.push(`${file.name} is not a supported format.`);
+                    return; // Skip this file
+                }
                 if (file.size > MAX_SIZE) {
                  this.warnings.push(`${file.name} exceeds 5MB (${(file.size / 1024 / 1024).toFixed(2)}MB) and was skipped.`);
                 } else {
@@ -52,9 +58,7 @@
                 }
             });
                
-        },
-
-      
+        },      
 
         formatFileSize(bytes) {
             if (!bytes) return '0 B';
@@ -114,11 +118,11 @@
         <input type="hidden" name="estimated_per_pcs" :value="estimatePerPcs">
         <input type="hidden" name="estimated_total" :value="estimateTotal">
 
-        <div x-show="category === 'bundle' || category === 'atasan'">
+        <div data-cy="section-atasan" x-show="category === 'bundle' || category === 'atasan'">
             @include('pages.guest.kustom.partials.section_config', ['title' => 'Section Atasan', 'prefix' => 'atasan'])
         </div>
 
-        <div x-show="category === 'bundle' || category === 'bawahan'" class="mt-12">
+        <div data-cy="section-bawahan" x-show="category === 'bundle' || category === 'bawahan'" class="mt-12">
             @include('pages.guest.kustom.partials.section_config', ['title' => 'Section Bawahan', 'prefix' => 'bawahan'])
         </div>
 
@@ -144,7 +148,7 @@
                 </div>
 
                 <template x-if="warnings.length">
-                    <ul  data-cy="warnings">
+                    <ul data-cy="warnings">
                         <template x-for="warning in warnings">
                             <li x-text="warning" style="color: red;"></li>
                         </template>
@@ -153,7 +157,7 @@
                 <template x-if="selectedFiles.length > 0">
                     <div class="mt-3 rounded-lg border border-gray-200 bg-white p-3">
                         <p class="text-xs font-semibold text-gray-500 mb-2">File dipilih:</p>
-                        <ul  data-cy="file-lists" class="space-y-1">
+                        <ul data-cy="file-list" class="space-y-1">
                             <template x-for="(f, idx) in selectedFiles" :key="idx">
                                 <li class="text-sm text-gray-700 flex items-center justify-between gap-3">
                                     <span x-text="f.name" class="truncate"></span>
