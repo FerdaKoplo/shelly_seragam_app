@@ -1,6 +1,5 @@
 <x-shared.modal_base name="modal-filter-produk-katalog" data-cy="modal-filter" title="Filter Produk" maxWidth="3xl">
-    <div
-        x-data="{
+    <div x-data="{
             filters: [],
 
             groups: {
@@ -66,7 +65,7 @@
 
                 // stok/ketersediaan -> filter_status (sesuai controller)
                 if (this.filters.includes('stok-ready')) url.searchParams.set('filter_status', 'ready');
-                if (this.filters.includes('stok-empty')) url.searchParams.set('filter_status', 'empty');
+                if (this.filters.includes('stok-empty')) url.searchParams.set('filter_status', 'pre-order');
                 // kalau tidak ada stok-selected, default backend sudah: stok >= 0
 
                 // sort (sesuai controller)
@@ -122,7 +121,7 @@
                 <h4 class="font-bold text-gray-900 mb-3">Ketersediaan</h4>
                 <div class="flex flex-wrap gap-3">
                     <x-guest.katalog.filter-button label="Stok Ready" id="stok-ready" />
-                    <x-guest.katalog.filter-button label="Stok Habis" id="stok-empty" />
+                    <x-guest.katalog.filter-button label="Pre-Order" id="stok-empty" />
                 </div>
                 <p class="text-xs text-gray-500 mt-2">
                     Default: semua produk yang tidak diarsipkan (stok &gt;= 0).
@@ -191,13 +190,11 @@
 
         <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end gap-3">
             <div class="flex justify-end gap-3 w-full">
-                <button @click="resetFilters()"
-                    data-cy="btn-reset-filter"
+                <button @click="resetFilters()" data-cy="btn-reset-filter"
                     class="px-8 py-2 font-bold text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
                     Hapus Filter
                 </button>
-                <button @click="applyFilters()"
-                    data-cy="btn-apply-filter"
+                <button @click="applyFilters()" data-cy="btn-apply-filter"
                     class="px-8 py-2 font-bold text-white bg-[#333333] rounded-md hover:bg-black transition-colors">
                     Terapkan Filter
                 </button>

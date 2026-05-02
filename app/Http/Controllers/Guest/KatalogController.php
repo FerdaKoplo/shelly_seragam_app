@@ -19,12 +19,6 @@ class KatalogController extends Controller
         if ($request->filled('search')) {
             $search = $request->search;
 
-            // $query->where(function ($q) use ($search) {
-            //     $q->whereHas('produk', function ($subQ) use ($search) {
-            //         $subQ->where('nama_produk', 'like', '%' . $search . '%');
-            //     })->orWhere('kategori', 'like', '%' . $search . '%');
-            // });
-            
             // search (nama produk saja)
             if ($request->filled('search')) {
                 $search = $request->search;
@@ -39,6 +33,8 @@ class KatalogController extends Controller
         if ($request->filled('min_harga')) {
             $query->where('harga', '>=', $request->min_harga);
         }
+
+
         if ($request->filled('max_harga')) {
             $query->where('harga', '<=', $request->max_harga);
         }
@@ -51,11 +47,10 @@ class KatalogController extends Controller
         // status stok
         if ($request->filled('filter_status')) {
             if ($request->filter_status === 'ready') {
-                $query->where('stok', '>', 0);
-            } elseif ($request->filter_status === 'empty') {
-                $query->where('stok', '=', 0);
+                $query->where('status', 'Tersedia');
+            } elseif ($request->filter_status === 'pre-order') {
+                $query->where('status', 'Pre-Order');
             }
-            // "active" = default (stok >= 0), sudah ke-cover
         }
 
         // sort

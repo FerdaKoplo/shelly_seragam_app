@@ -292,6 +292,18 @@ class KatalogProdukController extends Controller
         }
     }
 
+    public function showPreorderKatalog($id){
+        try {
+            $katalog = ProdukKatalog::where('produk_id', $id)->firstOrFail();
+            if ($katalog->stok == 0 ) {
+                $katalog->update(['status' => 'Pre-Order']);
+            } 
+
+        } catch (\Exception $e) {
+            
+        }
+    }
+
     public function destroy($id)
     {
         try {
