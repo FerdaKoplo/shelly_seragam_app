@@ -30,5 +30,13 @@ class ProdukKatalog extends Model
     {
         return $this->hasMany(FotoProdukKatalog::class, 'produk_id', 'produk_id');
     }
+    protected static function booted()
+    {
+        static::saving(function ($katalog) {
+            if ($katalog->status !== 'Arsip') {
+                $katalog->status = $katalog->stok <= 0 ? 'Pre-Order' : 'Tersedia';
+            }
+        });
+    }
 
 }
