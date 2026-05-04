@@ -93,6 +93,7 @@
             customData: initial.customData || null,
             shippingOptions: initial.shippingOptions || [],
             isSubmitting: false,
+            isConfirming: false,
             shippingMethod: initial.shippingMethod || null,
             shippingCost: 0,
             notes: initial.notes || "",
@@ -169,6 +170,13 @@
 
             async submitOrder() {
                 if (!this.validateCheckout()) return;
+                if (this.isSubmitting || this.isConfirming) return;
+
+                this.isConfirming = true;
+                const confirmed = window.confirm("Apakah data yang dimasukkan sudah benar?");
+                this.isConfirming = false;
+                if (!confirmed) return;
+
                 this.isSubmitting = true;
                 this.$refs.checkoutForm.submit();
             }
