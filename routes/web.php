@@ -15,6 +15,8 @@ use App\Models\ProdukKatalog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
 
 /*
 |--------------------------------------------------------------------------
@@ -193,6 +195,81 @@ Route::match(['GET', 'POST'], '/checkout', function (Request $request) {
         'notes' => $checkoutNotes,
         'size' => $request->input('size'),
     ];
+
+    // Payment gateway redirect (Midtrans Snap)
+    // Triggered only when the customer actually submits the checkout form.
+    if (
+        $request->isMethod('post')
+        && $request->hasAny(['full_name', 'email', 'phone', 'address', 'city', 'province', 'postal_code', 'shipping_id'])
+        && $request->input('payment_method') === 'midtrans'
+        && $type === 'katalog'
+    ) {
+        $serverKey = (string) env('MIDTRANS_SERVER_KEY', '');
+        $isProduction = (bool) env('MIDTRANS_IS_PRODUCTION', false);
+        $snapBaseUrl = $isProduction
+            ? 'https://app.midtrans.com'
+            : 'https://app.sandbox.midtrans.com';
+
+        if ($serverKey === '') {
+            return back()
+                ->withErrors(['payment_method' => 'Midtrans belum dikonfigurasi (MIDTRANS_SERVER_KEY).'])
+                ->withInput();
+        }
+
+        $orderId = 'ORDER-' . now()->format('YmdHis') . '-' . Str::upper(Str::random(6));
+
+        $itemDetails = collect($katalogItems)->map(function ($item) {
+            return [
+                'id' => (string) ($item['katalog_id'] ?? $item['id'] ?? ''),
+                'price' => (int) ($item['price'] ?? 0),
+                'quantity' => (int) ($item['quantity'] ?? 1),
+                'name' => (string) ($item['name'] ?? 'Produk'),
+            ];
+        })->values()->all();
+
+        $grossAmount = collect($itemDetails)->sum(function ($item) {
+            return ((int) $item['price']) * ((int) $item['quantity']);
+        });
+
+        $payload = [
+            'transaction_details' => [
+                'order_id' => $orderId,
+                'gross_amount' => (int) $grossAmount,
+            ],
+            'item_details' => $itemDetails,
+            'customer_details' => [
+                'first_name' => (string) $request->input('full_name'),
+                'email' => (string) $request->input('email'),
+                'phone' => (string) $request->input('phone'),
+                'shipping_address' => [
+                    'address' => (string) $request->input('address'),
+                    'city' => (string) $request->input('city'),
+                    'postal_code' => (string) $request->input('postal_code'),
+                    'country_code' => 'IDN',
+                ],
+            ],
+        ];
+
+        $response = Http::withBasicAuth($serverKey, '')
+            ->acceptJson()
+            ->asJson()
+            ->post($snapBaseUrl . '/snap/v1/transactions', $payload);
+
+        if (!$response->successful()) {
+            return back()
+                ->withErrors(['payment_method' => 'Gagal membuat pembayaran Midtrans. Coba lagi.'])
+                ->withInput();
+        }
+
+        $redirectUrl = (string) ($response->json('redirect_url') ?? '');
+        if ($redirectUrl === '') {
+            return back()
+                ->withErrors(['payment_method' => 'Response Midtrans tidak valid (redirect_url kosong).'])
+                ->withInput();
+        }
+
+        return redirect()->away($redirectUrl);
+    }
 
     return view('pages.guest.checkout.checkout', [
         'type' => $type,
