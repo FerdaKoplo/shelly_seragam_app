@@ -13,6 +13,18 @@
         shippingMethod: null,
         shippingCost: 0,
         notes: @json($checkoutNotes),
+        customer: {
+            full_name: "",
+            email: "",
+            phone: "",
+        },
+        address: {
+            address: "",
+            city: "",
+            province: "",
+            postal_code: "",
+        },
+        errors: {},
 
         selectShipping(option) {
             this.shippingMethod = option.id;
@@ -34,8 +46,41 @@
             return "Rp" + num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
         },
 
+        validateCheckout() {
+            const errors = {};
+
+            const fullName = (this.customer.full_name || "").trim();
+            const email = (this.customer.email || "").trim();
+            const phone = (this.customer.phone || "").trim();
+
+            const address = (this.address.address || "").trim();
+            const city = (this.address.city || "").trim();
+            const province = (this.address.province || "").trim();
+            const postal = (this.address.postal_code || "").trim();
+
+            if (!fullName) errors.full_name = "Nama lengkap wajib diisi.";
+            if (!email) errors.email = "Email wajib diisi.";
+            else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errors.email = "Format email tidak valid.";
+
+            if (!phone) errors.phone = "Nomor telepon wajib diisi.";
+            else if (!/^[0-9+\-\s]{8,20}$/.test(phone)) errors.phone = "Nomor telepon tidak valid.";
+
+            if (!address) errors.address = "Alamat jalan wajib diisi.";
+            if (!city) errors.city = "Kota wajib diisi.";
+            if (!province) errors.province = "Provinsi wajib diisi.";
+            if (!postal) errors.postal_code = "Kode pos wajib diisi.";
+            else if (!/^[0-9]{4,6}$/.test(postal)) errors.postal_code = "Kode pos tidak valid.";
+
+            if (!this.shippingMethod) errors.shipping_id = "Pilih opsi pengiriman.";
+
+            this.errors = errors;
+            return Object.keys(errors).length === 0;
+        },
+
         async submitOrder() {
-            if(!this.shippingMethod) return alert("Silahkan pilih opsi pengiriman");
+            if (!this.validateCheckout()) {
+                return;
+            }
             this.isSubmitting = true;
         }
     }'>

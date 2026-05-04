@@ -2,10 +2,33 @@
     <h2 class="text-xl font-bold">Alamat Pengiriman</h2>
     
     <div class="grid grid-cols-2 gap-3">
-        <input type="text" name="address" placeholder="Alamat Jalan" class="col-span-2 bg-gray-100 border-none rounded-xl p-4 focus:ring-2 focus:ring-black transition">
-        <input type="text" name="city" placeholder="Kota" class="col-span-2 bg-gray-100 border-none rounded-xl p-4 focus:ring-2 focus:ring-black">
-        <input type="text" name="province" placeholder="Provinsi" class="bg-gray-100 border-none rounded-xl p-4 focus:ring-2 focus:ring-black">
-        <input type="text" name="postal_code" placeholder="Kode Pos" class="bg-gray-100 border-none rounded-xl p-4 focus:ring-2 focus:ring-black">
+        <div class="col-span-2">
+            <input type="text" name="address" placeholder="Alamat Jalan"
+                x-model="address.address" @input="delete errors.address"
+                class="w-full bg-gray-100 border-none rounded-xl p-4 focus:ring-2 focus:ring-black transition">
+            <p x-show="errors.address" x-text="errors.address" class="mt-1 text-sm text-red-600"></p>
+        </div>
+
+        <div class="col-span-2">
+            <input type="text" name="city" placeholder="Kota"
+                x-model="address.city" @input="delete errors.city"
+                class="w-full bg-gray-100 border-none rounded-xl p-4 focus:ring-2 focus:ring-black transition">
+            <p x-show="errors.city" x-text="errors.city" class="mt-1 text-sm text-red-600"></p>
+        </div>
+
+        <div>
+            <input type="text" name="province" placeholder="Provinsi"
+                x-model="address.province" @input="delete errors.province"
+                class="w-full bg-gray-100 border-none rounded-xl p-4 focus:ring-2 focus:ring-black">
+            <p x-show="errors.province" x-text="errors.province" class="mt-1 text-sm text-red-600"></p>
+        </div>
+
+        <div>
+            <input type="text" name="postal_code" placeholder="Kode Pos"
+                x-model="address.postal_code" @input="delete errors.postal_code"
+                class="w-full bg-gray-100 border-none rounded-xl p-4 focus:ring-2 focus:ring-black">
+            <p x-show="errors.postal_code" x-text="errors.postal_code" class="mt-1 text-sm text-red-600"></p>
+        </div>
     </div>
 
     {{-- Dynamic Shipping Selector --}}
@@ -28,4 +51,5 @@
 
     {{-- Hidden input to ensure the selected method is sent to the server --}}
     <input type="hidden" name="shipping_id" :value="shippingMethod">
+    <p x-show="errors.shipping_id" x-text="errors.shipping_id" class="text-sm text-red-600"></p>
 </div>
