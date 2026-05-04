@@ -1,5 +1,5 @@
-<x-shared.modal_base   name="modal-size-variation" name="modal-size-variation" title="Variasi Ukuran" maxWidth="2xl">
-    <div x-data="{
+<x-shared.modal_base  name="modal-size-variation" title="Variasi Ukuran" maxWidth="2xl">
+    <div data-cy="modal-size-variation" x-data="{
         presets: ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
         selectedPreset: 'L', // Default selected
         sizeName: 'L',
