@@ -18,6 +18,7 @@ class ProdukSeeder extends Seeder
         $faker = Faker::create('id_ID'); 
 
         $kategoris = ['Atasan', 'Seragam Sekolah', 'Seragam Kantor', 'Kaos', 'Jaket', 'Celana', 'Aksesoris'];
+        $ukurans = ['XS', 'Seragam Sekolah', 'Seragam Kantor', 'Kaos', 'Jaket', 'Celana', 'Aksesoris'];
         
         for ($i = 0; $i < 100; $i++) {
             $now = Carbon::now();
@@ -44,12 +45,12 @@ class ProdukSeeder extends Seeder
                     'updated_at' => $now,
                 ]);
 
-                DB::table('foto_produk_katalog')->insert([
-                    'produk_id' => $produkId,
-                    'path' => 'uploads/produk/' . \Str::slug($kategori) . '-' . $faker->numberBetween(1, 10) . '.jpg',
-                    'created_at' => $now,
-                    'updated_at' => $now,
-                ]);
+                // DB::table('foto_produk_katalog')->insert([
+                //     'produk_id' => $produkId,
+                //     'path' => 'uploads/produk/' . \Str::slug($kategori) . '-' . $faker->numberBetween(1, 10) . '.jpg',
+                //     'created_at' => $now,
+                //     'updated_at' => $now,
+                // ]);
             }
         }
     }

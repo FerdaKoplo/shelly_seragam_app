@@ -1,4 +1,4 @@
-<x-shared.modal_base name="modal-panduan-ukuran" maxWidth="2xl" :showCloseButton="true">
+<x-shared.modal_base data-cy="size-guide-modal" name="modal-panduan-ukuran" maxWidth="2xl" :showCloseButton="true">
     <div x-data="{
         {{-- This mock data should be passed from your Product Model in the backend --}}
         measurements: [

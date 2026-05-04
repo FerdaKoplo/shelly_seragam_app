@@ -2,7 +2,7 @@
 @section('title', 'Keranjang Saya')
 
 @section('content')
-    <div class="container mx-auto px-4 py-8 max-w-7xl" x-data="{ 
+    <div data-cy="cart-page" class="container mx-auto px-4 py-8 max-w-7xl" x-data="{ 
             items: {{ Illuminate\Support\Js::from($items) }},
             notes: {{ Illuminate\Support\Js::from($notes) }},
             isSubmitting: false,
@@ -18,9 +18,8 @@
                     if (!this.shouldWarnOnLeave()) {
                         return;
                     }
-
                     event.preventDefault();
-                    event.returnValue = '';
+                    event.returnValue = 'You have items in your cart. Are you sure you want to leave?';
                 };
 
                 window.addEventListener('beforeunload', handler);
@@ -101,14 +100,14 @@
                         onsubmit="return confirm('Kosongkan seluruh item di keranjang?')">
                         @csrf
                         @method('DELETE')
-                        <button type="submit"
+                        <button data-cy="clear-cart-btn" type="submit"
                             class="inline-flex items-center rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-700 hover:bg-red-100">
                             Kosongkan Keranjang
                         </button>
                     </form>
                 </template>
                 <template x-if="items.length === 0">
-                    <div class="border rounded-xl p-6 text-gray-600">
+                    <div  data-cy="cart-empty" class="border rounded-xl p-6 text-gray-600">
                         Keranjang masih kosong. Tambahkan produk dari katalog.
                     </div>
                 </template>
@@ -141,7 +140,7 @@
 
                         @foreach($recommendations as $product)
                         <div class="min-w-[280px] md:min-w-[320px] lg:min-w-[350px] snap-start">
-                            <x-cards.product-card.horizontal :name="$product['name']" :price="$product['price']"
+                            <x-cards.product-card.horizontal data-cy="recommendation-item" :name="$product['name']" :price="$product['price']"
                                 :image="$product['img']" />
                         </div>
                         @endforeach
@@ -164,7 +163,7 @@
                 {{-- Notes Section --}}
                 <div>
                     <label class="text-xl font-bold mb-4 block">Catatan</label>
-                    <textarea x-model="notes" @input="queueSaveNotes()"
+                    <textarea x-model="notes" @input="queueSaveNotes()"  data-cy="cart-notes"
                         class="w-full border-black rounded-xl h-40 focus:ring-black focus:border-black bg-slate-200 p-4"
                         placeholder="Tambahkan catatan untuk pesanan Anda..."></textarea>
                     <p class="mt-2 text-xs text-gray-600" x-show="noteSaveState === 'saving'">Menyimpan catatan...</p>
@@ -176,7 +175,7 @@
                 {{-- Final Summary & Action --}}
                 <div class="space-y-6 pt-6">
                     <div class="flex justify-end">
-                        <p class="text-5xl font-black tracking-wider" x-text="formatCurrency(total)"></p>
+                        <p data-cy="cart-total" class="text-5xl font-black tracking-wider" x-text="formatCurrency(total)"></p>
                     </div>
 
                     <form action="{{ route('checkout') }}" method="POST" @submit="isSubmitting = true">
@@ -185,7 +184,7 @@
                         <input type="hidden" name="cart_data" :value="JSON.stringify(items)">
                         <input type="hidden" name="notes" :value="notes">
 
-                        <x-shared.button type="submit" variant="primary" :rounded="false"
+                        <x-shared.button data-cy="checkout-btn" type="submit" variant="primary" :rounded="false"
                             class="text-2xl py-6 text-white bg-black hover:bg-secondary hover:text-black tracking-widest">
                             Checkout
                         </x-shared.button>
