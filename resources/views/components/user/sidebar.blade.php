@@ -1,7 +1,7 @@
 @php
 $active = 'bg-secondary text-black ';
 $inactive = 'text-white hover:text-black hover:bg-secondary hover:bg-opacity-70 transition-colors duration-200';
-$role = auth()->user()->role;
+$role = auth()->user()?->role;
 @endphp
 
 <aside class="fixed left-0 top-24 w-80 h-[calc(100vh-6rem)] bg-neutral text-white transition-transform -translate-x-full lg:translate-x-0 overflow-y-auto">
