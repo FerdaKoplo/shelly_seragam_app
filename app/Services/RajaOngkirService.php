@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 
 class RajaOngkirService
@@ -22,6 +23,16 @@ class RajaOngkirService
      */
     public function searchDomesticDestination(string $search, int $limit = 20, int $offset = 0): array
     {
+        $ttlSeconds = (int) env('RAJA_ONGKIR_CACHE_TTL_SECONDS', 86400);
+        $cacheKey = 'rajaongkir:destinations:' . sha1(mb_strtolower(trim($search)) . "|{$limit}|{$offset}");
+
+        if ($ttlSeconds > 0) {
+            $cached = Cache::get($cacheKey);
+            if (is_array($cached) && $cached !== []) {
+                return $cached;
+            }
+        }
+
         $response = Http::withHeaders(['key' => $this->apiKey])
             ->acceptJson()
             ->get($this->baseUrl . 'destination/domestic-destination', [
@@ -31,15 +42,32 @@ class RajaOngkirService
             ]);
 
         if (!$response->successful()) {
-            return [];
+            return [[
+                '_error' => true,
+                'status' => $response->status(),
+                'message' => 'RajaOngkir request failed',
+                'body' => $response->json() ?? $response->body(),
+            ]];
         }
 
         // Komerce response commonly uses meta/data. Some legacy RajaOngkir wrappers use rajaongkir/results.
         $data = $response->json('data');
-        if (is_array($data)) return $data;
+        if (is_array($data)) {
+            if ($ttlSeconds > 0 && $data !== []) {
+                Cache::put($cacheKey, $data, $ttlSeconds);
+            }
+            return $data;
+        }
 
         $results = $response->json('rajaongkir.results');
-        return is_array($results) ? $results : [];
+        if (is_array($results)) {
+            if ($ttlSeconds > 0 && $results !== []) {
+                Cache::put($cacheKey, $results, $ttlSeconds);
+            }
+            return $results;
+        }
+
+        return [];
     }
 
     /**
@@ -48,6 +76,16 @@ class RajaOngkirService
      */
     public function calculateDomesticCost(int $origin, int $destination, int $weight, string $courier, string $price = 'lowest'): array
     {
+        $ttlSeconds = (int) env('RAJA_ONGKIR_CACHE_TTL_SECONDS', 86400);
+        $cacheKey = 'rajaongkir:cost:' . sha1("{$origin}|{$destination}|{$weight}|{$courier}|{$price}");
+
+        if ($ttlSeconds > 0) {
+            $cached = Cache::get($cacheKey);
+            if (is_array($cached) && $cached !== []) {
+                return $cached;
+            }
+        }
+
         $response = Http::withHeaders(['key' => $this->apiKey])
             ->acceptJson()
             ->asForm()
@@ -60,14 +98,31 @@ class RajaOngkirService
             ]);
 
         if (!$response->successful()) {
-            return [];
+            return [[
+                '_error' => true,
+                'status' => $response->status(),
+                'message' => 'RajaOngkir request failed',
+                'body' => $response->json() ?? $response->body(),
+            ]];
         }
 
         $data = $response->json('data');
-        if (is_array($data)) return $data;
+        if (is_array($data)) {
+            if ($ttlSeconds > 0 && $data !== []) {
+                Cache::put($cacheKey, $data, $ttlSeconds);
+            }
+            return $data;
+        }
 
         $results = $response->json('rajaongkir.results');
-        return is_array($results) ? $results : [];
+        if (is_array($results)) {
+            if ($ttlSeconds > 0 && $results !== []) {
+                Cache::put($cacheKey, $results, $ttlSeconds);
+            }
+            return $results;
+        }
+
+        return [];
     }
 
     public function getCost($origin, $destination, $weight, $courier)

@@ -16,9 +16,12 @@ class ShippingController extends Controller
 
         $results = $rajaOngkir->searchDomesticDestination((string) $request->input('search'));
 
+        $hasError = isset($results[0]) && is_array($results[0]) && (($results[0]['_error'] ?? false) === true);
+
         return response()->json([
             'data' => $results,
-        ]);
+            'ok' => !$hasError,
+        ], $hasError ? 502 : 200);
     }
 
     public function cost(Request $request, RajaOngkirService $rajaOngkir)
@@ -43,4 +46,3 @@ class ShippingController extends Controller
         ]);
     }
 }
-
