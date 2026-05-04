@@ -74,6 +74,33 @@ Route::match(['GET', 'POST'], '/checkout', function (Request $request) {
     $type = $request->input('type', $request->query('type', 'katalog'));
     $checkoutNotes = (string) $request->input('notes', $request->session()->get('cart_notes', ''));
 
+    // Validate only when the customer form is actually being submitted.
+    // (We also use POST to open checkout from product detail.)
+    if ($request->isMethod('post') && $request->hasAny([
+        'full_name',
+        'email',
+        'phone',
+        'address',
+        'city',
+        'province',
+        'postal_code',
+        'shipping_id',
+    ])) {
+        $request->validate([
+            'full_name' => ['required', 'string', 'min:2', 'max:100'],
+            'email' => ['required', 'email:rfc,dns', 'max:255'],
+            'phone' => ['required', 'string', 'min:8', 'max:20', 'regex:/^[0-9+\-\s]+$/'],
+
+            'address' => ['required', 'string', 'min:5', 'max:255'],
+            'city' => ['required', 'string', 'min:2', 'max:100'],
+            'province' => ['required', 'string', 'min:2', 'max:100'],
+            'postal_code' => ['required', 'string', 'regex:/^[0-9]{4,6}$/'],
+
+            'shipping_id' => ['required', 'in:reg,exp'],
+            'notes' => ['nullable', 'string', 'max:1000'],
+        ]);
+    }
+
     // Direct checkout (single item) from product detail page
     if ($request->isMethod('post') && $request->filled('katalog_id')) {
         $katalogId = (int) $request->input('katalog_id');
