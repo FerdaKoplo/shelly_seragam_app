@@ -94,6 +94,10 @@
             shippingOptions: initial.shippingOptions || [],
             isSubmitting: false,
             isConfirming: false,
+            isLoadingDestinations: false,
+            destinationQuery: "",
+            destinationId: null,
+            destinationResults: [],
             shippingMethod: initial.shippingMethod || null,
             shippingCost: 0,
             notes: initial.notes || "",
@@ -145,7 +149,6 @@
                 const phone = (this.customer.phone || "").trim();
 
                 const address = (this.address.address || "").trim();
-                const city = (this.address.city || "").trim();
                 const province = (this.address.province || "").trim();
                 const postal = (this.address.postal_code || "").trim();
 
@@ -157,10 +160,10 @@
                 else if (!/^[0-9+\-\s]{8,20}$/.test(phone)) errors.phone = "Nomor telepon tidak valid.";
 
                 if (!address) errors.address = "Alamat jalan wajib diisi.";
-                if (!city) errors.city = "Kota wajib diisi.";
                 if (!province) errors.province = "Provinsi wajib diisi.";
                 if (!postal) errors.postal_code = "Kode pos wajib diisi.";
                 else if (!/^[0-9]{4,6}$/.test(postal)) errors.postal_code = "Kode pos tidak valid.";
+                if (!this.destinationId) errors.city = "Pilih kota/kecamatan dari pencarian (RajaOngkir).";
 
                 if (!this.shippingMethod) errors.shipping_id = "Pilih opsi pengiriman.";
 
@@ -170,16 +173,108 @@
 
             get isAddressValid() {
                 const address = (this.address.address || "").trim();
-                const city = (this.address.city || "").trim();
-                const province = (this.address.province || "").trim();
                 const postal = (this.address.postal_code || "").trim();
 
                 if (!address || address.length < 5) return false;
-                if (!city || city.length < 2) return false;
-                if (!province || province.length < 2) return false;
                 if (!postal || !/^[0-9]{4,6}$/.test(postal)) return false;
+                if (!this.destinationId) return false;
 
                 return true;
+            },
+
+            async searchDestinations() {
+                const q = (this.destinationQuery || "").trim();
+                this.destinationId = null;
+                this.destinationResults = [];
+                if (q.length < 2) return;
+
+                this.isLoadingDestinations = true;
+                try {
+                    const resp = await fetch(`{{ route('shipping.destinations') }}?search=${encodeURIComponent(q)}`, {
+                        headers: { "Accept": "application/json" },
+                    });
+                    const json = await resp.json().catch(() => ({}));
+                    this.destinationResults = Array.isArray(json.data) ? json.data : [];
+                } catch (e) {
+                    this.destinationResults = [];
+                } finally {
+                    this.isLoadingDestinations = false;
+                }
+            },
+
+            selectDestination(dest) {
+                const id = dest?.id ?? dest?.destination_id ?? null;
+                const label = dest?.label ?? dest?.name ?? dest?.city_name ?? dest?.subdistrict_name ?? "";
+                const province = dest?.province_name ?? dest?.province ?? "";
+
+                this.destinationId = id ? parseInt(id, 10) : null;
+                this.destinationQuery = label || this.destinationQuery;
+                this.address.city = label || this.address.city;
+                this.address.province = province || this.address.province;
+                this.destinationResults = [];
+
+                if (this.destinationId) {
+                    this.loadShippingOptions();
+                }
+            },
+
+            get totalWeight() {
+                if (this.type !== "katalog") return 1000;
+                const qty = this.items.reduce((sum, item) => sum + (item.quantity || 0), 0);
+                return Math.max(1, qty) * 1000;
+            },
+
+            async loadShippingOptions() {
+                if (!this.destinationId) return;
+                try {
+                    const resp = await fetch(`{{ route('shipping.cost') }}`, {
+                        method: "POST",
+                        headers: {
+                            "Accept": "application/json",
+                            "Content-Type": "application/json",
+                            "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                        },
+                        body: JSON.stringify({
+                            destination: this.destinationId,
+                            weight: this.totalWeight,
+                            courier: "jne",
+                        }),
+                    });
+
+                    const json = await resp.json().catch(() => ({}));
+                    const raw = Array.isArray(json.data) ? json.data : [];
+
+                    const mapped = [];
+                    for (const courier of raw) {
+                        const courierName = courier?.name || courier?.courier || "Kurir";
+                        const costs = courier?.costs || courier?.cost || courier?.services || [];
+                        if (!Array.isArray(costs)) continue;
+
+                        for (const c of costs) {
+                            const service = c?.service || c?.name || c?.code || "Service";
+                            const costArr = c?.cost || c?.costs || [];
+                            const firstCost = Array.isArray(costArr) ? costArr[0] : null;
+                            const value = firstCost?.value ?? c?.value ?? null;
+                            const etd = firstCost?.etd ?? c?.etd ?? "";
+                            if (typeof value !== "number" && typeof value !== "string") continue;
+
+                            mapped.push({
+                                id: `${courierName}-${service}`.toLowerCase().replace(/\s+/g, "-"),
+                                label: `${courierName} ${service}`.trim(),
+                                duration: etd ? `${etd}` : null,
+                                price: parseInt(value, 10) || 0,
+                            });
+                        }
+                    }
+
+                    if (mapped.length > 0) {
+                        this.shippingOptions = mapped;
+                        this.shippingMethod = null;
+                        this.shippingCost = 0;
+                    }
+                } catch (e) {
+                    // keep existing options
+                }
             },
 
             async submitOrder() {

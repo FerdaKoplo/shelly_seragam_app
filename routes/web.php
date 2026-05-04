@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Guest\CartController;
 use App\Http\Controllers\Guest\KatalogController;
 use App\Http\Controllers\Guest\LandingController;
+use App\Http\Controllers\Guest\ShippingController;
 use App\Http\Controllers\User\KatalogProdukController;
 use App\Http\Controllers\User\KelolaTransaksiController;
 use App\Http\Controllers\User\ManageKustomisasiController;
@@ -68,6 +69,14 @@ Route::prefix('keranjang')->name('cart.')->group(function () {
 
     Route::delete('/clear', [CartController::class, 'clear'])
         ->name('clear');
+});
+
+/**
+ * RajaOngkir (Customer checkout helper)
+ */
+Route::prefix('shipping')->name('shipping.')->group(function () {
+    Route::get('/destinations', [ShippingController::class, 'destinations'])->name('destinations');
+    Route::post('/cost', [ShippingController::class, 'cost'])->name('cost');
 });
 
 /**

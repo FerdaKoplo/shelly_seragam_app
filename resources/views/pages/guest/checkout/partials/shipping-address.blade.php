@@ -10,9 +10,31 @@
         </div>
 
         <div class="col-span-2">
-            <input type="text" name="city" placeholder="Kota"
-                x-model="address.city" @input="delete errors.city"
-                class="w-full bg-gray-100 border-none rounded-xl p-4 focus:ring-2 focus:ring-black transition">
+            <div class="relative">
+                <input
+                    type="text"
+                    name="city"
+                    placeholder="Kota / Kecamatan"
+                    x-model="destinationQuery"
+                    @input="delete errors.city; searchDestinations()"
+                    @focus="searchDestinations()"
+                    autocomplete="off"
+                    class="w-full bg-gray-100 border-none rounded-xl p-4 focus:ring-2 focus:ring-black transition">
+
+                <div
+                    x-show="destinationResults.length > 0"
+                    class="absolute z-10 mt-2 w-full bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden max-h-64 overflow-y-auto">
+                    <template x-for="dest in destinationResults" :key="dest.id || dest.destination_id || dest.label">
+                        <button
+                            type="button"
+                            class="w-full text-left px-4 py-3 hover:bg-gray-50"
+                            @click="selectDestination(dest)">
+                            <div class="text-sm font-semibold" x-text="dest.label || dest.name || dest.city_name || dest.subdistrict_name || '-'"></div>
+                            <div class="text-xs text-gray-500" x-text="dest.province_name || dest.province || ''"></div>
+                        </button>
+                    </template>
+                </div>
+            </div>
             <p x-show="errors.city" x-text="errors.city" class="mt-1 text-sm text-red-600"></p>
         </div>
 
@@ -56,5 +78,6 @@
 
     {{-- Hidden input to ensure the selected method is sent to the server --}}
     <input type="hidden" name="shipping_id" :value="shippingMethod">
+    <input type="hidden" name="destination_id" :value="destinationId">
     <p x-show="errors.shipping_id" x-text="errors.shipping_id" class="text-sm text-red-600"></p>
 </div>
