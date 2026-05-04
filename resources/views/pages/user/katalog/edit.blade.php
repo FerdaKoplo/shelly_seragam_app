@@ -175,7 +175,7 @@
                             <div class="flex flex-wrap gap-2">
                                 <template x-for="(v, i) in variations" :key="i">
                                     <template x-if="v.type === 'ukuran'">
-                                        <div
+                                        <div data-cy="size-item"
                                             class="bg-gray-100 border border-gray-300 px-3 py-1.5 rounded-md text-sm flex items-center gap-2">
                                             <span class="font-medium" x-text="v.name"></span>
                                             <span class="text-xs text-gray-500" x-text="`(${v.chest}/${v.sleeve})`"></span>

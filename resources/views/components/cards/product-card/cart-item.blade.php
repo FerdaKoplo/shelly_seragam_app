@@ -1,22 +1,22 @@
 {{-- USAGE
-    <template x-for="(item, index) in items" :key="item.id">
+    <template x-for="(item, index) in items" :key="item.id" >
                     <x-cards.product-card.cart-item/>
                 </template>
     --}}
-    
-<div class="flex flex-col md:flex-row gap-6 border-b border-gray-100 pb-12 last:border-0 relative">
+
+<div :data-stock="item.stok" data-cy="cart-item" class="flex flex-col md:flex-row gap-6 border-b border-gray-100 pb-12 last:border-0 relative">
 
     <div class="w-full md:w-40">
         <div class="bg-gray-100 rounded-xl p-4 aspect-square flex items-center justify-center mb-2">
             <img :src="item.image_url || item.image || 'https://picsum.photos/id/1/600/800'" class="w-full object-contain" :alt="item.name">
         </div>
-        <h3 class="font-bold text-lg" x-text="item.name"></h3>
-        <p class="font-normal mt-1" x-text="formatCurrency(item.price)"></p>
+        <h3 data-cy="item-name" class="font-bold text-lg" x-text="item.name"></h3>
+        <p data-cy="item-price" class="font-normal mt-1" x-text="formatCurrency(item.price)"></p>
         <form :action="'{{ url('/keranjang/remove') }}/' + item.katalog_id" method="POST" class="mt-3"
             onsubmit="return confirm('Hapus item ini dari keranjang?')">
             @csrf
             @method('DELETE')
-            <button type="submit" class="text-sm font-medium text-red-600 hover:text-red-700">
+            <button data-cy="remove-item-btn" type="submit" class="text-sm font-medium text-red-600 hover:text-red-700">
                 Hapus Item
             </button>
         </form>
@@ -27,6 +27,9 @@
         <div class="flex flex-wrap gap-x-6 gap-y-2 text-sm text-gray-700">
             <template x-if="item.size">
                 <div><span class="font-bold">Ukuran:</span> <span x-text="item.size"></span></div>
+            </template>
+            <template x-if="item.stok">
+                <div><span class="font-bold">Stok:</span> <span x-text="item.stok"></span></div>
             </template>
             <template x-if="item.color">
                 <div><span class="font-bold">Warna:</span> <span x-text="item.color"></span></div>
@@ -46,6 +49,7 @@
                     @method('PATCH')
 
                     <button
+                        data-cy="decrement-btn"
                         type="submit"
                         name="action"
                         value="decrement"
@@ -54,21 +58,23 @@
                         −
                     </button>
 
-                    <input type="text" x-model="item.quantity"
+                    <input data-cy="quantity-input" type="text" x-model="item.quantity"
                         class="w-full text-center border-none focus:ring-0 text-sm font-bold bg-transparent pointer-events-none"
                         readonly>
 
                     <button
+                        data-cy="increment-btn"
                         type="submit"
                         name="action"
                         value="increment"
+                        :disabled="item.quantity >= item.stok"
                         class="px-3 py-1 text-xl hover:bg-gray-100 transition">
                         +
                     </button>
                 </form>
             </div>
             <div class="text-right">
-                <p class="text-2xl font-bold" x-text="formatCurrency(item.price * item.quantity)"></p>
+                <p data-cy="item-subtotal" class="text-2xl font-bold" x-text="formatCurrency(item.price * item.quantity)"></p>
             </div>
         </div>
     </div>

@@ -157,6 +157,7 @@
                         @csrf
                         <input type="hidden" name="quantity" :value="quantity">
                         <input type="hidden" name="size" :value="selectedSize">
+                        <input type="hidden" name="stok" value="{{ $item->stok }}">
                         <input type="hidden" name="color" :value="selectedColor">
                         <input type="hidden" name="mode" value="{{ $isPreOrder ? 'preorder' : 'normal' }}">
                         <x-shared.button type="submit" data-cy="btn-add-to-cart" variant="outline" :rounded="false">
@@ -167,6 +168,7 @@
                     <form action="{{ route('checkout') }}" method="POST">
                         @csrf
                         <input type="hidden" name="type" value="katalog">
+                        <input type="hidden" name="stok" value="{{ $item->stok }}">
                         <input type="hidden" name="mode" value="{{ $isPreOrder ? 'preorder' : 'normal' }}">
                         <input type="hidden" name="katalog_id" value="{{ $item->katalog_id }}">
                         <input type="hidden" name="quantity" :value="quantity">

@@ -1,5 +1,5 @@
-<x-shared.modal_base name="modal-size-variation" title="Variasi Ukuran" maxWidth="2xl">
-    <div x-data="{
+<x-shared.modal_base  name="modal-size-variation" title="Variasi Ukuran" maxWidth="2xl">
+    <div data-cy="modal-size-variation" x-data="{
         presets: ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
         selectedPreset: 'L', // Default selected
         sizeName: 'L',
@@ -34,7 +34,7 @@
         <h3 class="font-bold text-lg mb-3">Ukuran</h3>
         <div class="grid grid-cols-3 gap-3 mb-6">
             <template x-for="preset in presets" :key="preset">
-                <button type="button" @click="selectPreset(preset)"
+                <button :data-cy="`preset-${preset}`" type="button" @click="selectPreset(preset)"
                     class="py-2.5 border rounded-md text-sm font-medium transition" :class="selectedPreset === preset 
                         ? 'bg-[#323232] text-white border-[#323232]' 
                         : 'bg-white text-gray-900 border-black hover:bg-gray-50'" x-text="preset"></button>
@@ -67,14 +67,14 @@
                     <button type="button" @click="clearName()"
                         class="text-xs text-gray-500 hover:text-black">clear</button>
                 </div>
-                <input type="text" x-model="sizeName"
+                <input type="text" x-model="sizeName" data-cy="input-size-name"
                     class="w-full border border-black rounded-md px-3 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-black">
             </div>
 
             <div>
                 <label class="block text-sm font-medium text-gray-900 mb-1.5">Panjang Lengan</label>
                 <div class="flex gap-2">
-                    <input type="text" x-model="sleeveLength"
+                    <input type="text" x-model="sleeveLength" data-cy="input-sleeve"
                         class="flex-1 border border-black rounded-md px-3 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-black">
                     <div
                         class="border border-black rounded-md px-3 py-2.5 text-sm font-medium flex items-center justify-center bg-white min-w-[3.5rem]">
@@ -86,7 +86,7 @@
             <div>
                 <label class="block text-sm font-medium text-gray-900 mb-1.5">Lebar Dada</label>
                 <div class="flex gap-2">
-                    <input type="text" x-model="chestWidth"
+                    <input type="text" x-model="chestWidth" data-cy="input-chest"
                         class="flex-1 border border-black rounded-md px-3 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-black">
                     <div
                         class="border border-black rounded-md px-3 py-2.5 text-sm font-medium flex items-center justify-center bg-white min-w-[3.5rem]">
@@ -104,6 +104,7 @@
 
         <div class="mt-8">
             <button type="button" @click="submit()"
+             data-cy="submit-size"
                 class="w-full bg-[#323232] text-white py-3 rounded-md text-sm font-medium hover:opacity-90 transition">
                 Simpan
             </button>
