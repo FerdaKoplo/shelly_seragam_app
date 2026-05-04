@@ -34,15 +34,20 @@
     {{-- Dynamic Shipping Selector --}}
     <div class="space-y-3 pt-2">
         <label class="text-sm font-semibold text-gray-500 uppercase tracking-wider">Opsi Pengiriman</label>
-        <div class="flex flex-wrap gap-3">
+        <div x-show="!isAddressValid" class="text-sm text-gray-500 bg-gray-50 border border-gray-200 rounded-lg p-4">
+            Lengkapi alamat pengiriman yang valid untuk melihat opsi pengiriman, durasi, dan ongkir.
+        </div>
+
+        <div x-show="isAddressValid" class="flex flex-wrap gap-3">
             <template x-for="option in shippingOptions" :key="option.id">
-                <button 
-                    type="button" 
+                <button
+                    type="button"
                     @click="selectShipping(option)"
                     :class="shippingMethod === option.id ? 'border-black bg-black text-white' : 'border-gray-200 bg-white text-gray-600 hover:border-gray-400'"
-                    class="flex-1 min-w-[140px] border-2 py-4 px-6 rounded-xl text-sm font-bold transition-all duration-200 flex flex-col items-center gap-1">
-                    
+                    class="flex-1 min-w-[160px] border-2 py-4 px-6 rounded-xl text-sm font-bold transition-all duration-200 flex flex-col items-center gap-1">
+
                     <span x-text="option.label"></span>
+                    <span class="opacity-80 font-normal" x-text="option.duration || ''"></span>
                     <span class="opacity-80 font-normal" x-text="formatCurrency(option.price)"></span>
                 </button>
             </template>

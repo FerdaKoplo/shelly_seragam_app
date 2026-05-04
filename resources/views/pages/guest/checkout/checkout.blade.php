@@ -168,6 +168,20 @@
                 return Object.keys(errors).length === 0;
             },
 
+            get isAddressValid() {
+                const address = (this.address.address || "").trim();
+                const city = (this.address.city || "").trim();
+                const province = (this.address.province || "").trim();
+                const postal = (this.address.postal_code || "").trim();
+
+                if (!address || address.length < 5) return false;
+                if (!city || city.length < 2) return false;
+                if (!province || province.length < 2) return false;
+                if (!postal || !/^[0-9]{4,6}$/.test(postal)) return false;
+
+                return true;
+            },
+
             async submitOrder() {
                 if (!this.validateCheckout()) return;
                 if (this.isSubmitting || this.isConfirming) return;

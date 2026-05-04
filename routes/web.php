@@ -151,8 +151,8 @@ Route::match(['GET', 'POST'], '/checkout', function (Request $request) {
     }
 
     $shippingOptions = [
-        ['id' => 'reg', 'label' => 'Regular', 'price' => 15000],
-        ['id' => 'exp', 'label' => 'Express', 'price' => 35000],
+        ['id' => 'reg', 'label' => 'Regular', 'duration' => '2-3 hari', 'price' => 15000],
+        ['id' => 'exp', 'label' => 'Express', 'duration' => '1 hari', 'price' => 35000],
     ];
 
     $uploadedFiles = [];
