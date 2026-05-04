@@ -50,7 +50,7 @@ class ProdukSeeder extends Seeder
                     'produk_id' => $produkId,
                     'kategori' => $kategori,
                     'harga' => $faker->numberBetween(50, 500) * 1000,
-                    'stok' => $faker->numberBetween(0, 200),
+                    'stok' => $faker->numberBetween(0, 20),
                     'created_at' => $now,
                     'updated_at' => $now,
                 ]);

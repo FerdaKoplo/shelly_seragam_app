@@ -45,6 +45,7 @@ class CartController extends Controller
         $size = $request->input('size');
         $color = $request->input('color');
         $mode = $request->input('mode');
+        $stok = $request->input('stok');
 
         $katalog = ProdukKatalog::with(['produk', 'fotos'])->findOrFail($katalog_id);
 
@@ -68,6 +69,7 @@ class CartController extends Controller
                 'katalog_id' => $katalog_id,
                 'name' => $name,
                 'price' => (int) $katalog->harga,
+                'stok' => (int) $stok,
                 'quantity' => $qty,
                 'size' => is_string($size) && trim($size) !== '' ? trim($size) : null,
                 'color' => is_string($color) && trim($color) !== '' ? trim($color) : null,

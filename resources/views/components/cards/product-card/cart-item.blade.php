@@ -1,10 +1,10 @@
 {{-- USAGE
-    <template x-for="(item, index) in items" :key="item.id">
+    <template x-for="(item, index) in items" :key="item.id" >
                     <x-cards.product-card.cart-item/>
                 </template>
     --}}
 
-<div data-cy="cart-item" class="flex flex-col md:flex-row gap-6 border-b border-gray-100 pb-12 last:border-0 relative">
+<div :data-stock="item.stok" data-cy="cart-item" class="flex flex-col md:flex-row gap-6 border-b border-gray-100 pb-12 last:border-0 relative">
 
     <div class="w-full md:w-40">
         <div class="bg-gray-100 rounded-xl p-4 aspect-square flex items-center justify-center mb-2">
@@ -27,6 +27,9 @@
         <div class="flex flex-wrap gap-x-6 gap-y-2 text-sm text-gray-700">
             <template x-if="item.size">
                 <div><span class="font-bold">Ukuran:</span> <span x-text="item.size"></span></div>
+            </template>
+            <template x-if="item.stok">
+                <div><span class="font-bold">Stok:</span> <span x-text="item.stok"></span></div>
             </template>
             <template x-if="item.color">
                 <div><span class="font-bold">Warna:</span> <span x-text="item.color"></span></div>
@@ -64,6 +67,7 @@
                         type="submit"
                         name="action"
                         value="increment"
+                        :disabled="item.quantity >= item.stok"
                         class="px-3 py-1 text-xl hover:bg-gray-100 transition">
                         +
                     </button>
