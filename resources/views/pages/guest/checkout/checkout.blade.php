@@ -206,11 +206,19 @@
                 const id = dest?.id ?? dest?.destination_id ?? null;
                 const label = dest?.label ?? dest?.name ?? dest?.city_name ?? dest?.subdistrict_name ?? "";
                 const province = dest?.province_name ?? dest?.province ?? "";
+                const postal =
+                    dest?.postal_code ??
+                    dest?.postalCode ??
+                    dest?.zip ??
+                    dest?.zip_code ??
+                    dest?.zipCode ??
+                    "";
 
                 this.destinationId = id ? parseInt(id, 10) : null;
                 this.destinationQuery = label || this.destinationQuery;
                 this.address.city = label || this.address.city;
                 this.address.province = province || this.address.province;
+                if (postal) this.address.postal_code = String(postal);
                 this.destinationResults = [];
 
                 if (this.destinationId) {
