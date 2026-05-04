@@ -42,6 +42,9 @@ class CartController extends Controller
     public function add(Request $request, int $katalog_id)
     {
         $qty = max(1, (int) $request->input('quantity', 1));
+        $size = $request->input('size');
+        $color = $request->input('color');
+        $mode = $request->input('mode');
 
         $katalog = ProdukKatalog::with(['produk', 'fotos'])->findOrFail($katalog_id);
 
@@ -66,6 +69,9 @@ class CartController extends Controller
                 'name' => $name,
                 'price' => (int) $katalog->harga,
                 'quantity' => $qty,
+                'size' => is_string($size) && trim($size) !== '' ? trim($size) : null,
+                'color' => is_string($color) && trim($color) !== '' ? trim($color) : null,
+                'mode' => is_string($mode) && trim($mode) !== '' ? trim($mode) : null,
                 'image' => $image,
             ];
         }

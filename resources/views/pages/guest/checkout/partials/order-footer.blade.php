@@ -12,10 +12,13 @@
         <textarea
             x-show="type === 'katalog'"
             x-model="notes"
+            name="notes"
+            @input="delete errors.notes"
             rows="6"
             class="w-full border border-gray-300 rounded-md p-4 focus:ring-1 focus:ring-black outline-none"
             placeholder="Tambahkan catatan untuk pesanan Anda...">
         </textarea>
+        <p x-show="errors.notes" x-text="errors.notes" class="mt-1 text-sm text-red-600"></p>
     </div>
 
     {{-- 2. Ringkasan Pesanan (Calculations) --}}
@@ -47,6 +50,7 @@
 
         {{-- Payment Gateway Integration Button --}}
         <x-shared.button
+            type="button"
             @click="submitOrder()"
             variant="primary"
             :rounded="false"

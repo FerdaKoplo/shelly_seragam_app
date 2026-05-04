@@ -24,7 +24,14 @@ class LoginController extends Controller
 
         if (auth()->attempt($credentials)) {
             $request->session()->regenerate();
-
+            if (Auth::user()->status !== 'Active') {
+                Auth::logout();
+        
+                return back()->withErrors([
+                    'username' => 'Akun tidak aktif',
+                ]);
+            }
+        
             if (Auth::user()->role == 'Admin') {
                 return redirect()->route('statistik.transaksi');
             } else {
