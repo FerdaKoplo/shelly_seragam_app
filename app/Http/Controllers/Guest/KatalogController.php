@@ -79,10 +79,16 @@ class KatalogController extends Controller
     public function show($id)
     {
         $item = ProdukKatalog::query()
-            ->with(['produk', 'fotos'])
+            ->with([
+                'produk.detailProduks.pilihanDetails',
+                'produk.produkTransaksis',
+                'fotos',
+            ])
             ->where('katalog_id', $id)
             ->firstOrFail();
 
-        return view('pages.guest.katalog.detail', compact('item'));
+        $sold = (int) $item->produk?->produkTransaksis?->sum('quantity');
+
+        return view('pages.guest.katalog.detail', compact('item', 'sold'));
     }
 }

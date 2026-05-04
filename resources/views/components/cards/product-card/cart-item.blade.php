@@ -23,30 +23,17 @@
     </div>
 
     <div class="flex-1 space-y-6">
-        {{-- Size Selector --}}
-        <div>
-            <div class="flex justify-between items-center mb-3">
-                <span class="font-bold text-lg">Ukuran</span>
-                <button type="button" @click="$dispatch('open-modal', 'modal-panduan-ukuran')" class="text-xs flex items-center text-gray-500 hover:text-black">
-                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m4 0h1"></path>
-                    </svg>
-                    Panduan Ukuran
-                </button>
-            </div>
-            <div class="grid grid-cols-3 gap-2">
-                <template x-for="sz in ['XS', 'S', 'M', 'L', 'XL', 'XXL']">
-
-                    <label class="cursor-pointer">
-                        <input type="radio"
-                            :name="'size-' + item.id"
-                            :value="sz"
-                            x-model="item.size"
-                            class="hidden peer">
-                        <div class="border border-gray-200 py-2 text-center rounded-lg peer-checked:bg-black peer-checked:text-white transition" x-text="sz"></div>
-                    </label>
-                </template>
-            </div>
+        {{-- Selected Options --}}
+        <div class="flex flex-wrap gap-x-6 gap-y-2 text-sm text-gray-700">
+            <template x-if="item.size">
+                <div><span class="font-bold">Ukuran:</span> <span x-text="item.size"></span></div>
+            </template>
+            <template x-if="item.color">
+                <div><span class="font-bold">Warna:</span> <span x-text="item.color"></span></div>
+            </template>
+            <template x-if="item.mode === 'preorder'">
+                <div class="text-amber-700 font-medium">Pre-Order</div>
+            </template>
         </div>
 
         {{-- Quantity & Subtotal --}}

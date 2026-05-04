@@ -10,6 +10,7 @@ use App\Http\Controllers\User\KelolaTransaksiController;
 use App\Http\Controllers\User\ManageKustomisasiController;
 use App\Http\Controllers\User\PegawaiController;
 use App\Http\Controllers\User\StatistikPenjualanController;
+use App\Models\ProdukKatalog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
@@ -73,6 +74,30 @@ Route::match(['GET', 'POST'], '/checkout', function (Request $request) {
     $type = $request->input('type', $request->query('type', 'katalog'));
     $checkoutNotes = (string) $request->input('notes', $request->session()->get('cart_notes', ''));
 
+    // Direct checkout (single item) from product detail page
+    if ($request->isMethod('post') && $request->filled('katalog_id')) {
+        $katalogId = (int) $request->input('katalog_id');
+        $qty = max(1, (int) $request->input('quantity', 1));
+        $size = $request->input('size');
+
+        $katalog = ProdukKatalog::query()->with(['produk', 'fotos'])->findOrFail($katalogId);
+        $name = $katalog->produk->nama_produk ?? 'Produk';
+
+        $image = optional($katalog->fotos->first())->foto
+            ?? optional($katalog->fotos->first())->path
+            ?? optional($katalog->fotos->first())->url
+            ?? null;
+
+        $katalogItems = [[
+            'id' => $katalogId,
+            'katalog_id' => $katalogId,
+            'name' => $name,
+            'price' => (int) $katalog->harga,
+            'quantity' => $qty,
+            'size' => is_string($size) && trim($size) !== '' ? trim($size) : null,
+            'image' => $image,
+        ]];
+    } else {
     $katalogItems = array_map(function ($item) {
         $rawImage = $item['image'] ?? null;
         $isAbsolute = is_string($rawImage)
@@ -93,6 +118,7 @@ Route::match(['GET', 'POST'], '/checkout', function (Request $request) {
             'image_url' => $item['image_url'],
         ];
     }, array_values($request->session()->get('cart', [])));
+    }
 
     $shippingOptions = [
         ['id' => 'reg', 'label' => 'Regular', 'price' => 15000],
