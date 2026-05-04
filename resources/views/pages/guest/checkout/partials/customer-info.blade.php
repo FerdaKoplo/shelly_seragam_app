@@ -1,8 +1,37 @@
 <div>
     <h2 class="text-xl font-bold mb-4">Informasi Pelanggan</h2>
     <div class="space-y-3">
-        <input type="text" placeholder="Nama Lengkap" class="w-full bg-gray-100 border-none rounded-sm p-3 focus:ring-1 focus:ring-black">
-        <input type="email" placeholder="Alamat Email" class="w-full bg-gray-100 border-none rounded-sm p-3 focus:ring-1 focus:ring-black">
-        <input type="tel" placeholder="Nomor Telepon" class="w-full bg-gray-100 border-none rounded-sm p-3 focus:ring-1 focus:ring-black">
+        <div>
+            <input
+                type="text"
+                name="full_name"
+                placeholder="Nama Lengkap"
+                x-model="customer.full_name"
+                @input="delete errors.full_name"
+                class="w-full bg-gray-100 border-none rounded-sm p-3 focus:ring-1 focus:ring-black">
+            <p x-show="errors.full_name" x-text="errors.full_name" class="mt-1 text-sm text-red-600"></p>
+        </div>
+
+        <div>
+            <input
+                type="email"
+                name="email"
+                placeholder="Alamat Email"
+                x-model="customer.email"
+                @input="delete errors.email"
+                class="w-full bg-gray-100 border-none rounded-sm p-3 focus:ring-1 focus:ring-black">
+            <p x-show="errors.email" x-text="errors.email" class="mt-1 text-sm text-red-600"></p>
+        </div>
+
+        <div>
+            <input
+                type="tel"
+                name="phone"
+                placeholder="Nomor Telepon"
+                x-model="customer.phone"
+                @input="delete errors.phone"
+                class="w-full bg-gray-100 border-none rounded-sm p-3 focus:ring-1 focus:ring-black">
+            <p x-show="errors.phone" x-text="errors.phone" class="mt-1 text-sm text-red-600"></p>
+        </div>
     </div>
 </div>

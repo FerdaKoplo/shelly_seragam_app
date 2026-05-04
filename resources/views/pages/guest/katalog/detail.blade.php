@@ -8,9 +8,29 @@
 
     $firstImageUrl = $firstFoto ? asset('storage/' . $firstFoto->path) : $fallbackImage;
 
-$basePrice = (float) $item->harga;
+    $basePrice = (float) $item->harga;
     $isPreOrder = $item->status === 'Pre-Order'; 
     $maxQuantity = $isPreOrder ? 99 : (int) $item->stok;
+
+    $details = $item->produk?->detailProduks ?? collect();
+    $sizeOptions = $details
+        ->first(fn ($d) => strtolower((string) $d->nama_detail) === 'ukuran')
+        ?->pilihanDetails
+        ?->map(fn ($p) => (array) ($p->opsi ?? []))
+        ?->filter(fn ($o) => isset($o['name']) && (string) $o['name'] !== '')
+        ?->values()
+        ?? collect();
+
+    $colorOptions = $details
+        ->first(fn ($d) => strtolower((string) $d->nama_detail) === 'warna')
+        ?->pilihanDetails
+        ?->map(fn ($p) => (array) ($p->opsi ?? []))
+        ?->filter(fn ($o) => isset($o['hex']) && (string) $o['hex'] !== '')
+        ?->values()
+        ?? collect();
+
+    $defaultSize = (string) ($sizeOptions->first()['name'] ?? '');
+    $defaultColor = (string) ($colorOptions->first()['hex'] ?? '');
 @endphp
 
 <div
@@ -19,9 +39,9 @@ $basePrice = (float) $item->harga;
     x-data="{
         activeImage: '{{ $firstImageUrl }}',
         quantity: 1,
-        selectedSize: 'M',
-        selectedColor: 'red',
-        basePrice: {{ $basePrice }}
+        selectedSize: {{ Js::from($defaultSize ?: null) }},
+        selectedColor: {{ Js::from($defaultColor ?: null) }},
+        basePrice: {{ $basePrice }},
     }">
 
     <div class="flex items-center gap-4 mb-8">
@@ -85,35 +105,43 @@ $basePrice = (float) $item->harga;
             @endif
 
             <div class="mb-6">
-                <div class="flex justify-between items-center mb-3">
-                    <span class="font-bold text-lg">Ukuran</span>
-                    <button data-cy="btn-size-guide" @click="$dispatch('open-modal', 'modal-panduan-ukuran')" class="text-xs flex items-center text-gray-500 hover:text-black">
-                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m4 0h1"></path>
-                        </svg>
-                        Panduan Ukuran
-                    </button>
-                </div>
-                <div class="grid grid-cols-3 gap-2">
-                    <x-guest.katalog.size-selector label="XS" id="XS" />
-                    <x-guest.katalog.size-selector label="S" id="S" />
-                    <x-guest.katalog.size-selector label="M" id="M" />
-                    <x-guest.katalog.size-selector label="L" id="L" />
-                    <x-guest.katalog.size-selector label="XL" id="XL" />
-                    <x-guest.katalog.size-selector label="XXL" id="XXL" />
-                </div>
+                @if($sizeOptions->isNotEmpty())
+                    <div class="flex justify-between items-center mb-3">
+                        <span class="font-bold text-lg">Ukuran</span>
+                        <button data-cy="btn-size-guide" @click="$dispatch('open-modal', 'modal-panduan-ukuran')" class="text-xs flex items-center text-gray-500 hover:text-black">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m4 0h1"></path>
+                            </svg>
+                            Panduan Ukuran
+                        </button>
+                    </div>
+                    <div class="grid grid-cols-3 gap-2">
+                        @foreach($sizeOptions as $opt)
+                            @php $sz = (string) $opt['name']; @endphp
+                            <label class="cursor-pointer">
+                                <input type="radio" name="size" value="{{ $sz }}" x-model="selectedSize" class="hidden peer">
+                                <div class="border border-gray-200 py-2 text-center rounded-lg peer-checked:bg-black peer-checked:text-white transition">{{ $sz }}</div>
+                            </label>
+                        @endforeach
+                    </div>
+                @endif
             </div>
 
             <div class="mb-8">
-                <span class="font-bold text-lg block mb-3">Varian Warna</span>
-                <div class="grid grid-cols-3 gap-2">
-                    <x-guest.katalog.color-swatch color="#e56b6b" id="red" />
-                    <x-guest.katalog.color-swatch color="#d9a26c" id="tan" />
-                    <x-guest.katalog.color-swatch color="#2d1b1b" id="dark" />
-                    <x-guest.katalog.color-swatch color="#6b5ce5" id="purple" />
-                    <x-guest.katalog.color-swatch color="#5ca6e5" id="blue" />
-                    <x-guest.katalog.color-swatch color="#5ce57d" id="green" />
-                </div>
+                @if($colorOptions->isNotEmpty())
+                    <span class="font-bold text-lg block mb-3">Varian Warna</span>
+                    <div class="grid grid-cols-3 gap-2">
+                        @foreach($colorOptions as $opt)
+                            @php $hex = strtoupper((string) $opt['hex']); @endphp
+                            <label class="cursor-pointer">
+                                <input type="radio" name="color" value="{{ $hex }}" x-model="selectedColor" class="hidden peer">
+                                <div class="w-full aspect-[2/1] rounded-md border border-gray-200 peer-checked:ring-2 peer-checked:ring-black ring-offset-1 transition"
+                                    style="background-color: {{ $hex }};"></div>
+                                <div class="text-[10px] text-gray-500 mt-1 font-medium tracking-wide">{{ $hex }}</div>
+                            </label>
+                        @endforeach
+                    </div>
+                @endif
             </div>
 
             {{-- Quantity Button --}}
@@ -125,38 +153,36 @@ $basePrice = (float) $item->harga;
                 </p>
 
                 <div class="flex flex-col space-y-3">
-                    @if ($isPreOrder)
-                        <x-shared.button
-                            data-cy="btn-add-to-cart" variant="outline"
-                            :rounded="false"
-                            :href="route('checkout', ['type' => 'katalog', 'mode' => 'preorder'])">
-                            Pre-Order Sekarang
+                    <form action="{{ route('cart.add', ['katalog_id' => $item->katalog_id]) }}" method="POST">
+                        @csrf
+                        <input type="hidden" name="quantity" :value="quantity">
+                        <input type="hidden" name="size" :value="selectedSize">
+                        <input type="hidden" name="color" :value="selectedColor">
+                        <input type="hidden" name="mode" value="{{ $isPreOrder ? 'preorder' : 'normal' }}">
+                        <x-shared.button type="submit" data-cy="btn-add-to-cart" variant="outline" :rounded="false">
+                            Tambah ke Keranjang
                         </x-shared.button>
-                    @else
-                        <form action="{{ route('cart.add', ['katalog_id' => $item->katalog_id]) }}" method="POST">
-                            @csrf
-                            <input type="hidden" name="quantity" :value="quantity">
-                            <x-shared.button
-                                type="submit"
-                                variant="outline"
-                                :rounded="false">
-                                Add To Cart
-                            </x-shared.button>
-                        </form>
-                    @endif
-                    <x-shared.button
-                        data-cy="btn-checkout" variant="dark"
-                        :rounded="false"
-                        :href="route('checkout', ['type' => 'katalog', 'mode' => $isPreOrder ? 'preorder' : 'normal'])">
-                        {{ $isPreOrder ? 'Checkout Pre-Order' : 'Checkout' }}
-                    </x-shared.button>
+                    </form>
+
+                    <form action="{{ route('checkout') }}" method="POST">
+                        @csrf
+                        <input type="hidden" name="type" value="katalog">
+                        <input type="hidden" name="mode" value="{{ $isPreOrder ? 'preorder' : 'normal' }}">
+                        <input type="hidden" name="katalog_id" value="{{ $item->katalog_id }}">
+                        <input type="hidden" name="quantity" :value="quantity">
+                        <input type="hidden" name="size" :value="selectedSize">
+                        <input type="hidden" name="color" :value="selectedColor">
+                        <x-shared.button type="submit" data-cy="btn-checkout" variant="dark" :rounded="false">
+                            {{ $isPreOrder ? 'Checkout Pre-Order' : 'Checkout' }}
+                        </x-shared.button>
+                    </form>
                 </div>
             </div>
         </div>
     </div>
 
     <div class="mt-16 max-w-4xl">
-        <p  data-cy="product-sold" class="text-gray-500 mb-2">Terjual : 1.231.214</p>
+        <p data-cy="product-sold" class="text-gray-500 mb-2">Terjual : {{ number_format((int) ($sold ?? 0), 0, ',', '.') }}</p>
         <h3 class="font-bold mb-2">Deskripsi</h3>
         <p  data-cy="product-description" class="text-gray-600 leading-relaxed mb-6">
             {{ $item->produk->deskripsi }}
