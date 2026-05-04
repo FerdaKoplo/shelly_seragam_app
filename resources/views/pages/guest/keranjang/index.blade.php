@@ -143,7 +143,7 @@
                         <p>{{$product}}</p>
 
                 <div class="min-w-[280px] md:min-w-[320px] lg:min-w-[350px] snap-start">
-                    <x-cards.product-card.horizontal data-cy="recommendation-item" :name="$product['name']" :price="$product['price']"
+                    <x-cards.product-card.horizontal  :name="$product['name']" :price="$product['price']"
                         :image="$product['img']" />
                 </div>
 
@@ -157,7 +157,7 @@
                 $firstFoto = $product->fotos->first();
                 $imageUrl = $firstFoto ? asset('storage/' . $firstFoto->path) : $fallbackImage;
                 @endphp
-                <a href="{{ route('product.show', $product->katalog_id) }}">
+                <a href="{{ route('product.show', $product->katalog_id) }}" data-cy="recommendation-item">
 
                     <div class="min-w-[280px] md:min-w-[320px] lg:min-w-[350px] snap-start">
                         <x-cards.product-card.horizontal :name="$product->produk->nama_produk"
