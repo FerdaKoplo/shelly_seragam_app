@@ -30,6 +30,12 @@ class ProdukKatalog extends Model
     {
         return $this->hasMany(FotoProdukKatalog::class, 'produk_id', 'produk_id');
     }
+
+    public function vouchers()
+    {
+        return $this->hasMany(Voucher::class, 'katalog_id', 'katalog_id');
+    }
+
     protected static function booted()
     {
         static::saving(function ($katalog) {

@@ -10,6 +10,7 @@ use App\Http\Controllers\User\KelolaTransaksiController;
 use App\Http\Controllers\User\ManageKustomisasiController;
 use App\Http\Controllers\User\PegawaiController;
 use App\Http\Controllers\User\StatistikPenjualanController;
+use App\Http\Controllers\User\VoucherController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
@@ -188,6 +189,21 @@ Route::prefix('admin')->group(function () {
         Route::get('/get-ongkir', [KelolaTransaksiController::class, 'getOngkir'])->name('.get-ongkir');
         Route::post('/', [KelolaTransaksiController::class, 'store'])->name('.store');
         Route::put('/{id}', [KelolaTransaksiController::class, 'update'])->name('.update');
+    });
+
+
+    Route::prefix('manage-voucher')->name('manage.voucher')->group(function () {
+        Route::get('/', [VoucherController::class, 'index']);
+        Route::get('/create', [VoucherController::class, 'create'])->name('.create');
+        Route::get('/{id}/edit', [VoucherController::class, 'edit'])->name('.edit');
+
+        Route::post('/', [VoucherController::class, 'store'])->name('.store');
+
+        Route::put('/{id}', [VoucherController::class, 'update'])->name('.update');
+
+        Route::patch('/{id}/deactivate', [VoucherController::class, 'deactiveVoucher'])->name('.deactivate');
+
+        Route::delete('/{id}', [VoucherController::class, 'destroy'])->name('.destroy');
     });
 
     Route::get('/traffic', function () {

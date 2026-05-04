@@ -23,12 +23,19 @@ class CartController extends Controller
             return $item;
         }, $rawItems);
 
-        $subtotal = collect($items)->sum(fn ($i) => ((int) $i['price']) * ((int) $i['quantity']));
+        $recommendations = ProdukKatalog::with(['produk', 'fotos'])
+            ->where('stok', '>', 0)
+            ->inRandomOrder()
+            ->limit(5)
+            ->get();
+
+        $subtotal = collect($items)->sum(fn($i) => ((int) $i['price']) * ((int) $i['quantity']));
 
         return view('pages.guest.keranjang.index', [
             'items' => $items,
             'subtotal' => $subtotal,
             'notes' => (string) $request->session()->get('cart_notes', ''),
+            'recommendations' => $recommendations,
         ]);
     }
 
