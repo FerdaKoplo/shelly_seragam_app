@@ -22,12 +22,6 @@ class KatalogProdukController extends Controller
         if ($request->filled('search')) {
             $search = $request->search;
 
-            // $query->where(function ($q) use ($search) {
-            //     $q->whereHas('produk', function ($subQ) use ($search) {
-            //         $subQ->where('nama_produk', 'like', '%' . $search . '%');
-            //     })
-            //         ->orWhere('kategori', 'like', '%' . $search . '%');
-            // });
             if ($request->filled('search')) {
                 $search = $request->search;
 
@@ -295,6 +289,18 @@ class KatalogProdukController extends Controller
             return back()->with('success', 'Produk dipulihkan.');
         } catch (\Exception $e) {
             return back()->with('error', 'Gagal memulihkan produk.');
+        }
+    }
+
+    public function showPreorderKatalog($id){
+        try {
+            $katalog = ProdukKatalog::where('produk_id', $id)->firstOrFail();
+            if ($katalog->stok == 0 ) {
+                $katalog->update(['status' => 'Pre-Order']);
+            } 
+
+        } catch (\Exception $e) {
+            
         }
     }
 

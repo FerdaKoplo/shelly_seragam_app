@@ -22,6 +22,7 @@ class LoginControllerTest extends TestCase
             'username' => 'admin',
             'email' => 'test@example.com',
             'role' => 'Admin',
+            'status' => 'Active',
             'password' => Hash::make('admin')
         ]);
 
@@ -30,6 +31,7 @@ class LoginControllerTest extends TestCase
             'username' => 'budi.santoso',
             'email' => 'budisantoso@example.com',
             'role' => 'Pegawai',
+            'status' => 'Active',
             'password' => Hash::make('pegawai')
         ]);
     }
@@ -59,7 +61,7 @@ class LoginControllerTest extends TestCase
     }
 
     /** @test */
-    public function login_fails_for_invalid_credentials()
+    public function login_fails_when_password_incorrect()
     {
         $response = $this->from('/login')->post('/login', [
             'username' => 'admin',
@@ -82,5 +84,47 @@ class LoginControllerTest extends TestCase
         $this->assertGuest();
         $response->assertRedirect('/login');
         $response->assertSessionHasErrors(['username', 'password']);
+    }
+
+    /** @test */
+    public function login_fails_when_password_empty()
+    {
+        $response = $this->from('/login')->post('/login', [
+            'username' => 'admin',
+            'password' => '',
+        ]);
+
+        $this->assertGuest();
+        $response->assertRedirect('/login');
+        $response->assertSessionHasErrors(['password']);
+    }
+
+    /** @test */
+    public function login_fails_when_username_not_found()
+    {
+        $response = $this->from('/login')->post('/login', [
+            'username' => 'not_exist_user',
+            'password' => 'anypassword',
+        ]);
+
+        $this->assertGuest();
+        $response->assertRedirect('/login');
+        $response->assertSessionHasErrors('username');
+    }
+
+    /** @test */
+    public function login_fails_if_user_not_active()
+    {
+        $user = User::where('username', 'admin')->first();
+        $user->update(['status' => 'Inactive']);
+
+        $response = $this->from('/login')->post('/login', [
+            'username' => 'admin',
+            'password' => 'admin',
+        ]);
+
+        $this->assertGuest();
+        $response->assertRedirect('/login');
+        $response->assertSessionHasErrors('username');
     }
 }
