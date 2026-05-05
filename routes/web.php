@@ -205,79 +205,110 @@ Route::match(['GET', 'POST'], '/checkout', function (Request $request) {
         'size' => $request->input('size'),
     ];
 
-    // Payment gateway redirect (Midtrans Snap)
+    // Payment gateway redirect (Xendit Invoice)
     // Triggered only when the customer actually submits the checkout form.
     if (
         $request->isMethod('post')
         && $request->hasAny(['full_name', 'email', 'phone', 'address', 'city', 'province', 'postal_code', 'shipping_id'])
-        && $request->input('payment_method') === 'midtrans'
+        && $request->input('payment_method') === 'xendit'
         && $type === 'katalog'
     ) {
-        $serverKey = (string) env('MIDTRANS_SERVER_KEY', '');
-        $isProduction = (bool) env('MIDTRANS_IS_PRODUCTION', false);
-        $snapBaseUrl = $isProduction
-            ? 'https://app.midtrans.com'
-            : 'https://app.sandbox.midtrans.com';
+        $secretKey = (string) env('XENDIT_SECRET_KEY', '');
+        $baseUrl = rtrim((string) env('XENDIT_BASE_URL', 'https://api.xendit.co'), '/');
 
-        if ($serverKey === '') {
+        if ($secretKey === '') {
             return back()
-                ->withErrors(['payment_method' => 'Midtrans belum dikonfigurasi (MIDTRANS_SERVER_KEY).'])
+                ->withErrors(['payment_method' => 'Xendit belum dikonfigurasi (XENDIT_SECRET_KEY).'])
                 ->withInput();
         }
 
-        $orderId = 'ORDER-' . now()->format('YmdHis') . '-' . Str::upper(Str::random(6));
+        $externalId = 'ORDER-' . now()->format('YmdHis') . '-' . Str::upper(Str::random(6));
 
-        $itemDetails = collect($katalogItems)->map(function ($item) {
+        $items = collect($katalogItems)->map(function ($item) {
             return [
-                'id' => (string) ($item['katalog_id'] ?? $item['id'] ?? ''),
-                'price' => (int) ($item['price'] ?? 0),
-                'quantity' => (int) ($item['quantity'] ?? 1),
                 'name' => (string) ($item['name'] ?? 'Produk'),
+                'quantity' => (int) ($item['quantity'] ?? 1),
+                'price' => (int) ($item['price'] ?? 0),
             ];
         })->values()->all();
 
-        $grossAmount = collect($itemDetails)->sum(function ($item) {
+        $subtotal = (int) collect($items)->sum(function ($item) {
             return ((int) $item['price']) * ((int) $item['quantity']);
         });
 
-        $payload = [
-            'transaction_details' => [
-                'order_id' => $orderId,
-                'gross_amount' => (int) $grossAmount,
-            ],
-            'item_details' => $itemDetails,
-            'customer_details' => [
-                'first_name' => (string) $request->input('full_name'),
-                'email' => (string) $request->input('email'),
-                'phone' => (string) $request->input('phone'),
-                'shipping_address' => [
-                    'address' => (string) $request->input('address'),
-                    'city' => (string) $request->input('city'),
-                    'postal_code' => (string) $request->input('postal_code'),
-                    'country_code' => 'IDN',
-                ],
-            ],
+        $shippingMethod = (string) $request->input('shipping_id', '');
+        $shippingPrice = (int) data_get(
+            collect($shippingOptions)->firstWhere('id', $shippingMethod),
+            'price',
+            0
+        );
+        $amount = $subtotal + $shippingPrice;
+
+        if ($amount <= 0) {
+            return back()
+                ->withErrors(['payment_method' => 'Subtotal pesanan tidak valid. Periksa kembali keranjang Anda.'])
+                ->withInput();
+        }
+
+        $fullName = trim((string) $request->input('full_name'));
+        $nameParts = preg_split('/\s+/', $fullName, -1, PREG_SPLIT_NO_EMPTY) ?: [];
+        $givenNames = trim((string) ($nameParts[0] ?? $fullName));
+        $surname = trim(implode(' ', array_slice($nameParts, 1)));
+
+        $customer = [
+            'given_names' => $givenNames !== '' ? $givenNames : $fullName,
+            'email' => (string) $request->input('email'),
+            'mobile_number' => (string) $request->input('phone'),
         ];
 
-        $response = Http::withBasicAuth($serverKey, '')
+        if ($surname !== '') {
+            $customer['surname'] = $surname;
+        }
+
+        $payload = [
+            'external_id' => $externalId,
+            'amount' => $amount,
+            'currency' => 'IDR',
+            'description' => 'Pembayaran pesanan ' . $externalId,
+            'invoice_duration' => 86400,
+            'success_redirect_url' => url('/checkout'),
+            'failure_redirect_url' => url('/checkout'),
+            'payer_email' => (string) $request->input('email'),
+            'customer' => $customer,
+            'items' => $items,
+        ];
+
+        $response = Http::withBasicAuth($secretKey, '')
             ->acceptJson()
             ->asJson()
-            ->post($snapBaseUrl . '/snap/v1/transactions', $payload);
+            ->post($baseUrl . '/v2/invoices', $payload);
 
         if (!$response->successful()) {
+            \Log::warning('Xendit invoice creation failed', [
+                'status' => $response->status(),
+                'body' => $response->json(),
+                'raw' => $response->body(),
+                'payload' => [
+                    'external_id' => $externalId,
+                    'amount' => $amount,
+                ],
+            ]);
+
+            $message = (string) data_get($response->json(), 'message', 'Gagal membuat pembayaran Xendit. Coba lagi.');
+
             return back()
-                ->withErrors(['payment_method' => 'Gagal membuat pembayaran Midtrans. Coba lagi.'])
+                ->withErrors(['payment_method' => $message])
                 ->withInput();
         }
 
-        $redirectUrl = (string) ($response->json('redirect_url') ?? '');
-        if ($redirectUrl === '') {
+        $invoiceUrl = (string) ($response->json('invoice_url') ?? '');
+        if ($invoiceUrl === '') {
             return back()
-                ->withErrors(['payment_method' => 'Response Midtrans tidak valid (redirect_url kosong).'])
+                ->withErrors(['payment_method' => 'Response Xendit tidak valid (invoice_url kosong).'])
                 ->withInput();
         }
 
-        return redirect()->away($redirectUrl);
+        return redirect()->away($invoiceUrl);
     }
 
     return view('pages.guest.checkout.checkout', [
