@@ -113,6 +113,14 @@ Route::match(['GET', 'POST'], '/checkout', function (Request $request) {
         ]);
     }
 
+    $orderPayload = [];
+    if ($request->filled('order_payload')) {
+        $decodedPayload = json_decode((string) $request->input('order_payload'), true);
+        if (json_last_error() === JSON_ERROR_NONE && is_array($decodedPayload)) {
+            $orderPayload = $decodedPayload;
+        }
+    }
+
     // Direct checkout (single item) from product detail page
     if ($request->isMethod('post') && $request->filled('katalog_id')) {
         $katalogId = (int) $request->input('katalog_id');
@@ -136,27 +144,48 @@ Route::match(['GET', 'POST'], '/checkout', function (Request $request) {
             'size' => is_string($size) && trim($size) !== '' ? trim($size) : null,
             'image' => $image,
         ]];
+    } elseif ($request->isMethod('post') && !empty($orderPayload) && $type === 'katalog') {
+        $katalogItems = array_map(function ($item) {
+            $rawImage = $item['image'] ?? null;
+            $isAbsolute = is_string($rawImage)
+                && (str_starts_with($rawImage, 'http://') || str_starts_with($rawImage, 'https://'));
+
+            $item['image_url'] = $isAbsolute
+                ? $rawImage
+                : ($rawImage ? asset('storage/' . ltrim($rawImage, '/')) : 'https://picsum.photos/id/1/600/800');
+
+            return [
+                'id' => $item['id'] ?? $item['katalog_id'] ?? null,
+                'katalog_id' => $item['katalog_id'] ?? $item['id'] ?? null,
+                'name' => $item['name'] ?? 'Produk',
+                'price' => (int) ($item['price'] ?? 0),
+                'quantity' => (int) ($item['quantity'] ?? 1),
+                'size' => $item['size'] ?? null,
+                'image' => $item['image'] ?? null,
+                'image_url' => $item['image_url'],
+            ];
+        }, array_values($orderPayload));
     } else {
-    $katalogItems = array_map(function ($item) {
-        $rawImage = $item['image'] ?? null;
-        $isAbsolute = is_string($rawImage)
-            && (str_starts_with($rawImage, 'http://') || str_starts_with($rawImage, 'https://'));
+        $katalogItems = array_map(function ($item) {
+            $rawImage = $item['image'] ?? null;
+            $isAbsolute = is_string($rawImage)
+                && (str_starts_with($rawImage, 'http://') || str_starts_with($rawImage, 'https://'));
 
-        $item['image_url'] = $isAbsolute
-            ? $rawImage
-            : ($rawImage ? asset('storage/' . ltrim($rawImage, '/')) : 'https://picsum.photos/id/1/600/800');
+            $item['image_url'] = $isAbsolute
+                ? $rawImage
+                : ($rawImage ? asset('storage/' . ltrim($rawImage, '/')) : 'https://picsum.photos/id/1/600/800');
 
-        return [
-            'id' => $item['id'] ?? $item['katalog_id'] ?? null,
-            'katalog_id' => $item['katalog_id'] ?? $item['id'] ?? null,
-            'name' => $item['name'] ?? 'Produk',
-            'price' => (int) ($item['price'] ?? 0),
-            'quantity' => (int) ($item['quantity'] ?? 1),
-            'size' => $item['size'] ?? null,
-            'image' => $item['image'] ?? null,
-            'image_url' => $item['image_url'],
-        ];
-    }, array_values($request->session()->get('cart', [])));
+            return [
+                'id' => $item['id'] ?? $item['katalog_id'] ?? null,
+                'katalog_id' => $item['katalog_id'] ?? $item['id'] ?? null,
+                'name' => $item['name'] ?? 'Produk',
+                'price' => (int) ($item['price'] ?? 0),
+                'quantity' => (int) ($item['quantity'] ?? 1),
+                'size' => $item['size'] ?? null,
+                'image' => $item['image'] ?? null,
+                'image_url' => $item['image_url'],
+            ];
+        }, array_values($request->session()->get('cart', [])));
     }
 
     $shippingOptions = [
