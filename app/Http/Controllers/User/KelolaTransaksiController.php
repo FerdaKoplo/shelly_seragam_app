@@ -40,6 +40,19 @@ class KelolaTransaksiController extends Controller
         return view('pages.user.transaksi.index', compact('transaksis'));
     }
 
+    public function searchDestination(Request $request)
+    {
+        $search = $request->query('q');
+        
+        if (empty($search) || strlen($search) < 3) {
+            return response()->json([]);
+        }
+
+        $results = $this->rajaOngkir->searchDomesticDestination($search);
+
+        return response()->json($results);
+    }
+
     public function checkResi(Request $request)
     {
         $request->validate([

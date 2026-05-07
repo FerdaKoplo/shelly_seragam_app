@@ -17,7 +17,8 @@ return new class extends Migration
                ->references('produk_id')
                 ->on('produk')
                 ->onDelete('cascade');
-            $table->enum('spesifikasi_khusus', ['Bundle', 'Atasan', 'Bawahan']);
+            // $table->enum('spesifikasi_khusus', ['Bundle', 'Atasan', 'Bawahan']);
+            $table->string('spesifikasi_khusus');
             $table->timestamps();
         });
     }

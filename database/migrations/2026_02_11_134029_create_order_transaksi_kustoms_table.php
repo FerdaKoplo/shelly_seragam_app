@@ -19,7 +19,8 @@ return new class extends Migration
                 ->onDelete('cascade');
             $table->integer('quantity');
             $table->string('ukuran_dipilih');
-            $table->enum('tipe_kustom', ['Bundle', 'Atasan', 'Bawahan']);
+            // $table->enum('tipe_kustom', ['Bundle', 'Atasan', 'Bawahan']);
+            $table->string('tipe_kustom');
             $table->text('catatan');
             $table->text('detail_pilihan_kustomisasi');
             $table->timestamps();

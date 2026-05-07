@@ -38,7 +38,7 @@ class VoucherAdminTest extends TestCase
         $this->loginAsAdmin();
     }
 
-    public function it_rejects_creation_when_code_is_empty()
+    public function test_it_rejects_creation_when_code_is_empty()
     {
         $response = $this->post('/admin/vouchers', [
             'code' => '',
@@ -50,7 +50,7 @@ class VoucherAdminTest extends TestCase
                  ->assertValidationErrors(['code']);
     }
 
-    public function it_rejects_creation_if_voucher_code_already_exists()
+    public function test_it_rejects_creation_if_voucher_code_already_exists()
     {
         Voucher::factory()->create(['code' => 'PROMO2026']);
 
@@ -64,7 +64,7 @@ class VoucherAdminTest extends TestCase
                  ->assertValidationErrors(['code']);
     }
 
-    public function it_can_create_a_new_voucher_successfully()
+    public function test_it_can_create_a_new_voucher_successfully()
     {
         $response = $this->post('/admin/vouchers', [
             'code' => 'KILAT50',
@@ -79,7 +79,7 @@ class VoucherAdminTest extends TestCase
         ]);
     }
 
-    public function it_can_update_an_existing_voucher()
+    public function test_it_can_update_an_existing_voucher()
     {
         $voucher = Voucher::factory()->create([
             'code' => 'AWAL',
