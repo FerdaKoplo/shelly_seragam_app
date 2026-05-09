@@ -5,7 +5,7 @@
 <x-shared.notification />
     <div class="px-6 pb-12 " x-data="{
                                 images: [],
-                                variations: [], 
+                                variations: [],
 
                                 handleImageUpload(event) {
                                     const files = event.target.files;
@@ -176,17 +176,17 @@
 
                         <div class="flex flex-wrap gap-2 mb-3">
                             <template x-for="(v, i) in variations.filter(item => item.type === 'ukuran')" :key="i">
-                                <div data-cy="size-item"
+                                <div
                                     class="bg-gray-100 border border-gray-300 px-3 py-1 rounded-full text-sm flex items-center gap-2">
                                     <span x-text="v.name"></span>
                                     <span class="text-xs text-gray-500" x-text="`(${v.chest}/${v.sleeve})`"></span>
-                                    <button  type="button" @click="removeVariation(variations.indexOf(v))"
+                                    <button type="button" @click="removeVariation(variations.indexOf(v))"
                                         class="text-red-500 hover:text-red-700 font-bold">×</button>
                                 </div>
                             </template>
                         </div>
 
-                        <button data-cy="open-size-modal" type="button" @click="$dispatch('open-modal', 'modal-size-variation')"
+                        <button type="button" @click="$dispatch('open-modal', 'modal-size-variation')"
                             class="w-full border-2 border-dashed border-gray-300 rounded-full py-2 text-gray-500 text-sm hover:border-gray-400 hover:bg-gray-50 transition">
                             Tambahkan Variasi Ukuran
                         </button>
