@@ -133,15 +133,18 @@
                 </h1>
 
                 <div>
-                    <table>
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class=" border-gray-200 text-gray-700 text-sm tracking-wide">
+                                <th class="px-6 py-4 font-bold">ID</th>
+                                <th class="px-6 py-4 font-bold">Nama Customer</th>
+                                <th class="px-6 py-4 font-bold">Jenis Produk</th>
+                                <th class="px-6 py-4 font-bold">Status Transaksi</th>
+                                <th class="px-6 py-4 font-bold">Status Pengiriman</th>
+                            </tr>
+                        </thead>
                         <tbody class="divide-y divide-gray-100">
-                            <th>ID</th>
-                            <th>Nama Customer</th>
-                            <th>Jenis Produk</th>
-                            <th>Jenis Produk</th>
-                            <th>Jenis Produk</th>
-
-                            @foreach ($allTransactions as $transaction)
+                            @forelse ($allTransactions as $transaction)
                                 @php
                                     $hasRegular = $transaction->produkTransaksis->count() > 0;
                                     $hasCustom = $transaction->orderKustoms->count() > 0;
@@ -160,24 +163,26 @@
                                     <td class="px-6 py-4 text-sm font-medium text-gray-900">
                                         #TRX{{ str_pad($transaction->transaksi_id, 3, '0', STR_PAD_LEFT) }}
                                     </td>
-
                                     <td class="px-6 py-4 text-sm text-gray-600">
                                         {{ $transaction->nama_customer }}
                                     </td>
-
                                     <td class="px-6 py-4 text-sm text-gray-600">
                                         {{ $jenisProduk }}
                                     </td>
-
                                     <td class="px-6 py-4 text-sm text-gray-600">
-                                        {{ $transaction->status  }}
+                                        {{ $transaction->status }}
                                     </td>
-
                                     <td class="px-6 py-4 text-sm text-gray-600">
                                         {{ $transaction->pengiriman->status_pengiriman ?? 'Belum Dikirim' }}
                                     </td>
                                 </tr>
-                            @endforeach
+                            @empty
+                                <tr>
+                                    <td colspan="5" class="px-6 py-10 text-center text-gray-500 font-medium">
+                                        Tidak ada data transaksi di bulan ini.
+                                    </td>
+                                </tr>
+                            @endforelse
                         </tbody>
                     </table>
                 </div>
@@ -200,7 +205,7 @@
             const labels = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
 
             const salesData = @json($salesData);
-            const maxValue = Math.max(...salesData) > 0 ? Math.max(...salesData) + 10 : 100; 
+            const maxValue = Math.max(...salesData) > 0 ? Math.max(...salesData) + 10 : 100;
             const backgroundData = salesData.map(() => maxValue);
 
             new Chart(ctx, {
@@ -211,19 +216,19 @@
                         {
                             label: 'Penjualan',
                             data: salesData,
-                            backgroundColor: '#EBCD5E', 
+                            backgroundColor: '#EBCD5E',
                             hoverBackgroundColor: '#DKB940',
                             barThickness: 12,
-                            borderRadius: 20, 
-                            borderSkipped: false, 
+                            borderRadius: 20,
+                            borderSkipped: false,
                             order: 1
                         },
                         {
                             label: 'Target',
                             data: backgroundData,
-                            backgroundColor: '#F2F7FF', 
+                            backgroundColor: '#F2F7FF',
                             hoverBackgroundColor: '#F2F7FF',
-                            barThickness: 12, 
+                            barThickness: 12,
                             borderRadius: 20,
                             borderSkipped: false,
                             order: 2
@@ -241,7 +246,7 @@
 
                     plugins: {
                         legend: {
-                            display: false 
+                            display: false
                         },
                         tooltip: {
                             filter: function (tooltipItem) {
@@ -254,13 +259,13 @@
                     },
                     scales: {
                         x: {
-                            stacked: true, 
+                            stacked: true,
                             grid: {
-                                display: false, 
+                                display: false,
                                 drawBorder: false
                             },
                             ticks: {
-                                color: '#9CA3AF', 
+                                color: '#9CA3AF',
                                 font: {
                                     size: 11
                                 }
@@ -268,10 +273,10 @@
                         },
                         y: {
                             beginAtZero: true,
-                            max: maxValue, 
+                            max: maxValue,
                             grid: {
-                                color: '#F3F4F6', 
-                                borderDash: [5, 5], 
+                                color: '#F3F4F6',
+                                borderDash: [5, 5],
                                 drawBorder: false
                             },
                             ticks: {
