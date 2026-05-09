@@ -29,22 +29,18 @@ class KatalogController extends Controller
             }
         }
 
-        // harga
+        // 2. Harga
         if ($request->filled('min_harga')) {
             $query->where('harga', '>=', $request->min_harga);
         }
-
-
         if ($request->filled('max_harga')) {
             $query->where('harga', '<=', $request->max_harga);
         }
 
-        // kategori (exact match dari DB)
+        // 3. Kategori & Status
         if ($request->filled('filter_kategori')) {
             $query->where('kategori', $request->filter_kategori);
         }
-
-        // status stok
         if ($request->filled('filter_status')) {
             if ($request->filter_status === 'ready') {
                 $query->where('status', 'Tersedia');
@@ -53,19 +49,51 @@ class KatalogController extends Controller
             }
         }
 
-        // sort
+        // 4. FILTER BARU: Pakaian Untuk (Pria / Wanita)
+        if ($request->filled('filter_gender')) {
+            $query->whereHas('produk.detailProduks', function ($q) use ($request) {
+                // Asumsi nama atribut di DB adalah 'Pakaian Untuk' atau 'Gender'
+                $q->whereIn('nama_detail', ['Pakaian Untuk', 'Gender'])
+                    ->whereHas('pilihanDetails', function ($q2) use ($request) {
+                        $q2->where('opsi', $request->filter_gender);
+                    });
+            });
+        }
+
+        if ($request->filled('filter_ukuran')) {
+            $query->whereHas('produk.detailProduks', function ($q) use ($request) {
+                $q->where('nama_detail', 'Ukuran')
+                    ->whereHas('pilihanDetails', function ($q2) use ($request) {
+                        $q2->where('opsi', $request->filter_ukuran);
+                    });
+            });
+        }
+
+        if ($request->filled('filter_material')) {
+            $query->whereHas('produk.detailProduks', function ($q) use ($request) {
+                $q->whereIn('nama_detail', ['Material Kain', 'Bahan', 'Jenis Kain'])
+                    ->whereHas('pilihanDetails', function ($q2) use ($request) {
+                        $q2->where('opsi', 'like', '%' . $request->filter_material . '%');
+                    });
+            });
+        }
+
         $sort = $request->get('sort', 'newest');
         if ($sort === 'price_high') {
             $query->orderByDesc('harga');
         } elseif ($sort === 'price_low') {
             $query->orderBy('harga');
+        } elseif ($sort === 'best_selling') {
+            $query->addSelect([
+                'terjual' => \App\Models\ProdukTransaksi::selectRaw('SUM(quantity)')
+                    ->whereColumn('produk_id', 'produk_katalog.produk_id')
+            ])->orderByDesc('terjual');
         } else {
-            $query->orderByDesc('katalog_id'); // newest
+            $query->orderByDesc('katalog_id');
         }
 
         $katalog = $query->paginate(35)->appends($request->except('page'));
 
-        // categories untuk dropdown modal (sesuai DB)
         $categories = ProdukKatalog::query()
             ->where('stok', '>=', 0)
             ->select('kategori')

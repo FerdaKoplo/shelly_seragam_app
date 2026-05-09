@@ -2,7 +2,7 @@
     <div class="flex flex-col text-left">
         <h1 class="text-4xl leading-tight">SHELLY</h1>
         <h1 class="font-bold text-sm tracking-[0.3em] uppercase -mt-1">SERAGAM</h1>
-    </div> 
+    </div>
     
     @yield('action')
 
