@@ -8,7 +8,6 @@
         $allBordirs = [0, 1, 2, 3, 4, 5];
         $existingSections = \App\Models\ProdukKustom::pluck('spesifikasi_khusus')->toArray();
 
-        // Build JS-ready section data from DB
         $sectionData = $kustoms->map(function ($k) {
             $details = $k->produk->detailProduks->keyBy('nama_detail');
 
@@ -19,10 +18,10 @@
                 ->toArray() ?? [];
 
             $counts = array_map('intval', $getRaw('Jumlah Kombinasi Kain'));
-            $maxCount = count($counts) > 0 ? max($counts) : 1; // Extract max state for UI
+            $maxCount = count($counts) > 0 ? max($counts) : 1;
 
             $bordirs = array_map('intval', $getRaw('Jumlah Titik Bordir'));
-            $maxBordir = count($bordirs) > 0 ? max($bordirs) : 0; // Extract max state for UI
+            $maxBordir = count($bordirs) > 0 ? max($bordirs) : 0; 
 
             $getFlag = function ($name) use ($details) {
                 $raw = $details->get($name)?->pilihanDetails->first()?->getRawOriginal('opsi');
@@ -37,8 +36,8 @@
                 'name' => $k->spesifikasi_khusus,
                 'showKombinasi' => count($counts) > 0,
                 'showBordir' => count($bordirs) > 0,
-                'enabledCounts' => [$maxCount], // Load max selection for Radio
-                'enabledBordirs' => [$maxBordir], // Load max selection for Radio
+                'enabledCounts' => [$maxCount], 
+                'enabledBordirs' => [$maxBordir],
                 'showCatatan' => $getFlag('Catatan'),
                 'showUpload' => $getFlag('Upload Desain'),
                 'showUkuran' => $getFlag('Ukuran'),
@@ -58,23 +57,33 @@
                 <h1 class="text-[28px] font-bold text-black">Edit Produk Kustomisasi</h1>
             </div>
 
-            @if(session('error'))
-                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg">
-                    {{ session('error') }}
-                </div>
-            @endif
-
-            @if($errors->any())
-                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg">
-                    <ul class="list-disc list-inside text-sm">
-                        @foreach($errors->all() as $e) <li>{{ $e }}</li> @endforeach
-                    </ul>
-                </div>
-            @endif
-
             <form action="{{ route('manage.kustom.update', $kustoms->first()->kustom_id) }}" method="POST"
-                x-data="kustomEditForm()" @submit.prevent="submitForm($el)">
+                x-data="kustomEditForm($dispatch)" @submit.prevent="submitForm($el)">
                 @csrf @method('PUT')
+
+                {{-- <!-- MODAL TAMBAH SECTION -->
+                <x-shared.modal_base name="modal-tambah-section" maxWidth="md" :showCloseButton="true">
+                    <div class="mb-2">
+                        <h3 class="text-xl font-bold text-gray-900 mb-2">Tambah Section Baru</h3>
+                        <p class="text-sm text-gray-500 mb-4">Masukkan nama area / spesifikasi khusus pakaian yang ingin
+                            Anda kustomisasi.</p>
+
+                        <input type="text" x-model="newSectionName" @keydown.enter.prevent="confirmAddSection()"
+                            class="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:border-black focus:ring-1 focus:ring-black outline-none transition"
+                            placeholder="Contoh: Bentuk Kerah, Lengan, Sablon, dll." autofocus>
+                    </div>
+
+                    <x-slot name="footer">
+                        <button type="button" @click="$dispatch('close-modal', 'modal-tambah-section')"
+                            class="px-5 py-2 text-sm font-medium text-gray-600 hover:text-black transition">
+                            Batal
+                        </button>
+                        <button type="button" @click="confirmAddSection()"
+                            class="px-5 py-2 text-sm font-bold bg-black text-white rounded-lg hover:bg-gray-800 transition">
+                            Tambahkan
+                        </button>
+                    </x-slot>
+                </x-shared.modal_base> --}}
 
                 {{-- Section tabs --}}
                 <div class="flex gap-3 items-center mb-6 flex-wrap" data-cy="edit-section-tab">
@@ -85,10 +94,10 @@
                             class="px-5 py-2 border rounded-lg font-medium text-sm transition-colors" x-text="sec.name">
                         </button>
                     </template>
-                    <button type="button" @click="addSection()"
+                    {{-- <button type="button" @click="addSection()"
                         class="px-5 py-2 border border-dashed border-gray-400 rounded-lg text-sm text-gray-500 hover:border-black hover:text-black transition-colors">
                         + Tambah Section
-                    </button>
+                    </button> --}}
                 </div>
 
                 {{-- Section panels --}}
@@ -188,12 +197,12 @@
                     </div>
                 </template>
 
-                <div class="mt-4">
+                {{-- <div class="mt-4">
                     <button type="button" @click="addSection()"
                         class="w-full border border-dashed border-gray-400 rounded-xl py-4 text-sm text-gray-500 hover:bg-gray-50 transition">
                         Tambahkan Section Lagi
                     </button>
-                </div>
+                </div> --}}
 
                 {{-- ── Aspek Tambahan ── --}}
                 <div class="flex flex-col gap-4 mt-4">
@@ -232,12 +241,14 @@
     </div>
 
     <script>
-        function kustomEditForm() {
+        function kustomEditForm($dispatch) {
             const saved = @json($sectionData);
+            const existingSections = @json($existingSections);
 
             return {
                 activeSection: 0,
-                // Assign unique internalId separate from DB id
+                newSectionName: '', 
+                
                 sections: saved.map(s => ({
                     ...s,
                     internalId: Date.now() + Math.random(),
@@ -254,21 +265,41 @@
                     if (!this.showUkuran) { this.showUkuran = true; return; }
                 },
 
-                addSection() {
-                    const name = prompt('Nama section baru:');
-                    if (!name || !name.trim()) return;
+                // addSection() {
+                //     this.newSectionName = ''; 
+                //     $dispatch('open-modal', 'modal-tambah-section');
+                // },
+
+                // confirmAddSection() {
+                //     const name = this.newSectionName;
+                //     if (!name || !name.trim()) {
+                //         $dispatch('notify', 'Nama section tidak boleh kosong!');
+                //         return;
+                //     }
+                //     const cleanName = name.trim();
                     
-                    this.sections.push({
-                        internalId: Date.now() + Math.random(),
-                        id: null, // null so controller knows it's a new entry
-                        name: name.trim(),
-                        showKombinasi: false,
-                        showBordir: false,
-                        enabledCounts: [1], // Radio selection default
-                        enabledBordirs: [0], // Radio selection default
-                    });
-                    this.activeSection = this.sections.length - 1;
-                },
+                //     if (this.sections.some(s => s.name.toLowerCase() === cleanName.toLowerCase())) {
+                //         $dispatch('notify', `Section "${cleanName}" sudah ada di tab form ini!`);
+                //         return;
+                //     }
+                //     if (existingSections.some(s => s.toLowerCase() === cleanName.toLowerCase())) {
+                //         $dispatch('notify', `Section "${cleanName}" sudah pernah dibuat di database! Silahkan gunakan menu Edit.`);
+                //         return;
+                //     }
+                    
+                //     this.sections.push({
+                //         internalId: Date.now() + Math.random(),
+                //         id: null, 
+                //         name: cleanName,
+                //         showKombinasi: false,
+                //         showBordir: false,
+                //         enabledCounts: [1],
+                //         enabledBordirs: [0],
+                //     });
+                //     this.activeSection = this.sections.length - 1;
+
+                //     $dispatch('close-modal', 'modal-tambah-section');
+                // },
 
                 removeSection(idx) {
                     this.sections.splice(idx, 1);
@@ -284,12 +315,10 @@
                 },
 
                 toggleCount(idx, n) {
-                    // Radio selection logic
                     this.sections[idx].enabledCounts = [n];
                 },
 
                 toggleBordir(idx, n) {
-                    // Radio selection logic
                     this.sections[idx].enabledBordirs = [n];
                 },
 
@@ -307,14 +336,12 @@
 
                     let submittedCount = 0;
 
-                    // Send ALL active sections in form
                     this.sections.forEach((sec) => {
                         if (sec.id) add(`sections[${submittedCount}][kustom_id]`, sec.id); 
                         add(`sections[${submittedCount}][name]`, sec.name);
                         add(`sections[${submittedCount}][show_kombinasi]`, sec.showKombinasi ? '1' : '0');
                         add(`sections[${submittedCount}][show_bordir]`, sec.showBordir ? '1' : '0');
                         
-                        // Extract single max selection array back to 1,2,3 for DB mapping
                         if (sec.showKombinasi && sec.enabledCounts.length > 0) {
                             const maxC = sec.enabledCounts[0];
                             for(let i=1; i<=maxC; i++) {
