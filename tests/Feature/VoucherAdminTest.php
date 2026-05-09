@@ -3,10 +3,12 @@
 namespace Tests\Feature;
 
 use App\Models\User;
-use Hash;
+// use Hash;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
+use App\Models\Voucher;
 
 class VoucherAdminTest extends TestCase
 {
