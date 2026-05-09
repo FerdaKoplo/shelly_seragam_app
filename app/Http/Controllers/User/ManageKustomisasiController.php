@@ -56,6 +56,13 @@ class ManageKustomisasiController extends Controller
             'sections.*.bordir_options.*' => 'integer|between:0,5',
         ]);
 
+        $submittedNames = collect($request->input('sections'))->pluck('name')->toArray();
+        $isDuplicate = ProdukKustom::whereIn('spesifikasi_khusus', $submittedNames)->exists();
+
+        if ($isDuplicate) {
+            return back()->withInput()->with('error', 'Aspek Sudah Pernah Ditambahkan');
+        }
+
         DB::beginTransaction();
         try {
             foreach ($request->input('sections') as $sec) {
@@ -116,6 +123,8 @@ class ManageKustomisasiController extends Controller
             'sections.*.bordir_options.*' => 'integer|between:0,5',
         ]);
 
+
+
         DB::beginTransaction();
         try {
             foreach ($request->input('sections') as $sec) {
@@ -160,6 +169,13 @@ class ManageKustomisasiController extends Controller
     {
         try {
             $kustom = ProdukKustom::findOrFail($id);
+            $isInUse = DB::table('order_transaksi_kustom')
+                ->where('tipe_kustom', $kustom->spesifikasi_khusus)
+                ->exists();
+
+            if ($isInUse) {
+                return back()->with('error', 'Aspek tidak dapat dihapus karena masih digunakan oleh transaksi aktif');
+            }
             $kustom->produk->delete();
             return redirect()->route('manage.kustom')->with('success', 'Produk kustom berhasil dihapus.');
         } catch (\Exception $e) {
