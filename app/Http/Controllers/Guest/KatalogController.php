@@ -63,7 +63,7 @@ class KatalogController extends Controller
             $query->orderByDesc('katalog_id'); // newest
         }
 
-        $katalog = $query->paginate(12)->appends($request->except('page'));
+        $katalog = $query->paginate(35)->appends($request->except('page'));
 
         // categories untuk dropdown modal (sesuai DB)
         $categories = ProdukKatalog::query()

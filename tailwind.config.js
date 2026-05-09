@@ -14,6 +14,7 @@ module.exports = {
       },
 
       colors: {
+        light: '#D9D9D9',
         brand: "#FFE96E",
         secondary: "#F7CF43",
         primary: "#E09624",
