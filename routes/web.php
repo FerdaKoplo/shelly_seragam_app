@@ -86,6 +86,18 @@ Route::match(['GET', 'POST'], '/checkout', function (Request $request) {
     $type = $request->input('type', $request->query('type', 'katalog'));
     $checkoutNotes = (string) $request->input('notes', $request->session()->get('cart_notes', ''));
 
+    $orderSuccessMessage = 'Pesanan berhasil dibuat, Anda akan dihubungi oleh CS untuk konfirmasi dan finalisasi harga.';
+
+    // After Xendit payment, browser lands here with ?checkout_success=1 — swap for clean URL + flash (see x-shared.notification).
+    if ($request->isMethod('get') && $request->boolean('checkout_success')) {
+        if ($type === 'katalog') {
+            $request->session()->forget('cart');
+        }
+
+        return redirect()->route('checkout', ['type' => $type])
+            ->with('success', $orderSuccessMessage);
+    }
+
     // Validate only when the customer form is actually being submitted.
     // (We also use POST to open checkout from product detail.)
     if ($request->isMethod('post') && $request->hasAny([
@@ -300,7 +312,10 @@ Route::match(['GET', 'POST'], '/checkout', function (Request $request) {
             'currency' => 'IDR',
             'description' => 'Pembayaran pesanan ' . $externalId,
             'invoice_duration' => 86400,
-            'success_redirect_url' => url('/checkout'),
+            'success_redirect_url' => url('/checkout') . '?' . http_build_query([
+                'checkout_success' => '1',
+                'type' => 'katalog',
+            ]),
             'failure_redirect_url' => url('/checkout'),
             'payer_email' => (string) $request->input('email'),
             'customer' => $customer,
@@ -338,6 +353,24 @@ Route::match(['GET', 'POST'], '/checkout', function (Request $request) {
         }
 
         return redirect()->away($invoiceUrl);
+    }
+
+    if (
+        $request->isMethod('post')
+        && $type === 'kustom'
+        && $request->hasAny([
+            'full_name',
+            'email',
+            'phone',
+            'address',
+            'city',
+            'province',
+            'postal_code',
+            'shipping_id',
+        ])
+    ) {
+        return redirect()->route('checkout', ['type' => 'kustom'])
+            ->with('success', $orderSuccessMessage);
     }
 
     return view('pages.guest.checkout.checkout', [
