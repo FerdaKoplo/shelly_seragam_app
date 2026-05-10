@@ -19,6 +19,7 @@
         @yield('body')
     </div>
     <x-shared.notification />
+    <x-guest.katalog.toast />
 
 </bod>
 
