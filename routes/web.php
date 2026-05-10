@@ -17,6 +17,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 /*
@@ -187,7 +188,8 @@ Route::match(['GET', 'POST'], '/checkout', function (Request $request) {
             $path = $file->store('uploads/kustom', 'public');
             $uploadedFiles[] = [
                 'name' => $file->getClientOriginalName(),
-                'url' => Storage::disk('public')->url($path),
+                // 'url' => Storage::disk('public')->url($path),
+                'url' => asset('storage/' . ltrim($path, '/')),
                 'extension' => $extension,
             ];
         }
@@ -284,7 +286,8 @@ Route::match(['GET', 'POST'], '/checkout', function (Request $request) {
             ->post($baseUrl . '/v2/invoices', $payload);
 
         if (!$response->successful()) {
-            \Log::warning('Xendit invoice creation failed', [
+            // \Log::warning('Xendit invoice creation failed', [
+            Log::warning('Xendit invoice creation failed', [
                 'status' => $response->status(),
                 'body' => $response->json(),
                 'raw' => $response->body(),

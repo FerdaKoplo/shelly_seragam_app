@@ -76,11 +76,12 @@ class PegawaiController extends Controller
     // logic to remove a user
     public function destroy($user_id)
     {
-        $user = User::findOrFail($user_id); 
+        $user = User::findOrFail($user_id);
+
         if ($user->transaksis()->exists()) {
             return back()->with('error', 'Pegawai tidak dapat dihapus karena memiliki transaksi aktif');
         }
-        $user->delete(); //
+        $user->delete();
         return back()->with('success', 'Pegawai telah dihapus.');
     }
 }
