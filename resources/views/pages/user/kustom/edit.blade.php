@@ -62,23 +62,23 @@
                 @csrf @method('PUT')
 
                 {{-- <!-- MODAL TAMBAH SECTION -->
-                <x-shared.modal_base name="modal-tambah-section" maxWidth="md" :showCloseButton="true">
-                    <div class="mb-2">
+                <x-shared.modal_base name="modal-tambah-section" maxWidth="md" :showCloseButton="true" >
+                    <div class="mb-2" data-cy="modal-tambah-section">
                         <h3 class="text-xl font-bold text-gray-900 mb-2">Tambah Section Baru</h3>
                         <p class="text-sm text-gray-500 mb-4">Masukkan nama area / spesifikasi khusus pakaian yang ingin
                             Anda kustomisasi.</p>
 
-                        <input type="text" x-model="newSectionName" @keydown.enter.prevent="confirmAddSection()"
+                        <input data-cy="nama-section-input" type="text" x-model="newSectionName" @keydown.enter.prevent="confirmAddSection()"
                             class="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:border-black focus:ring-1 focus:ring-black outline-none transition"
                             placeholder="Contoh: Bentuk Kerah, Lengan, Sablon, dll." autofocus>
                     </div>
 
                     <x-slot name="footer">
-                        <button type="button" @click="$dispatch('close-modal', 'modal-tambah-section')"
+                        <button type="button" data-cy="btn-add-section-batal" @click="$dispatch('close-modal', 'modal-tambah-section')"
                             class="px-5 py-2 text-sm font-medium text-gray-600 hover:text-black transition">
                             Batal
                         </button>
-                        <button type="button" @click="confirmAddSection()"
+                        <button type="button" data-cy="btn-add-section-simpan" @click="confirmAddSection()"
                             class="px-5 py-2 text-sm font-bold bg-black text-white rounded-lg hover:bg-gray-800 transition">
                             Tambahkan
                         </button>
@@ -107,7 +107,7 @@
                         <div class="flex flex-col gap-1">
                             <div class="flex items-center justify-between">
                                 <h2 class="text-xl font-bold" x-text="'Section ' + sec.name"></h2>
-                                <button type="button" x-show="sections.length > 1" @click="removeSection(sIdx)"
+                                <button data-cy="btn-delete-kustom" ="button" x-show="sections.length > 1" @click="removeSection(sIdx)"
                                     class="text-xs text-red-500 hover:text-red-700 underline">
                                     Hapus Section
                                 </button>
