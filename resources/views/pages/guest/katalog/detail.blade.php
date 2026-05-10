@@ -9,7 +9,7 @@
     $firstImageUrl = $firstFoto ? asset('storage/' . $firstFoto->path) : $fallbackImage;
 
     $basePrice = (float) $item->harga;
-    $isPreOrder = $item->status === 'Pre-Order';
+    $isPreOrder = $item->status === 'Pre-Order'; 
     $maxQuantity = $isPreOrder ? 99 : (int) $item->stok;
 
     $details = $item->produk?->detailProduks ?? collect();
