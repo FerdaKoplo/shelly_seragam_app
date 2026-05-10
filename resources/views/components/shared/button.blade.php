@@ -14,6 +14,7 @@
         'ghost'   => 'border-transparent text-gray-600 hover:text-black',
         'dark'    => 'bg-[#262626] text-white border-[#262626] hover:bg-black',
         'white'   => 'bg-white text-black border-black hover:bg-gray-50',
+        'yellow' => 'font-bebas '
     ];
 
     // Safely get the variant classes

@@ -35,7 +35,7 @@
 
 <div
     data-cy="product-detail"
-    class="max-w-full mx-auto px-4 py-8"
+    class="max-w-full mx-auto px-32 py-8"
     x-data="{
         activeImage: '{{ $firstImageUrl }}',
         quantity: 1,
@@ -51,10 +51,10 @@
         <h1 class="text-4xl font-bebas tracking-widest">Detail Produk</h1>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 mx-auto items-start">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mx-auto items-start">
 
         {{-- Thumbnails --}}
-        <div class="lg:col-span-1 flex flex-col space-y-4">
+        <div class="lg:col-span-1 flex flex-col space-y-10">
             @forelse($item->fotos as $foto)
             @php $url = asset('storage/' . $foto->path); @endphp
 
@@ -148,7 +148,7 @@
             <x-shared.quantity-button model="quantity" :max="$maxQuantity" />
 
             <div class="mt-10">
-                <p data-cy="total-price" class="text-5xl font-bold mb-6">
+                <p data-cy="total-price" class="text-4xl  mb-6">
                     Rp<span x-text="(quantity * basePrice).toLocaleString('id-ID')"></span>
                 </p>
 
