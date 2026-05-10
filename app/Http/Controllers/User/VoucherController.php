@@ -98,7 +98,6 @@ class VoucherController extends Controller
             'kode_voucher.unique' => 'Voucher Dengan Kode Yang Sama Sudah Dibuat '
         ]);
 
-
         $kodeVoucher = $request->filled('kode_voucher')
             ? $validated['kode_voucher']
             : $this->randomizeVoucherCodeName($validated['nama_voucher']);
