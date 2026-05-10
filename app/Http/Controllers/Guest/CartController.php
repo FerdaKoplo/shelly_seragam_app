@@ -80,7 +80,7 @@ class CartController extends Controller
 
         $request->session()->put('cart', $cart);
 
-        return redirect()->route('keranjang');
+        return redirect()->route('keranjang')->with('cart_success', 'berhasil ditambahkan ke keranjang');
     }
 
     public function update(Request $request, int $katalog_id)

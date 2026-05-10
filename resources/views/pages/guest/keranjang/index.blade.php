@@ -172,7 +172,7 @@
         <div>
             <label class="text-xl font-bold mb-4 block">Catatan</label>
             <textarea x-model="notes" @input="queueSaveNotes()" data-cy="cart-notes"
-                class="w-full border-black rounded-xl h-40 focus:ring-black focus:border-black bg-slate-200 p-4"
+                class="w-full border-black rounded-xl h-40 focus:ring-black focus:border-black border-2  p-4"
                 placeholder="Tambahkan catatan untuk pesanan Anda..."></textarea>
             <p class="mt-2 text-xs text-gray-600" x-show="noteSaveState === 'saving'">Menyimpan catatan...</p>
             <p class="mt-2 text-xs text-green-700" x-show="noteSaveState === 'saved'">Catatan tersimpan.</p>
@@ -193,7 +193,7 @@
                 <input type="hidden" name="notes" :value="notes">
 
                 <x-shared.button data-cy="checkout-btn" type="submit" variant="primary" :rounded="false"
-                    class="text-2xl py-6 text-white bg-black hover:bg-secondary hover:text-black tracking-widest">
+                    class="text-4xl py-5  bg-secondary font-bebas tracking-widest hover:bg-secondary">
                     Checkout
                 </x-shared.button>
             </form>

@@ -26,13 +26,13 @@
                 x-data="{ active: '{{ $sections[0] ?? '' }}' }">
 
                 <div class="border border-black  py-3 rounded-2xl px-4 gap-4 flex pr-12">
-                    <a href="{{ route('manage.kustom.create') }}"
+                    <a data-cy="btn-add-kustom" href="{{ route('manage.kustom.create') }}"
                         class="inline-flex items-center py-1.5 px-14 bg-white border border-dashed border-black text-black rounded-lg font-medium text-lg hover:bg-gray-50 transition">
                         +
                     </a>
 
                     @foreach($sections as $sec)
-                        <button type="button" @click="active = '{{ $sec }}'" :class="active === '{{ $sec }}'
+                        <button data-cy="section-tab-{{ $sec }}'" :class="active === '{{ $sec }}'
                                                 ? 'bg-black text-white border-black'
                                                 : 'bg-white text-black border-gray-300 hover:border-black'"
                             class="px-10 py-1.5 border rounded-lg text-lg font-medium transition-colors">
@@ -60,6 +60,7 @@
                                     <div class="flex gap-2 flex-wrap">
                                         @foreach($kustom->produk->detailProduks->filter(fn($d) => $d->pilihanDetails->isNotEmpty()) as $detail)
                                             <span
+                                            data-cy="kustom-item"
                                                 class="text-xs bg-gray-100 border border-gray-200 rounded-full px-2.5 py-0.5 text-gray-600">
                                                 {{ $detail->nama_detail }}
                                             </span>
@@ -71,12 +72,12 @@
                                 </div>
 
                                 <div class="flex gap-2">
-                                    <a href="{{ route('manage.kustom.edit', $kustom->kustom_id) }}"
+                                    <a data-cy="btn-edit-kustom" href="{{ route('manage.kustom.edit', $kustom->kustom_id) }}"
                                         class="px-4 py-2 text-black font-bold rounded-lg hover:bg-yellow-500 transition text-sm">
                                         Edit
                                     </a>
 
-                                    <button type="button" @click="$dispatch('open-delete-modal', { 
+                                    <button data-cy="btn-delete-kustom" type="button" @click="$dispatch('open-delete-modal', { 
                                                                             url: '{{ route('manage.kustom.destroy', $kustom->kustom_id) }}', 
                                                                             message: 'Apa Anda yakin ingin menghapus section {{ $kustom->spesifikasi_khusus }}?'
                                                                         })"
