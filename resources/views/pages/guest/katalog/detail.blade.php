@@ -119,7 +119,7 @@
                         @foreach($sizeOptions as $opt)
                             @php $sz = (string) $opt['name']; @endphp
                             <label class="cursor-pointer">
-                                <input type="radio" name="size" value="{{ $sz }}" x-model="selectedSize" class="hidden peer">
+                                <input type="radio" name="size" data-cy="size-{{ $sz }}" value="{{ $sz }}" x-model="selectedSize" class="hidden peer">
                                 <div class="border border-gray-200 py-2 text-center rounded-lg peer-checked:bg-black peer-checked:text-white transition">{{ $sz }}</div>
                             </label>
                         @endforeach
@@ -134,7 +134,7 @@
                         @foreach($colorOptions as $opt)
                             @php $hex = strtoupper((string) $opt['hex']); @endphp
                             <label class="cursor-pointer">
-                                <input type="radio" name="color" value="{{ $hex }}" x-model="selectedColor" class="hidden peer">
+                                <input type="radio" name="color" value="{{ $hex }}" x-model="selectedColor" data-cy="color-{{$hex}}" class="hidden peer">
                                 <div class="w-full aspect-[2/1] rounded-md border border-gray-200 peer-checked:ring-2 peer-checked:ring-black ring-offset-1 transition"
                                     style="background-color: {{ $hex }};"></div>
                                 <div class="text-[10px] text-gray-500 mt-1 font-medium tracking-wide">{{ $hex }}</div>
