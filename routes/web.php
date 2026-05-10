@@ -87,6 +87,18 @@ Route::match(['GET', 'POST'], '/checkout', function (Request $request) {
     $type = $request->input('type', $request->query('type', 'katalog'));
     $checkoutNotes = (string) $request->input('notes', $request->session()->get('cart_notes', ''));
 
+    $orderSuccessMessage = 'Pesanan berhasil dibuat, Anda akan dihubungi oleh CS untuk konfirmasi dan finalisasi harga.';
+
+    // After Xendit payment, browser lands here with ?checkout_success=1 — swap for clean URL + flash (see x-shared.notification).
+    if ($request->isMethod('get') && $request->boolean('checkout_success')) {
+        if ($type === 'katalog') {
+            $request->session()->forget('cart');
+        }
+
+        return redirect()->route('checkout', ['type' => $type])
+            ->with('success', $orderSuccessMessage);
+    }
+
     // Validate only when the customer form is actually being submitted.
     // (We also use POST to open checkout from product detail.)
     if ($request->isMethod('post') && $request->hasAny([
@@ -114,6 +126,14 @@ Route::match(['GET', 'POST'], '/checkout', function (Request $request) {
         ]);
     }
 
+    $orderPayload = [];
+    if ($request->filled('order_payload')) {
+        $decodedPayload = json_decode((string) $request->input('order_payload'), true);
+        if (json_last_error() === JSON_ERROR_NONE && is_array($decodedPayload)) {
+            $orderPayload = $decodedPayload;
+        }
+    }
+
     // Direct checkout (single item) from product detail page
     if ($request->isMethod('post') && $request->filled('katalog_id')) {
         $katalogId = (int) $request->input('katalog_id');
@@ -137,27 +157,48 @@ Route::match(['GET', 'POST'], '/checkout', function (Request $request) {
             'size' => is_string($size) && trim($size) !== '' ? trim($size) : null,
             'image' => $image,
         ]];
+    } elseif ($request->isMethod('post') && !empty($orderPayload) && $type === 'katalog') {
+        $katalogItems = array_map(function ($item) {
+            $rawImage = $item['image'] ?? null;
+            $isAbsolute = is_string($rawImage)
+                && (str_starts_with($rawImage, 'http://') || str_starts_with($rawImage, 'https://'));
+
+            $item['image_url'] = $isAbsolute
+                ? $rawImage
+                : ($rawImage ? asset('storage/' . ltrim($rawImage, '/')) : 'https://picsum.photos/id/1/600/800');
+
+            return [
+                'id' => $item['id'] ?? $item['katalog_id'] ?? null,
+                'katalog_id' => $item['katalog_id'] ?? $item['id'] ?? null,
+                'name' => $item['name'] ?? 'Produk',
+                'price' => (int) ($item['price'] ?? 0),
+                'quantity' => (int) ($item['quantity'] ?? 1),
+                'size' => $item['size'] ?? null,
+                'image' => $item['image'] ?? null,
+                'image_url' => $item['image_url'],
+            ];
+        }, array_values($orderPayload));
     } else {
-    $katalogItems = array_map(function ($item) {
-        $rawImage = $item['image'] ?? null;
-        $isAbsolute = is_string($rawImage)
-            && (str_starts_with($rawImage, 'http://') || str_starts_with($rawImage, 'https://'));
+        $katalogItems = array_map(function ($item) {
+            $rawImage = $item['image'] ?? null;
+            $isAbsolute = is_string($rawImage)
+                && (str_starts_with($rawImage, 'http://') || str_starts_with($rawImage, 'https://'));
 
-        $item['image_url'] = $isAbsolute
-            ? $rawImage
-            : ($rawImage ? asset('storage/' . ltrim($rawImage, '/')) : 'https://picsum.photos/id/1/600/800');
+            $item['image_url'] = $isAbsolute
+                ? $rawImage
+                : ($rawImage ? asset('storage/' . ltrim($rawImage, '/')) : 'https://picsum.photos/id/1/600/800');
 
-        return [
-            'id' => $item['id'] ?? $item['katalog_id'] ?? null,
-            'katalog_id' => $item['katalog_id'] ?? $item['id'] ?? null,
-            'name' => $item['name'] ?? 'Produk',
-            'price' => (int) ($item['price'] ?? 0),
-            'quantity' => (int) ($item['quantity'] ?? 1),
-            'size' => $item['size'] ?? null,
-            'image' => $item['image'] ?? null,
-            'image_url' => $item['image_url'],
-        ];
-    }, array_values($request->session()->get('cart', [])));
+            return [
+                'id' => $item['id'] ?? $item['katalog_id'] ?? null,
+                'katalog_id' => $item['katalog_id'] ?? $item['id'] ?? null,
+                'name' => $item['name'] ?? 'Produk',
+                'price' => (int) ($item['price'] ?? 0),
+                'quantity' => (int) ($item['quantity'] ?? 1),
+                'size' => $item['size'] ?? null,
+                'image' => $item['image'] ?? null,
+                'image_url' => $item['image_url'],
+            ];
+        }, array_values($request->session()->get('cart', [])));
     }
 
     $shippingOptions = [
@@ -273,7 +314,10 @@ Route::match(['GET', 'POST'], '/checkout', function (Request $request) {
             'currency' => 'IDR',
             'description' => 'Pembayaran pesanan ' . $externalId,
             'invoice_duration' => 86400,
-            'success_redirect_url' => url('/checkout'),
+            'success_redirect_url' => url('/checkout') . '?' . http_build_query([
+                'checkout_success' => '1',
+                'type' => 'katalog',
+            ]),
             'failure_redirect_url' => url('/checkout'),
             'payer_email' => (string) $request->input('email'),
             'customer' => $customer,
@@ -314,6 +358,24 @@ Route::match(['GET', 'POST'], '/checkout', function (Request $request) {
         return redirect()->away($invoiceUrl);
     }
 
+    if (
+        $request->isMethod('post')
+        && $type === 'kustom'
+        && $request->hasAny([
+            'full_name',
+            'email',
+            'phone',
+            'address',
+            'city',
+            'province',
+            'postal_code',
+            'shipping_id',
+        ])
+    ) {
+        return redirect()->route('checkout', ['type' => 'kustom'])
+            ->with('success', $orderSuccessMessage);
+    }
+
     return view('pages.guest.checkout.checkout', [
         'type' => $type,
         'items' => $katalogItems,
@@ -325,10 +387,6 @@ Route::match(['GET', 'POST'], '/checkout', function (Request $request) {
 
 // user routes
 Route::prefix('admin')->middleware('auth')->group(function () {
-    Route::get('/manage-transaksi', function () {
-        return view('pages.user.transaksi.index');
-    })->name('manage.transaksi');
-
     Route::prefix('manage-katalog')->name('manage.katalog')->group(function () {
         Route::get('/', [KatalogProdukController::class, 'index'])->name('');
         Route::get('/create', [KatalogProdukController::class, 'create'])->name('.create');
