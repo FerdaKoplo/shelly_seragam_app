@@ -384,10 +384,6 @@ Route::match(['GET', 'POST'], '/checkout', function (Request $request) {
 
 // user routes
 Route::prefix('admin')->middleware('auth')->group(function () {
-    Route::get('/manage-transaksi', function () {
-        return view('pages.user.transaksi.index');
-    })->name('manage.transaksi');
-
     Route::prefix('manage-katalog')->name('manage.katalog')->group(function () {
         Route::get('/', [KatalogProdukController::class, 'index'])->name('');
         Route::get('/create', [KatalogProdukController::class, 'create'])->name('.create');
