@@ -15,14 +15,18 @@ class StatistikPenjualanController extends Controller
     {
         $query = Transaksi::query();
 
-        $allTransactions = $query->with(['produkTransaksis', 'orderKustoms', 'pengiriman'])->paginate(10)->appends(request()->except('page'));
+        $currentYear = date('Y');
+        $query->whereYear('tanggal_transaksi', $currentYear);
 
         if ($request->filled('bulan')) {
             $query->whereMonth('tanggal_transaksi', $request->bulan);
         }
 
-        $currentYear = date('Y');
-        $query->whereYear('tanggal_transaksi', $currentYear);
+        $allTransactions = (clone $query)
+            ->with(['produkTransaksis', 'orderKustoms', 'pengiriman'])
+            ->orderBy('tanggal_transaksi', 'desc') 
+            ->paginate(10)
+            ->appends(request()->query());
 
         $salesQuery = Transaksi::selectRaw('MONTH(tanggal_transaksi) as month, COUNT(*) as total')
             ->whereYear('tanggal_transaksi', $currentYear);
@@ -34,6 +38,7 @@ class StatistikPenjualanController extends Controller
             $salesData[] = $salesDataRaw[$m] ?? 0;
         }
 
+        // --- Bagian Card Statistik (Mengikuti Filter Bulan) ---
         $totalRevenue = (clone $query)->sum('total_harga');
 
         $totalOrders = (clone $query)->count();
@@ -47,7 +52,6 @@ class StatistikPenjualanController extends Controller
             ->sum('order_transaksi_kustom.quantity');
 
         $totalProductSold = $totalRegularProducts + $totalCustomOrders;
-
 
         return view('pages.user.admin.statistik-transaksi.index', compact(
             'allTransactions',

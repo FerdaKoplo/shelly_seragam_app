@@ -115,8 +115,7 @@ class VoucherController extends Controller
             'jenis_voucher' => $validated['jenis_voucher'],
         ]);
 
-        return redirect()->route('manage.voucher.update')->with('success', 'Voucher Berhasil Ditambahkan');
-
+        return redirect()->route('manage.voucher')->with('success', 'Voucher Berhasil Diperbarui');
     }
 
     public function deactiveVoucher($id)

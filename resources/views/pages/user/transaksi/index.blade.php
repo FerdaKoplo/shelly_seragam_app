@@ -2,18 +2,55 @@
 @section('title', 'Manage Transaksi')
 @section('content')
 
-    <div x-data="{ 
-        modalOpen: false, 
+    <div x-data="{
+        modalOpen: false,
         selectedTrx: null,
         
-        // State untuk Ongkir
         ongkirResults: null,
         loadingOngkir: false,
         selectedCourier: 'jne',
         destinationId: '',
+        
+        destinationName: '',
+        destinations: [],
+        showDestinationDropdown: false,
+        isSearching: false,
+        searchTimeout: null,
+
+        searchLocation(query) {
+            if (this.searchTimeout) clearTimeout(this.searchTimeout);
+            
+            if (query.length < 3) {
+                this.destinations = [];
+                this.showDestinationDropdown = false;
+                return;
+            }
+
+            this.isSearching = true;
+            this.showDestinationDropdown = true;
+
+            // Debounce delay (500ms) mencegah spam request saat ngetik cepat
+            this.searchTimeout = setTimeout(async () => {
+                try {
+                    const response = await fetch(`{{ route('manage.transaksi.search-destination') }}?q=${query}`);
+                    const data = await response.json();
+                    this.destinations = data;
+                } catch (error) {
+                    console.error('Gagal mencari lokasi:', error);
+                } finally {
+                    this.isSearching = false;
+                }
+            }, 500);
+        },
+
+        selectDestination(dest) {
+            this.destinationId = dest.id;
+            this.destinationName = dest.name || dest.display || dest.label;
+            this.showDestinationDropdown = false;
+        },
 
         async calculateOngkir(weight) {
-            if(!this.destinationId) return alert('Masukkan ID Kota tujuan terlebih dahulu (contoh: 114 untuk Denpasar)');
+            if(!this.destinationId) return alert('Pilih kota/kecamatan tujuan dari daftar dropdown terlebih dahulu.');
             this.loadingOngkir = true;
             this.ongkirResults = null;
             try {
@@ -85,8 +122,7 @@
                                 <td class="py-3 px-2">{{ $statusBayar }}</td>
                                 <td class="py-3 px-2">{{ $statusKirim }}</td>
                                 <td class="py-3 px-2">
-                                    <button @click="modalOpen = true; selectedTrx = {{ $trx->transaksi_id }}; ongkirResults = null; destinationId = '';"
-                                        class="bg-[#333333] text-white px-5 py-1.5 rounded text-xs hover:bg-gray-800 transition shadow-sm">
+                                    <button @click="modalOpen = true; selectedTrx = {{ $trx->transaksi_id }}; ongkirResults = null; destinationId = ''; destinationName = ''; destinations = [];" class="bg-[#333333] text-white px-5 py-1.5 rounded text-xs hover:bg-gray-800 transition shadow-sm">
                                         Detail
                                     </button>
                                 </td>
@@ -177,12 +213,34 @@
                                             Cek Estimasi Ongkir
                                         </h3>
                                         <div class="grid grid-cols-2 gap-3 mb-3">
-                                            <div>
-                                                <label class="text-[10px] text-gray-500 uppercase font-bold block mb-1">ID Kota Tujuan</label>
-                                                <input type="text" x-model="destinationId" placeholder="Misal: 114" 
-                                                    class="w-full border border-gray-300 rounded px-3 py-2 text-xs focus:outline-none focus:border-gray-500">
+                                            
+                                            <div class="relative col-span-2" @click.away="showDestinationDropdown = false">
+                                                <label class="text-[10px] text-gray-500 uppercase font-bold block mb-1">Alamat Pengiriman (Kecamatan / Kota)</label>
+                                                <input type="text" 
+                                                    x-model="destinationName" 
+                                                    @input="searchLocation($event.target.value)" 
+                                                    @focus="if(destinationName.length >= 3) showDestinationDropdown = true"
+                                                    placeholder="Ketik minimal 3 huruf (contoh: sumbergempol)" 
+                                                    class="w-full border border-gray-300 rounded px-3 py-2 text-xs focus:outline-none focus:border-black bg-gray-50 focus:bg-white transition-colors relative z-10" autocomplete="off">
+                                                
+                                                <div x-show="showDestinationDropdown" x-transition.opacity
+                                                    class="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-xl max-h-48 overflow-y-auto custom-scrollbar" 
+                                                    style="display: none;">
+                                                    
+                                                    <div x-show="isSearching" class="p-3 text-xs text-center text-gray-500">Mencari lokasi...</div>
+                                                    <div x-show="!isSearching && destinations.length === 0 && destinationName.length >= 3" class="p-3 text-xs text-center text-gray-500">Lokasi tidak ditemukan</div>
+                                                    
+                                                    <template x-for="dest in destinations" :key="dest.id">
+                                                        <div @click="selectDestination(dest)" class="p-3 hover:bg-gray-100 cursor-pointer border-b border-gray-100 last:border-0 transition-colors">
+
+                                                            <p class="font-bold text-xs text-gray-800" x-text="dest.label || dest.name || dest.display || 'Lokasi Tidak Diketahui'"></p>
+                                                        </div>
+                                                    </template>
+                                                </div>
                                             </div>
-                                            <div>
+
+                                            {{-- Dropdown Kurir dipindah menjadi memakan 1 kolom penuh di bawah --}}
+                                            <div class="col-span-2">
                                                 <label class="text-[10px] text-gray-500 uppercase font-bold block mb-1">Kurir</label>
                                                 <select x-model="selectedCourier" class="w-full border border-gray-300 rounded px-3 py-2 text-xs focus:outline-none focus:border-gray-500 bg-white">
                                                     <option value="jne">JNE</option>

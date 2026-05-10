@@ -117,7 +117,7 @@ class KatalogProdukController extends Controller
                         foreach ($items as $item) {
                             $data = json_decode($item['data'], true);
 
-                            // $opsiValue = json_encode($data);
+
 
                             PilihanDetailProduk::create([
                                 'detail_produk_id' => $detail->detail_produk_id,

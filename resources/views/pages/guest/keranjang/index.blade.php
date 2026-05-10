@@ -2,7 +2,7 @@
 @section('title', 'Keranjang Saya')
 
 @section('content')
-<div data-cy="cart-page" class="container mx-auto px-4 py-8 max-w-7xl" x-data="{ 
+<div data-cy="cart-page" class="container mx-auto px-4 py-8 max-w-7xl" x-data="{
             items: {{ Illuminate\Support\Js::from($items) }},
             notes: {{ Illuminate\Support\Js::from($notes) }},
             isSubmitting: false,

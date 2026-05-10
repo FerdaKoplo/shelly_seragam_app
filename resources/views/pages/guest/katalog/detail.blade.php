@@ -99,7 +99,7 @@
             <h1  data-cy="product-name" class="text-4xl font-normal text-gray-900 mb-2">{{ $item->produk->nama_produk }}</h1>
             <p data-cy="product-price" class="text-5xl font-bold mb-2">Rp{{ number_format($item->harga, 0, ',', '.') }}</p>
             @if ($isPreOrder)
-                <p class="text-amber-700 font-medium mb-1">Stok habis. Namun anda tetap bisa melakukan Pre-Order</p>
+                <p class="text-amber-700 font-medium mb-1">Stok habis — tetap bisa Pre-Order</p>
             @else
                 <p data-cy="product-stock" class="text-gray-600 mb-8">Stok: {{ $item->stok }}</p>
             @endif
@@ -153,7 +153,7 @@
                 </p>
 
                 <div class="flex flex-col space-y-3">
-                    <form action="{{ route('cart.add', ['katalog_id' => $item->katalog_id]) }}" method="POST">
+                    {{-- <form action="{{ route('cart.add', ['katalog_id' => $item->katalog_id]) }}" method="POST">
                         @csrf
                         <input type="hidden" name="quantity" :value="quantity">
                         <input type="hidden" name="size" :value="selectedSize">
@@ -162,6 +162,30 @@
                         <input type="hidden" name="mode" value="{{ $isPreOrder ? 'preorder' : 'normal' }}">
                         <x-shared.button type="submit" data-cy="btn-add-to-cart" variant="outline" :rounded="false">
                             Tambah ke Keranjang
+                        </x-shared.button>
+                    </form> --}}
+
+                    {{-- <form action="{{ route('cart.add', ['katalog_id' => $item->katalog_id]) }}" method="POST">
+                        @csrf
+                        <input type="hidden" name="quantity" :value="quantity">
+                        <input type="hidden" name="size" :value="selectedSize">
+                        <input type="hidden" name="stok" value="{{ $item->stok }}">
+                        <input type="hidden" name="color" :value="selectedColor">
+                        <input type="hidden" name="mode" value="{{ $isPreOrder ? 'preorder' : 'normal' }}">
+                        <x-shared.button type="submit" data-cy="btn-add-to-cart" variant="outline" :rounded="false">
+                            Tambah ke Keranjang
+                        </x-shared.button>
+                    </form>s --}}
+
+                    <form action="{{ route('cart.add', ['katalog_id' => $item->katalog_id]) }}" method="POST">
+                        @csrf
+                        <input type="hidden" name="quantity" :value="quantity">
+                        <input type="hidden" name="size" :value="selectedSize">
+                        <input type="hidden" name="stok" value="{{ $item->stok }}">
+                        <input type="hidden" name="color" :value="selectedColor">
+                        <input type="hidden" name="mode" value="{{ $isPreOrder ? 'preorder' : 'normal' }}">
+                        <x-shared.button type="submit" data-cy="btn-add-to-cart" variant="outline" :rounded="false">
+                            {{ $isPreOrder ? 'Pre-Order Sekarang' : 'Add To Cart' }}
                         </x-shared.button>
                     </form>
 

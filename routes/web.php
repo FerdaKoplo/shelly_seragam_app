@@ -386,6 +386,7 @@ Route::prefix('admin')->middleware('auth')->group(function () {
         Route::get('/', [KelolaTransaksiController::class, 'index']);
         Route::get('/check-resi', [KelolaTransaksiController::class, 'checkResi'])->name('.check-resi');
         Route::get('/get-ongkir', [KelolaTransaksiController::class, 'getOngkir'])->name('.get-ongkir');
+        Route::get('/search-destination', [KelolaTransaksiController::class, 'searchDestination'])->name('.search-destination');
         Route::post('/', [KelolaTransaksiController::class, 'store'])->name('.store');
         Route::put('/{id}', [KelolaTransaksiController::class, 'update'])->name('.update');
     });
