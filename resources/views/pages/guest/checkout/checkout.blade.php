@@ -3,6 +3,7 @@
 
 @section('content')
 <div class="container mx-auto px-4 py-8 max-w-7xl"
+ data-cy="checkout-page"
     x-cloak
     x-init="init()"
     x-data="checkoutPage({{ Js::from([
@@ -27,12 +28,13 @@
     ]) }})">
 
     <form
+     data-cy="checkout-form"
         x-ref="checkoutForm"
         method="POST"
         action="{{ route('checkout') }}"
         @submit.prevent="submitOrder()">
         @csrf
-        <input type="hidden" name="type" value="{{ $type }}">
+        <input type="hidden" name="type" value="{{ $type }}" data-cy="checkout-type">
 
     {{-- Header with Back Button --}}
     <div class="flex items-center gap-4 mb-12">
@@ -41,7 +43,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7" />
             </svg>
         </a>
-        <h1 class="text-6xl font-bebas tracking-widest uppercase">Checkout</h1>
+        <h1 data-cy="checkout-title" class="text-6xl font-bebas tracking-widest uppercase">Checkout</h1>
     </div>
 
     {{-- Main Grid --}}
@@ -63,7 +65,7 @@
 
             {{-- Product Items (For Katalog) --}}
             <template x-if="type === 'katalog'">
-                <div class="space-y-6 max-h-[60vh] overflow-y-auto pr-2 no-scrollbar">
+                <div data-cy="katalog-items" class="space-y-6 max-h-[60vh] overflow-y-auto pr-2 no-scrollbar">
                     <template x-for="(item, index) in items" :key="item.id">
                         <x-cards.product-card.cart-item />
                     </template>
