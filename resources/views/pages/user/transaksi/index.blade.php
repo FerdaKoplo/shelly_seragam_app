@@ -82,11 +82,11 @@
 
                 <div class="flex space-x-2">
                     <a href="{{ route('manage.transaksi', ['filter' => 'katalog']) }}"
-                        class="px-4 py-2 border border-gray-300 text-sm rounded-md transition {{ request('filter') == 'katalog' ? 'bg-white text-gray-800 font-medium shadow-sm' : 'bg-white hover:bg-gray-50' }}">
+                        class="px-4 py-2 border border-gray-300 text-sm rounded-md transition {{ request('filter') == 'katalog' ? 'bg-black text-white font-medium shadow-sm' : 'bg-white hover:bg-gray-50' }}">
                         Produk Katalog
                     </a>
                     <a href="{{ route('manage.transaksi', ['filter' => 'kustom']) }}"
-                        class="px-4 py-2 border border-gray-300 text-sm rounded-md transition {{ request('filter') == 'kustom' ? 'bg-white text-gray-800 font-medium shadow-sm' : 'bg-white hover:bg-gray-50' }}">
+                        class="px-4 py-2 border border-gray-300 text-sm rounded-md transition {{ request('filter') == 'kustom' ? 'bg-black text-white font-medium shadow-sm' : ' bg-white text-gray-800  over:bg-gray-50' }}">
                         Produk Kustom
                     </a>
                     @if(request('filter') || request('search'))

@@ -2,7 +2,7 @@
     <h2 class="text-xl font-bold">Pembayaran</h2>
     
     {{-- Payment Method Selection Box --}}
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div class="grid grid-cols-1 md:grid-cols-1 gap-4">
         <label class="border border-emerald-100 bg-emerald-50 rounded-xl overflow-hidden cursor-pointer">
             <div class="bg-emerald-100 p-4 font-semibold text-gray-700 flex justify-between items-center">
                 <span class="flex items-center gap-2">
