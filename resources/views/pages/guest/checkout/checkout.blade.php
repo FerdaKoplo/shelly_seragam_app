@@ -52,7 +52,7 @@
             @include('pages.guest.checkout.partials.customer-info')
             @include('pages.guest.checkout.partials.shipping-address')
 
-            {{-- Only show Midtrans box for Katalog/Standard checkout --}}
+            {{-- Only show Xendit box for Katalog/Standard checkout --}}
             <div x-show="type === 'katalog'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 transform -translate-y-2">
                 @include('pages.guest.checkout.partials.payment-method')
             </div>

@@ -186,13 +186,19 @@ class VoucherController extends Controller
 
     public function deactiveVoucher($id)
     {
-        $voucher = Voucher::with('katalog.produk')->findOrFail($id);
 
-        $voucher->update([
-            'status' => 'Habis'
-        ]);
+        try {
+            $voucher = Voucher::with('katalog.produk')->findOrFail($id);
 
-        return back()->with('sucess', 'Voucher Berhasil Dinonaktifkan');
+            $voucher->update([
+                'status' => 'Habis'
+            ]);
+
+            return back()->with('sucess', 'Voucher Berhasil Dinonaktifkan');
+
+        } catch (\Exception $e) {
+            return back()->with('error', 'Gagal menghapus menonaktifkan voucher.');
+        }
     }
 
     public function destroy($id)
@@ -200,7 +206,7 @@ class VoucherController extends Controller
         $voucher = Voucher::with('katalog.produk')->findOrFail($id);
         $voucher->delete();
 
-        return redirect()->route('manage.voucher.destroy')->with('success', 'Voucher Berhasil Dihapus');
+        return back()->with('success', 'Voucher Berhasil Dihapus');
 
     }
 

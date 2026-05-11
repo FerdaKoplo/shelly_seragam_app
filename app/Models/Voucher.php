@@ -13,8 +13,6 @@ class Voucher extends Model
         'nominal',
         'persentase'
     ];
-
-
     protected $fillable = [
         'katalog_id',
         'nama_voucher',

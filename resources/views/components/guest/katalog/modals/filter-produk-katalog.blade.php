@@ -61,6 +61,7 @@
                     katun: 'Katun', woll: 'Woll', kargo: 'Kargo',
                     resmi: 'Resmi', 'material-batik': 'Batik'
                 };
+
                 for (const id of this.filters) {
                     if (materialMap[id]) { url.searchParams.set('filter_material', materialMap[id]); break; }
                 }

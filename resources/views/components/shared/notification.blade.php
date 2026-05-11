@@ -1,4 +1,4 @@
-<div x-data="{ 
+<div x-data="{
         show: false, 
         message: 'Something went wrong', 
         title: 'Error',
@@ -29,16 +29,4 @@
         <h2 :class="type === 'success' ? 'text-green-600' : 'text-warningPrimary'"
             class="font-semibold text-xl tracking-wide" x-text="message"></h2>
     </div>
-    {{-- <div @click.outside="show = false"
-        class="relative w-[400px] bg-warningSecondary rounded-2xl shadow-xl p-8 py-12 flex flex-col items-center justify-center text-center animate-bounce-in">
-        <button @click="show = false"
-            class="absolute top-1 font-semibold right-4 text-warningPrimary hover:opacity-75 transition">
-            <p class="font-inter">
-                X
-            </p>
-
-        </button>
-
-        <h2 class="text-warningPrimary font-semibold text-xl tracking-wide" x-text="message"></h2>
-    </div> --}}
 </div>

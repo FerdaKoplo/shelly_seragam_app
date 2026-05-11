@@ -306,7 +306,6 @@ class KatalogProdukController extends Controller
                 Storage::disk('public')->delete($foto->path);
             }
 
-
             $produk->delete();
 
             return redirect()->route('manage.katalog')->with('success', 'Produk berhasil dihapus.');
