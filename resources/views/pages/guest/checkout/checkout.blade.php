@@ -75,6 +75,18 @@
                 @include('pages.guest.checkout.partials.custom-summary')
             </template>
 
+            {{-- Voucher Input --}}
+            <div class="mb-6">
+                <label for="voucher_code" class="block text-lg font-semibold mb-2">Kode Voucher</label>
+                <input type="text" id="voucher_code" name="voucher_code" x-model="voucherCode" class="w-full border rounded px-3 py-2" placeholder="Masukkan kode voucher">
+                <template x-if="voucherError">
+                    <p class="text-red-500 text-sm mt-1" x-text="voucherError"></p>
+                </template>
+                <template x-if="voucherSuccess">
+                    <p class="text-green-500 text-sm mt-1" x-text="voucherSuccess"></p>
+                </template>
+                <button type="button" class="mt-2 px-4 py-2 bg-blue-600 text-white rounded" @click="applyVoucher()" :disabled="isApplyingVoucher">Terapkan Voucher</button>
+            </div>
             {{-- Summary & Totals --}}
             <div class="pt-6 border-t border-gray-100">
                 @include('pages.guest.checkout.partials.order-footer')
@@ -105,6 +117,52 @@
             address: initial.address || { address: "", city: "", province: "", postal_code: "" },
             errors: initial.errors || {},
 
+            // Voucher
+            voucherCode: '',
+            voucherError: '',
+            voucherSuccess: '',
+            isApplyingVoucher: false,
+            voucher: null,
+            voucherDiscount: 0,
+
+            async applyVoucher() {
+                this.voucherError = '';
+                this.voucherSuccess = '';
+                this.voucherCode = (this.voucherCode || '').trim();
+
+                if (!this.voucherCode) {
+                    this.voucherError = 'Masukkan kode voucher terlebih dahulu.';
+                    return;
+                }
+
+                this.isApplyingVoucher = true;
+                try {
+                    const response = await fetch('/api/voucher/validate', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ kode: this.voucherCode })
+                    });
+                    const contentType = response.headers.get('content-type') || '';
+                    const data = contentType.includes('application/json')
+                        ? await response.json()
+                        : { message: await response.text() };
+                    if (response.ok && data.success) {
+                        this.voucher = data.voucher;
+                        this.voucherSuccess = 'Voucher berhasil diterapkan!';
+                    } else {
+                        this.voucher = null;
+                        this.voucherError = data.message || 'Voucher tidak valid.';
+                    }
+                } catch (e) {
+                    this.voucher = null;
+                    this.voucherError = 'Terjadi kesalahan saat validasi voucher.';
+                } finally {
+                    this.isApplyingVoucher = false;
+                }
+            },
+
             init() {
                 this.flattenErrors();
                 if (this.shippingMethod) {
@@ -134,7 +192,16 @@
             },
 
             get total() {
-                return this.subtotal + this.shippingCost;
+                // Hitung total setelah diskon voucher
+                let total = this.subtotal + this.shippingCost;
+                if (this.voucher) {
+                    if (this.voucher.jenis_voucher === 'nominal') {
+                        total -= this.voucher.nilai_diskon;
+                    } else if (this.voucher.jenis_voucher === 'persentase') {
+                        total -= Math.floor(this.subtotal * (this.voucher.nilai_diskon / 100));
+                    }
+                }
+                return total > 0 ? total : 0;
             },
 
             formatCurrency(num) {
