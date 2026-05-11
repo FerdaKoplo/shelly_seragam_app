@@ -28,7 +28,8 @@ class ShippingController extends Controller
     {
         $request->validate([
             'destination' => ['required', 'integer', 'min:1'],
-            'weight' => ['required', 'integer', 'min:1'],
+            // Komerce Calculate API expects weight in kilograms (kg) and supports decimals.
+            'weight' => ['required', 'numeric', 'min:0.001'],
             'courier' => ['required', 'string', 'max:200'],
         ]);
 
@@ -36,7 +37,7 @@ class ShippingController extends Controller
         $results = $rajaOngkir->calculateDomesticCost(
             $origin,
             (int) $request->integer('destination'),
-            (int) $request->integer('weight'),
+            (float) $request->input('weight'),
             (string) $request->input('courier'),
             'lowest'
         );

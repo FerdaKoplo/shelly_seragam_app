@@ -296,7 +296,12 @@
             get totalWeight() {
                 if (this.type !== "katalog") return 1000;
                 const qty = this.items.reduce((sum, item) => sum + (item.quantity || 0), 0);
-                return Math.max(1, qty) * 1000;
+                // Komerce Calculate API expects weight in kilograms (kg).
+                // Baseline: 1 item = 200g = 0.2kg (e.g. 10 items => 2.0kg, 3 items => 0.6kg).
+                const weightPerItemKg = 0.2;
+                const totalKg = Math.max(1, qty) * weightPerItemKg;
+                // Keep at most 3 decimals to avoid floating noise.
+                return Math.round(totalKg * 1000) / 1000;
             },
 
             async loadShippingOptions() {

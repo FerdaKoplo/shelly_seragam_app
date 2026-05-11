@@ -74,7 +74,7 @@ class RajaOngkirService
      * Calculate domestic shipping cost.
      * Komerce v1 endpoint: calculate/domestic-cost
      */
-    public function calculateDomesticCost(int $origin, int $destination, int $weight, string $courier, string $price = 'lowest'): array
+    public function calculateDomesticCost(int $origin, int $destination, float $weight, string $courier, string $price = 'lowest'): array
     {
         $ttlSeconds = (int) env('RAJA_ONGKIR_CACHE_TTL_SECONDS', 86400);
         $cacheKey = 'rajaongkir:cost:' . sha1("{$origin}|{$destination}|{$weight}|{$courier}|{$price}");
@@ -128,7 +128,7 @@ class RajaOngkirService
     public function getCost($origin, $destination, $weight, $courier)
     {
         // Backward-compat wrapper for older callers.
-        return $this->calculateDomesticCost((int) $origin, (int) $destination, (int) $weight, (string) $courier);
+        return $this->calculateDomesticCost((int) $origin, (int) $destination, (float) $weight, (string) $courier);
     }
 
     public function trackWaybill($waybill, $courier)
