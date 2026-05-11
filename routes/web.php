@@ -200,10 +200,9 @@ Route::match(['GET', 'POST'], '/checkout', function (Request $request) {
         }, array_values($request->session()->get('cart', [])));
     }
 
-    $shippingOptions = [
-        ['id' => 'reg', 'label' => 'Regular', 'duration' => '2-3 hari', 'price' => 15000],
-        ['id' => 'exp', 'label' => 'Express', 'duration' => '1 hari', 'price' => 35000],
-    ];
+    // Shipping options are loaded dynamically from the shipping cost endpoint
+    // after the user selects a destination from the RajaOngkir/Komerce search.
+    $shippingOptions = [];
 
     $uploadedFiles = [];
 
