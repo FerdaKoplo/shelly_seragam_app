@@ -3,7 +3,7 @@
 
 @section('content')
 <div class="container mx-auto px-4 py-8 max-w-7xl"
- data-cy="checkout-page"
+    data-cy="checkout-page"
     x-cloak
     x-init="init()"
     x-data="checkoutPage({{ Js::from([
@@ -28,7 +28,7 @@
     ]) }})">
 
     <form
-     data-cy="checkout-form"
+        data-cy="checkout-form"
         x-ref="checkoutForm"
         method="POST"
         action="{{ route('checkout') }}"
@@ -36,68 +36,57 @@
         @csrf
         <input type="hidden" name="type" value="{{ $type }}" data-cy="checkout-type">
 
-    {{-- Header with Back Button --}}
-    <div class="flex items-center gap-4 mb-12">
-        <a href="javascript:history.back()" class="hover:opacity-50 transition">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7" />
-            </svg>
-        </a>
-        <h1 data-cy="checkout-title" class="text-6xl font-bebas tracking-widest uppercase">Checkout</h1>
-    </div>
-
-    {{-- Main Grid --}}
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-16 items-start">
-
-        {{-- LEFT COLUMN: Forms --}}
-        <div class="lg:col-span-6 space-y-12">
-            @include('pages.guest.checkout.partials.customer-info')
-            @include('pages.guest.checkout.partials.shipping-address')
-
-            {{-- Only show Xendit box for Katalog/Standard checkout --}}
-            <div x-show="type === 'katalog'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 transform -translate-y-2">
-                @include('pages.guest.checkout.partials.payment-method')
-            </div>
+        {{-- Header with Back Button --}}
+        <div class="flex items-center gap-4 mb-12">
+            <a href="javascript:history.back()" class="hover:opacity-50 transition">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7" />
+                </svg>
+            </a>
+            <h1 data-cy="checkout-title" class="text-6xl font-bebas tracking-widest uppercase">Checkout</h1>
         </div>
 
-        {{-- RIGHT COLUMN: Order Content & Summary --}}
-        <div class="lg:col-span-6 space-y-10">
+        {{-- Main Grid --}}
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-16 items-start">
 
-            {{-- Product Items (For Katalog) --}}
-            <template x-if="type === 'katalog'">
-                <div data-cy="katalog-items" class="space-y-6 max-h-[60vh] overflow-y-auto pr-2 no-scrollbar">
-                    <template x-for="(item, index) in items" :key="item.id">
-                        <x-cards.product-card.cart-item />
-                    </template>
+            {{-- LEFT COLUMN: Forms --}}
+            <div class="lg:col-span-6 space-y-12">
+                @include('pages.guest.checkout.partials.customer-info')
+                @include('pages.guest.checkout.partials.shipping-address')
+
+                {{-- Only show Xendit box for Katalog/Standard checkout --}}
+                <div x-show="type === 'katalog'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 transform -translate-y-2">
+                    @include('pages.guest.checkout.partials.payment-method')
                 </div>
-            </template>
-
-            {{-- Custom Card (For Kustom) --}}
-            <template x-if="type === 'kustom'">
-                @include('pages.guest.checkout.partials.custom-summary')
-            </template>
-
-            {{-- Voucher Input --}}
-            <div class="mb-6">
-                <label for="voucher_code" class="block text-lg font-semibold mb-2">Kode Voucher</label>
-                <input type="text" id="voucher_code" name="voucher_code" x-model="voucherCode" class="w-full border rounded px-3 py-2" placeholder="Masukkan kode voucher">
-                <template x-if="voucherError">
-                    <p class="text-red-500 text-sm mt-1" x-text="voucherError"></p>
-                </template>
-                <template x-if="voucherSuccess">
-                    <p class="text-green-500 text-sm mt-1" x-text="voucherSuccess"></p>
-                </template>
-                <button type="button" class="mt-2 px-4 py-2 bg-blue-600 text-white rounded" @click="applyVoucher()" :disabled="isApplyingVoucher">Terapkan Voucher</button>
             </div>
-            {{-- Summary & Totals --}}
-            <div class="pt-6 border-t border-gray-100">
-                @include('pages.guest.checkout.partials.order-footer')
+
+            {{-- RIGHT COLUMN: Order Content & Summary --}}
+            <div class="lg:col-span-6 space-y-10">
+
+                {{-- Product Items (For Katalog) --}}
+                <template x-if="type === 'katalog'">
+                    <div data-cy="katalog-items" class="space-y-4 max-h-[60vh] overflow-y-auto pr-2 no-scrollbar">
+                        <template x-for="(item, index) in items" :key="item.id">
+                            <x-cards.product-card.cart-item />
+                        </template>
+                    </div>
+                </template>
+
+                {{-- Custom Card (For Kustom) --}}
+                <template x-if="type === 'kustom'">
+                    @include('pages.guest.checkout.partials.custom-summary')
+                </template>
+
+                {{-- Summary & Totals --}}
+                <div class="border-t border-gray-100">
+                   
+                    @include('pages.guest.checkout.partials.order-footer')
+                </div>
             </div>
         </div>
-    </div>
 </div>
 
-    <x-guest.katalog.modals.panduan-ukuran />
+<x-guest.katalog.modals.panduan-ukuran />
 
 <script>
     function checkoutPage(initial) {
@@ -117,8 +106,17 @@
             shippingMethod: initial.shippingMethod || null,
             shippingCost: 0,
             notes: initial.notes || "",
-            customer: initial.customer || { full_name: "", email: "", phone: "" },
-            address: initial.address || { address: "", city: "", province: "", postal_code: "" },
+            customer: initial.customer || {
+                full_name: "",
+                email: "",
+                phone: ""
+            },
+            address: initial.address || {
+                address: "",
+                city: "",
+                province: "",
+                postal_code: ""
+            },
             errors: initial.errors || {},
 
             // Voucher
@@ -146,12 +144,15 @@
                         headers: {
                             'Content-Type': 'application/json'
                         },
-                        body: JSON.stringify({ kode: this.voucherCode })
+                        body: JSON.stringify({
+                            kode: this.voucherCode
+                        })
                     });
                     const contentType = response.headers.get('content-type') || '';
-                    const data = contentType.includes('application/json')
-                        ? await response.json()
-                        : { message: await response.text() };
+                    const data = contentType.includes('application/json') ?
+                        await response.json() : {
+                            message: await response.text()
+                        };
                     if (response.ok && data.success) {
                         this.voucher = data.voucher;
                         this.voucherSuccess = 'Voucher berhasil diterapkan!';
@@ -263,7 +264,9 @@
                     this.isLoadingDestinations = true;
                     try {
                         const resp = await fetch(`{{ route('shipping.destinations') }}?search=${encodeURIComponent(q)}`, {
-                            headers: { "Accept": "application/json" },
+                            headers: {
+                                "Accept": "application/json"
+                            },
                         });
                         const json = await resp.json().catch(() => ({}));
                         this.destinationResults = Array.isArray(json.data) ? json.data : [];
@@ -328,9 +331,9 @@
                     });
 
                     const json = await resp.json().catch(() => ({}));
-                    const raw = Array.isArray(json.data)
-                        ? json.data
-                        : (Array.isArray(json?.rajaongkir?.results) ? json.rajaongkir.results : []);
+                    const raw = Array.isArray(json.data) ?
+                        json.data :
+                        (Array.isArray(json?.rajaongkir?.results) ? json.rajaongkir.results : []);
 
                     if (Array.isArray(raw) && raw[0] && raw[0]._error) {
                         const status = raw[0].status ? ` (HTTP ${raw[0].status})` : "";
@@ -346,9 +349,15 @@
                         this.shippingCost = 0;
                         if ((raw[0].status || 0) === 429) {
                             const extra = bodyMsg ? ` (${bodyMsg})` : "";
-                            this.errors = { ...(this.errors || {}), shipping_id: `Terlalu banyak request ongkir (HTTP 429). Tunggu 1 menit lalu coba lagi.${extra}` };
+                            this.errors = {
+                                ...(this.errors || {}),
+                                shipping_id: `Terlalu banyak request ongkir (HTTP 429). Tunggu 1 menit lalu coba lagi.${extra}`
+                            };
                         } else {
-                            this.errors = { ...(this.errors || {}), shipping_id: msg };
+                            this.errors = {
+                                ...(this.errors || {}),
+                                shipping_id: msg
+                            };
                         }
                         return;
                     }
@@ -399,7 +408,10 @@
                         this.shippingOptions = [];
                         this.shippingMethod = null;
                         this.shippingCost = 0;
-                        this.errors = { ...(this.errors || {}), shipping_id: "Opsi pengiriman tidak ditemukan. Coba pilih kota/kecamatan lagi." };
+                        this.errors = {
+                            ...(this.errors || {}),
+                            shipping_id: "Opsi pengiriman tidak ditemukan. Coba pilih kota/kecamatan lagi."
+                        };
                     }
                 } catch (e) {
                     // keep existing options
@@ -423,5 +435,5 @@
         };
     }
 </script>
-    </form>
+</form>
 @endsection
