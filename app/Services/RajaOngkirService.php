@@ -9,12 +9,19 @@ class RajaOngkirService
 {
     protected $apiKey;
     protected $baseUrl;
+    protected $authHeaders;
 
     public function __construct()
     {
         $this->apiKey = (string) env('RAJA_ONGKIR_KEY', '');
         $baseUrl = (string) env('RAJA_ONGKIR_BASE_URL', '');
         $this->baseUrl = rtrim($baseUrl, '/') . '/';
+
+        // Some providers use `key` (RajaOngkir), others use `x-api-key` (Komerce/Komship).
+        // Sending both keeps compatibility with either gateway.
+        $this->authHeaders = $this->apiKey !== ''
+            ? ['key' => $this->apiKey, 'x-api-key' => $this->apiKey]
+            : [];
     }
 
     /**
@@ -33,7 +40,7 @@ class RajaOngkirService
             }
         }
 
-        $response = Http::withHeaders(['key' => $this->apiKey])
+        $response = Http::withHeaders($this->authHeaders)
             ->acceptJson()
             ->get($this->baseUrl . 'destination/domestic-destination', [
                 'search' => $search,
@@ -42,12 +49,29 @@ class RajaOngkirService
             ]);
 
         if (!$response->successful()) {
-            return [[
+            $errorPayload = [[
                 '_error' => true,
                 'status' => $response->status(),
                 'message' => 'RajaOngkir request failed',
                 'body' => $response->json() ?? $response->body(),
             ]];
+
+            // Avoid hammering the upstream when rate-limited or temporarily failing.
+            if ($ttlSeconds > 0 && in_array($response->status(), [429, 500, 502, 503, 504], true)) {
+                Cache::put($cacheKey, $errorPayload, 60);
+            }
+
+            \Log::warning('RajaOngkir cost request failed', [
+                'status' => $response->status(),
+                'url' => $this->baseUrl . 'calculate/domestic-cost',
+                'origin' => $origin,
+                'destination' => $destination,
+                'weight' => $weight,
+                'courier' => $courier,
+                'price' => $price,
+                'body' => $response->json() ?? $response->body(),
+            ]);
+            return $errorPayload;
         }
 
         // Komerce response commonly uses meta/data. Some legacy RajaOngkir wrappers use rajaongkir/results.
@@ -86,7 +110,7 @@ class RajaOngkirService
             }
         }
 
-        $response = Http::withHeaders(['key' => $this->apiKey])
+        $response = Http::withHeaders($this->authHeaders)
             ->acceptJson()
             ->asForm()
             ->post($this->baseUrl . 'calculate/domestic-cost', [
@@ -98,6 +122,16 @@ class RajaOngkirService
             ]);
 
         if (!$response->successful()) {
+            \Log::warning('RajaOngkir cost request failed', [
+                'status' => $response->status(),
+                'url' => $this->baseUrl . 'calculate/domestic-cost',
+                'origin' => $origin,
+                'destination' => $destination,
+                'weight' => $weight,
+                'courier' => $courier,
+                'price' => $price,
+                'body' => $response->json() ?? $response->body(),
+            ]);
             return [[
                 '_error' => true,
                 'status' => $response->status(),
@@ -133,7 +167,7 @@ class RajaOngkirService
 
     public function trackWaybill($waybill, $courier)
     {
-        $response = Http::withHeaders(['key' => $this->apiKey])
+        $response = Http::withHeaders($this->authHeaders)
             ->acceptJson()
             ->asForm()
             ->post($this->baseUrl . 'waybill', [

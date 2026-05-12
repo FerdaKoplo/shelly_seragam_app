@@ -48,6 +48,12 @@ class VoucherController extends Controller
 
     public function store(Request $request)
     {
+        if (is_string($request->kode_voucher)) {
+            $request->merge([
+                'kode_voucher' => trim($request->kode_voucher),
+            ]);
+        }
+
         $validated = $request->validate([
             'nama_voucher' => 'required|string|max:255',
             'kode_voucher' => 'nullable|string|unique:vouchers,kode_voucher',
@@ -61,7 +67,7 @@ class VoucherController extends Controller
         ]);
 
         $kodeVoucher = $request->filled('kode_voucher')
-            ? $validated['kode_voucher']
+            ? $this->normalizeVoucherCode($validated['kode_voucher'])
             : $this->randomizeVoucherCodeName($validated['nama_voucher']);
 
         $voucher = Voucher::create([
@@ -86,6 +92,12 @@ class VoucherController extends Controller
 
     public function update(Request $request, $id)
     {
+        if (is_string($request->kode_voucher)) {
+            $request->merge([
+                'kode_voucher' => trim($request->kode_voucher),
+            ]);
+        }
+
         $validated = $request->validate([
             'nama_voucher' => 'required|string|max:255',
             'kode_voucher' => 'nullable|string|unique:vouchers,kode_voucher,' . $id,
@@ -99,7 +111,7 @@ class VoucherController extends Controller
         ]);
 
         $kodeVoucher = $request->filled('kode_voucher')
-            ? $validated['kode_voucher']
+            ? $this->normalizeVoucherCode($validated['kode_voucher'])
             : $this->randomizeVoucherCodeName($validated['nama_voucher']);
 
         $voucher = Voucher::findOrFail($id);
@@ -115,6 +127,60 @@ class VoucherController extends Controller
         ]);
 
         return redirect()->route('manage.voucher')->with('success', 'Voucher Berhasil Diperbarui');
+    }
+
+    // API: Validasi voucher
+    public function validateVoucher(Request $request)
+    {
+        $request->validate([
+            'kode' => 'required|string',
+        ]);
+
+        $kodeVoucher = $this->normalizeVoucherCode($request->kode);
+
+        $voucher = Voucher::whereRaw('UPPER(TRIM(kode_voucher)) = ?', [$kodeVoucher])
+            ->first();
+
+        if (!$voucher) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Voucher tidak ditemukan.'
+            ], 404);
+        }
+
+        if ($voucher->status !== 'Aktif') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Voucher sudah tidak aktif.'
+            ], 422);
+        }
+
+        $today = now()->toDateString();
+
+        if ($voucher->tanggal_mulai > $today) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Voucher belum aktif.'
+            ], 422);
+        }
+
+        if ($voucher->tanggal_berakhir < $today) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Voucher sudah kedaluwarsa.'
+            ], 422);
+        }
+
+        return response()->json([
+            'success' => true,
+            'voucher' => [
+                'kode_voucher' => $voucher->kode_voucher,
+                'jenis_voucher' => $voucher->jenis_voucher,
+                'nilai_diskon' => $voucher->nilai_diskon,
+                'nama_voucher' => $voucher->nama_voucher,
+                'deskripsi' => $voucher->deskripsi,
+            ]
+        ]);
     }
 
     public function deactiveVoucher($id)
@@ -152,6 +218,11 @@ class VoucherController extends Controller
         $randomStringVoucher = Str::upper(Str::random($randomLength));
 
         return $cleanPrefix . '-' . $randomStringVoucher;
+    }
+
+    private function normalizeVoucherCode(string $code): string
+    {
+        return Str::upper(trim($code));
     }
 
 }

@@ -1,4 +1,4 @@
-<div class="space-y-8 mt-10">
+<div class="space-y-8 mt-4">
     {{-- 1. Catatan Section --}}
     <div>
         <h3 class="font-bold text-xl mb-4">Catatan</h3>
@@ -15,24 +15,44 @@
             name="notes"
             @input="delete errors.notes"
             rows="6"
+            data-cy="checkout-notes"
             class="w-full border border-gray-300 rounded-md p-4 focus:ring-1 focus:ring-black outline-none"
             placeholder="Tambahkan catatan untuk pesanan Anda...">
         </textarea>
         <p x-show="errors.notes" x-text="errors.notes" class="mt-1 text-sm text-red-600"></p>
     </div>
 
+    {{-- Voucher Input --}}
+    <div class="">
+        <label for="voucher_code" class="block text-lg font-semibold mb-2">Kode Voucher</label>
+        <input type="text" id="voucher_code" name="voucher_code" x-model="voucherCode" class="w-full border rounded px-3 py-2" placeholder="Masukkan kode voucher">
+        <template x-if="voucherError">
+            <p class="text-red-500 text-sm mt-1" x-text="voucherError"></p>
+        </template>
+        <template x-if="voucherSuccess">
+            <p class="text-green-500 text-sm mt-1" x-text="voucherSuccess"></p>
+        </template>
+        <button type="button" class="mt-4 px-4 py-2 bg-white text-black border-gray-200 hover:border-black hover:text-white hover:bg-black border" @click="applyVoucher()" :disabled="isApplyingVoucher">Terapkan Voucher</button>
+    </div>
+
     {{-- 2. Ringkasan Pesanan (Calculations) --}}
-    <div class="space-y-3">
+    <div class="space-y-3" data-cy="order-summary">
         <h3 class="font-bold text-xl">Ringkasan Pesanan</h3>
         <div class="space-y-1">
             <div class="flex justify-between text-lg text-gray-600">
                 <span>Subtotal:</span>
-                <span x-text="formatCurrency(subtotal)"></span>
+                <span x-text="formatCurrency(subtotal)" data-cy="subtotal-value"></span>
             </div>
             <div class="flex justify-between text-lg text-gray-600">
                 <span>Ongkir:</span>
-                <span x-text="formatCurrency(shippingCost)"></span>
+                <span x-text="formatCurrency(shippingCost)" data-cy="shipping-cost-value"></span>
             </div>
+            <template x-if="voucher">
+                <div class="flex justify-between text-lg text-green-600">
+                    <span>Diskon Voucher (<span x-text="voucher.nama_voucher"></span>):</span>
+                    <span>-<span x-text="voucher.jenis_voucher === 'nominal' ? formatCurrency(voucher.nilai_diskon) : voucher.nilai_diskon + '%' "></span></span>
+                </div>
+            </template>
         </div>
     </div>
 
@@ -40,7 +60,7 @@
     <div class="pt-4">
         <div class="text-right mb-6">
             {{-- Main Large Total --}}
-            <h2 class="text-6xl font-black tracking-tighter" x-text="formatCurrency(total)"></h2>
+            <h2 class="text-6xl font-black tracking-tighter" data-cy="total-value" x-text="formatCurrency(total)"></h2>
 
             {{-- Kustom Specific Disclaimer --}}
             <p x-show="type === 'kustom'" class="text-gray-400 text-sm mt-2">
@@ -50,6 +70,7 @@
 
         {{-- Payment Gateway Integration Button --}}
         <x-shared.button
+            data-cy="submit-checkout"
             type="button"
             @click="submitOrder()"
             variant="primary"
@@ -62,7 +83,7 @@
                 <template x-if="isSubmitting">
                     <svg class="animate-spin h-8 w-8 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        <path data-cy="submit-loading" class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
                 </template>
 
