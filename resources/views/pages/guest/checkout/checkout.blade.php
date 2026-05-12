@@ -77,6 +77,18 @@
                 @include('pages.guest.checkout.partials.custom-summary')
             </template>
 
+            {{-- Voucher Input --}}
+            <div class="mb-6">
+                <label for="voucher_code" class="block text-lg font-semibold mb-2">Kode Voucher</label>
+                <input type="text" id="voucher_code" name="voucher_code" x-model="voucherCode" class="w-full border rounded px-3 py-2" placeholder="Masukkan kode voucher">
+                <template x-if="voucherError">
+                    <p class="text-red-500 text-sm mt-1" x-text="voucherError"></p>
+                </template>
+                <template x-if="voucherSuccess">
+                    <p class="text-green-500 text-sm mt-1" x-text="voucherSuccess"></p>
+                </template>
+                <button type="button" class="mt-2 px-4 py-2 bg-blue-600 text-white rounded" @click="applyVoucher()" :disabled="isApplyingVoucher">Terapkan Voucher</button>
+            </div>
             {{-- Summary & Totals --}}
             <div class="pt-6 border-t border-gray-100">
                 @include('pages.guest.checkout.partials.order-footer')
@@ -97,6 +109,8 @@
             isSubmitting: false,
             isConfirming: false,
             isLoadingDestinations: false,
+            isLoadingShipping: false,
+            destinationSearchTimer: null,
             destinationQuery: "",
             destinationId: null,
             destinationResults: [],
@@ -106,6 +120,52 @@
             customer: initial.customer || { full_name: "", email: "", phone: "" },
             address: initial.address || { address: "", city: "", province: "", postal_code: "" },
             errors: initial.errors || {},
+
+            // Voucher
+            voucherCode: '',
+            voucherError: '',
+            voucherSuccess: '',
+            isApplyingVoucher: false,
+            voucher: null,
+            voucherDiscount: 0,
+
+            async applyVoucher() {
+                this.voucherError = '';
+                this.voucherSuccess = '';
+                this.voucherCode = (this.voucherCode || '').trim();
+
+                if (!this.voucherCode) {
+                    this.voucherError = 'Masukkan kode voucher terlebih dahulu.';
+                    return;
+                }
+
+                this.isApplyingVoucher = true;
+                try {
+                    const response = await fetch('/api/voucher/validate', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ kode: this.voucherCode })
+                    });
+                    const contentType = response.headers.get('content-type') || '';
+                    const data = contentType.includes('application/json')
+                        ? await response.json()
+                        : { message: await response.text() };
+                    if (response.ok && data.success) {
+                        this.voucher = data.voucher;
+                        this.voucherSuccess = 'Voucher berhasil diterapkan!';
+                    } else {
+                        this.voucher = null;
+                        this.voucherError = data.message || 'Voucher tidak valid.';
+                    }
+                } catch (e) {
+                    this.voucher = null;
+                    this.voucherError = 'Terjadi kesalahan saat validasi voucher.';
+                } finally {
+                    this.isApplyingVoucher = false;
+                }
+            },
 
             init() {
                 this.flattenErrors();
@@ -136,7 +196,16 @@
             },
 
             get total() {
-                return this.subtotal + this.shippingCost;
+                // Hitung total setelah diskon voucher
+                let total = this.subtotal + this.shippingCost;
+                if (this.voucher) {
+                    if (this.voucher.jenis_voucher === 'nominal') {
+                        total -= this.voucher.nilai_diskon;
+                    } else if (this.voucher.jenis_voucher === 'persentase') {
+                        total -= Math.floor(this.subtotal * (this.voucher.nilai_diskon / 100));
+                    }
+                }
+                return total > 0 ? total : 0;
             },
 
             formatCurrency(num) {
@@ -189,19 +258,21 @@
                 this.destinationId = null;
                 this.destinationResults = [];
                 if (q.length < 2) return;
-
-                this.isLoadingDestinations = true;
-                try {
-                    const resp = await fetch(`{{ route('shipping.destinations') }}?search=${encodeURIComponent(q)}`, {
-                        headers: { "Accept": "application/json" },
-                    });
-                    const json = await resp.json().catch(() => ({}));
-                    this.destinationResults = Array.isArray(json.data) ? json.data : [];
-                } catch (e) {
-                    this.destinationResults = [];
-                } finally {
-                    this.isLoadingDestinations = false;
-                }
+                if (this.destinationSearchTimer) clearTimeout(this.destinationSearchTimer);
+                this.destinationSearchTimer = setTimeout(async () => {
+                    this.isLoadingDestinations = true;
+                    try {
+                        const resp = await fetch(`{{ route('shipping.destinations') }}?search=${encodeURIComponent(q)}`, {
+                            headers: { "Accept": "application/json" },
+                        });
+                        const json = await resp.json().catch(() => ({}));
+                        this.destinationResults = Array.isArray(json.data) ? json.data : [];
+                    } catch (e) {
+                        this.destinationResults = [];
+                    } finally {
+                        this.isLoadingDestinations = false;
+                    }
+                }, 300);
             },
 
             selectDestination(dest) {
@@ -231,11 +302,16 @@
             get totalWeight() {
                 if (this.type !== "katalog") return 1000;
                 const qty = this.items.reduce((sum, item) => sum + (item.quantity || 0), 0);
-                return Math.max(1, qty) * 1000;
+                // RajaOngkir/Komerce domestic-cost endpoint in this app expects weight in grams (integer).
+                // Baseline: 1 item = 200g (e.g. 10 items => 2000g, 3 items => 600g).
+                const weightPerItemGram = 200;
+                return Math.max(1, qty) * weightPerItemGram;
             },
 
             async loadShippingOptions() {
                 if (!this.destinationId) return;
+                if (this.isLoadingShipping) return;
+                this.isLoadingShipping = true;
                 try {
                     const resp = await fetch(`{{ route('shipping.cost') }}`, {
                         method: "POST",
@@ -252,28 +328,65 @@
                     });
 
                     const json = await resp.json().catch(() => ({}));
-                    const raw = Array.isArray(json.data) ? json.data : [];
+                    const raw = Array.isArray(json.data)
+                        ? json.data
+                        : (Array.isArray(json?.rajaongkir?.results) ? json.rajaongkir.results : []);
+
+                    if (Array.isArray(raw) && raw[0] && raw[0]._error) {
+                        const status = raw[0].status ? ` (HTTP ${raw[0].status})` : "";
+                        const bodyMsg =
+                            raw[0]?.body?.message ||
+                            raw[0]?.body?.error ||
+                            raw[0]?.body?.rajaongkir?.status?.description ||
+                            raw[0]?.body?.rajaongkir?.status?.message ||
+                            "";
+                        const msg = (raw[0].message || "Gagal memuat ongkir.") + status + (bodyMsg ? `: ${bodyMsg}` : "");
+                        this.shippingOptions = [];
+                        this.shippingMethod = null;
+                        this.shippingCost = 0;
+                        if ((raw[0].status || 0) === 429) {
+                            const extra = bodyMsg ? ` (${bodyMsg})` : "";
+                            this.errors = { ...(this.errors || {}), shipping_id: `Terlalu banyak request ongkir (HTTP 429). Tunggu 1 menit lalu coba lagi.${extra}` };
+                        } else {
+                            this.errors = { ...(this.errors || {}), shipping_id: msg };
+                        }
+                        return;
+                    }
 
                     const mapped = [];
+                    const pushOption = (courierName, service, value, etd) => {
+                        const price = parseInt(value, 10);
+                        if (!Number.isFinite(price) || price <= 0) return;
+                        mapped.push({
+                            id: `${courierName}-${service}`.toLowerCase().replace(/\s+/g, "-"),
+                            label: `${courierName} ${service}`.trim(),
+                            duration: etd ? `${etd}` : null,
+                            price,
+                        });
+                    };
+
                     for (const courier of raw) {
-                        const courierName = courier?.name || courier?.courier || "Kurir";
-                        const costs = courier?.costs || courier?.cost || courier?.services || [];
-                        if (!Array.isArray(costs)) continue;
+                        // Shape A (RajaOngkir-ish): [{ name, costs: [{ service, cost:[{value,etd}] }] }]
+                        const courierName = courier?.name || courier?.courier || courier?.code || "Kurir";
+                        const costs = courier?.costs || courier?.cost || courier?.services || null;
+                        if (Array.isArray(costs)) {
+                            for (const c of costs) {
+                                const service = c?.service || c?.name || c?.code || "Service";
+                                const costArr = c?.cost || c?.costs || [];
+                                const firstCost = Array.isArray(costArr) ? costArr[0] : null;
+                                const value = firstCost?.value ?? c?.value ?? null;
+                                const etd = firstCost?.etd ?? c?.etd ?? "";
+                                if (value != null) pushOption(courierName, service, value, etd);
+                            }
+                            continue;
+                        }
 
-                        for (const c of costs) {
-                            const service = c?.service || c?.name || c?.code || "Service";
-                            const costArr = c?.cost || c?.costs || [];
-                            const firstCost = Array.isArray(costArr) ? costArr[0] : null;
-                            const value = firstCost?.value ?? c?.value ?? null;
-                            const etd = firstCost?.etd ?? c?.etd ?? "";
-                            if (typeof value !== "number" && typeof value !== "string") continue;
-
-                            mapped.push({
-                                id: `${courierName}-${service}`.toLowerCase().replace(/\s+/g, "-"),
-                                label: `${courierName} ${service}`.trim(),
-                                duration: etd ? `${etd}` : null,
-                                price: parseInt(value, 10) || 0,
-                            });
+                        // Shape B (flat rows): [{ courier, service, value/cost/price, etd }]
+                        const service = courier?.service || courier?.service_type || courier?.type || "Service";
+                        const value = courier?.value ?? courier?.cost ?? courier?.price ?? courier?.tariff ?? null;
+                        const etd = courier?.etd ?? courier?.duration ?? courier?.estimation ?? "";
+                        if (value != null) {
+                            pushOption(courierName, service, value, etd);
                         }
                     }
 
@@ -281,9 +394,17 @@
                         this.shippingOptions = mapped;
                         this.shippingMethod = null;
                         this.shippingCost = 0;
+                        if (this.errors?.shipping_id) delete this.errors.shipping_id;
+                    } else {
+                        this.shippingOptions = [];
+                        this.shippingMethod = null;
+                        this.shippingCost = 0;
+                        this.errors = { ...(this.errors || {}), shipping_id: "Opsi pengiriman tidak ditemukan. Coba pilih kota/kecamatan lagi." };
                     }
                 } catch (e) {
                     // keep existing options
+                } finally {
+                    this.isLoadingShipping = false;
                 }
             },
 

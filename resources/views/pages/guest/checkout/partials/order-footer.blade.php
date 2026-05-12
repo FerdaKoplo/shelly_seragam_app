@@ -34,6 +34,12 @@
                 <span>Ongkir:</span>
                 <span x-text="formatCurrency(shippingCost)" data-cy="shipping-cost-value"></span>
             </div>
+            <template x-if="voucher">
+                <div class="flex justify-between text-lg text-green-600">
+                    <span>Diskon Voucher (<span x-text="voucher.nama_voucher"></span>):</span>
+                    <span>-<span x-text="voucher.jenis_voucher === 'nominal' ? formatCurrency(voucher.nilai_diskon) : voucher.nilai_diskon + '%' "></span></span>
+                </div>
+            </template>
         </div>
     </div>
 
