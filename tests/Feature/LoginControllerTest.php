@@ -16,24 +16,28 @@ class LoginControllerTest extends TestCase
     {
         parent::setUp();
 
-        // Seed users manually to test
-        User::create([
-            'nama' => 'Test User Admin',
-            'username' => 'admin',
-            'email' => 'test@example.com',
-            'role' => 'Admin',
-            'status' => 'Active',
-            'password' => Hash::make('admin')
-        ]);
+        User::updateOrCreate(
+            ['username' => 'admin'], 
+            [
+                'nama' => 'Test User Admin',
+                'email' => 'test@example.com',
+                'role' => 'Admin',
+                'status' => 'Active',
+                'password' => Hash::make('admin')
+            ]
+        );
 
-        User::create([
-            'nama' => 'Budi Santoso',
-            'username' => 'budi.santoso',
-            'email' => 'budisantoso@example.com',
-            'role' => 'Pegawai',
-            'status' => 'Active',
-            'password' => Hash::make('pegawai')
-        ]);
+        // Pegawai
+        User::updateOrCreate(
+            ['username' => 'budi.santoso'], 
+            [
+                'nama' => 'Budi Santoso',
+                'email' => 'budisantoso@example.com',
+                'role' => 'Pegawai',
+                'status' => 'Active',
+                'password' => Hash::make('pegawai')
+            ]
+        );
     }
 
     /** @test */

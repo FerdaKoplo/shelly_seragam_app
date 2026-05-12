@@ -10,7 +10,7 @@
         loadingOngkir: false,
         selectedCourier: 'jne',
         destinationId: '',
-        
+{{--         
         destinationName: '',
         destinations: [],
         showDestinationDropdown: false,
@@ -63,7 +63,7 @@
             } finally {
                 this.loadingOngkir = false;
             }
-        }
+        } --}}
     }" class="p-8 w-full">
         <div class="bg-white rounded-lg shadow-sm p-6 min-h-full border border-gray-200">
 
@@ -181,6 +181,10 @@
                                         </div>
                                     </div>
 
+                                        <div>
+                                            <input type="file">
+                                        </div>
+
                                     <form action="{{ route('manage.transaksi.update', $trx->transaksi_id) }}" method="POST" id="form-{{$trx->transaksi_id}}">
                                         @csrf
                                         @method('PUT')
@@ -207,13 +211,12 @@
                                         <p class="text-[10px] text-gray-400 mt-4 italic">* Riwayat perubahan akan tercatat otomatis.</p>
                                     </form>
 
-                                    <div class="mt-8 border-t border-gray-200 pt-6">
+                                    {{-- <div class="mt-8 border-t border-gray-200 pt-6">
                                         <h3 class="text-sm font-bold text-gray-800 mb-4 flex items-center gap-2">
                                             <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
                                             Cek Estimasi Ongkir
                                         </h3>
                                         <div class="grid grid-cols-2 gap-3 mb-3">
-                                            
                                             <div class="relative col-span-2" @click.away="showDestinationDropdown = false">
                                                 <label class="text-[10px] text-gray-500 uppercase font-bold block mb-1">Alamat Pengiriman (Kecamatan / Kota)</label>
                                                 <input type="text" 
@@ -239,7 +242,6 @@
                                                 </div>
                                             </div>
 
-                                            {{-- Dropdown Kurir dipindah menjadi memakan 1 kolom penuh di bawah --}}
                                             <div class="col-span-2">
                                                 <label class="text-[10px] text-gray-500 uppercase font-bold block mb-1">Kurir</label>
                                                 <select x-model="selectedCourier" class="w-full border border-gray-300 rounded px-3 py-2 text-xs focus:outline-none focus:border-gray-500 bg-white">
@@ -278,7 +280,7 @@
                                                 Layanan kurir tidak tersedia untuk rute ini.
                                             </div>
                                         </template>
-                                    </div>
+                                    </div> --}}
                                 </div>
 
                                 <div class="flex justify-center gap-3 mt-6 border-t border-gray-100 pt-6">
@@ -287,6 +289,7 @@
                                     <button type="submit" form="form-{{$trx->transaksi_id}}"
                                         class="w-full py-2.5 bg-[#333333] text-white rounded text-sm hover:bg-gray-800 transition font-medium">Simpan Perubahan</button>
                                 </div>
+
                             </div>
 
                             <div class="w-1/2">
