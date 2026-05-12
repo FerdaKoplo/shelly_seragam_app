@@ -95,8 +95,8 @@
                 <div class="flex flex-col gap-2 mt-2">
                     <label class="font-bold text-gray-900">Nilai Diskon</label>
                     <div class="relative">
-                        <input data-cy="voucher-discount-input" type="number" name="nilai_diskon" value="{{ old('nilai_diskon') }}" placeholder="0"
-                            class="w-full border border-black rounded-md px-4 py-3 text-4xl font-normal placeholder-black focus:outline-none focus:ring-1 focus:ring-black"
+                        <input data-cy="voucher-discount-input" onkeydown="if(event.key === '-') event.preventDefault();" type="number" name="nilai_diskon" value="{{ old('nilai_diskon') }}" placeholder="0"
+                            class="w-full border border-black placeholder:text-gray-400 rounded-md px-4 py-3 text-4xl font-normal placeholder-black focus:outline-none focus:ring-1 focus:ring-black"
                             required>
                         <span class="absolute top-2 right-2 text-red-500 text-xl">*</span>
                     </div>

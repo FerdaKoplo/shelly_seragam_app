@@ -58,12 +58,13 @@ class VoucherController extends Controller
             'nama_voucher' => 'required|string|max:255',
             'kode_voucher' => 'nullable|string|unique:vouchers,kode_voucher',
             'deskripsi' => 'required|string',
-            'nilai_diskon' => 'required|numeric',
+            'nilai_diskon' => 'required|numeric|gt:0',
             'tanggal_mulai' => 'required|date|date_format:Y-m-d|after_or_equal:today',
             'tanggal_berakhir' => 'required|date|date_format:Y-m-d|after:tanggal_mulai',
             'jenis_voucher' => ['required', Rule::in(Voucher::JENIS_VOUCHER)],
         ], [
-            'kode_voucher.unique' => 'Voucher Dengan Kode Yang Sama Sudah Dibuat '
+            'kode_voucher.unique' => 'Voucher Dengan Kode Yang Sama Sudah Dibuat ',
+            'nilai_diskon.gt' => 'Nilai diskon tidak bisa negatif atau nol.',
         ]);
 
         $kodeVoucher = $request->filled('kode_voucher')
@@ -102,12 +103,13 @@ class VoucherController extends Controller
             'nama_voucher' => 'required|string|max:255',
             'kode_voucher' => 'nullable|string|unique:vouchers,kode_voucher,' . $id,
             'deskripsi' => 'required|string',
-            'nilai_diskon' => 'required|numeric',
+            'nilai_diskon' => 'required|numeric|gt:0',
             'tanggal_mulai' => 'required|date|date_format:Y-m-d|after_or_equal:today',
             'tanggal_berakhir' => 'required|date|date_format:Y-m-d|after:tanggal_mulai',
             'jenis_voucher' => ['required', Rule::in(Voucher::JENIS_VOUCHER)],
         ], [
-            'kode_voucher.unique' => 'Voucher Dengan Kode Yang Sama Sudah Dibuat '
+            'kode_voucher.unique' => 'Voucher Dengan Kode Yang Sama Sudah Dibuat ',
+            'nilai_diskon.gt' => 'Nilai diskon tidak bisa negatif atau nol.',
         ]);
 
         $kodeVoucher = $request->filled('kode_voucher')
