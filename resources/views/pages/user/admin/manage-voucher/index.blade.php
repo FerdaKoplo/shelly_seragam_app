@@ -2,11 +2,11 @@
 @section('title', 'Manage Voucher')
 @section('content')
 
-    <div x-data class="flex gap-16 flex-col justify-center items-center px-10">
+    <div x-data class="flex gap-16 flex-col justify-center items-center px-10"  data-cy="voucher-page">
         {{-- Search & Filter Section --}}
-        <div class="flex items-center gap-7 w-full">
+        <div class="flex items-center gap-7 w-full"  data-cy="voucher-toolbar">
             <div>
-                <button id="btn-filter-voucher" type="button" @click="$dispatch('open-modal', 'modal-filter-voucher')"
+                <button id="btn-filter-voucher"  data-cy="filter-voucher-button" type="button" @click="$dispatch('open-modal', 'modal-filter-voucher')"
                     class="border border-black p-2.5 rounded-md hover:bg-gray-50 transition">
                     <svg width="19" height="19" viewBox="0 0 19 19" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M3.36869 0.842173C3.36869 0.378978 2.98971 0 2.52652 0C2.06332 0 1.68435 0.378978 1.68435 0.842173V4.21086H0V9.2639H5.05304V4.21086H3.36869V0.842173ZM6.73738 12.6326C6.73738 13.7274 7.44481 14.6538 8.42173 15.0075V18.5278H10.1061V15.0075C11.083 14.6622 11.7904 13.7358 11.7904 12.6326V10.9482H6.73738V12.6326ZM0 12.6326C0 13.7274 0.707425 14.6538 1.68435 15.0075V18.5278H3.36869V15.0075C4.34561 14.6538 5.05304 13.7274 5.05304 12.6326V10.9482H0V12.6326ZM16.8435 4.21086V0.842173C16.8435 0.378978 16.4645 0 16.0013 0C15.5381 0 15.1591 0.378978 15.1591 0.842173V4.21086H13.4748V9.2639H18.5278V4.21086H16.8435ZM10.1061 0.842173C10.1061 0.378978 9.7271 0 9.2639 0C8.80071 0 8.42173 0.378978 8.42173 0.842173V4.21086H6.73738V9.2639H11.7904V4.21086H10.1061V0.842173ZM13.4748 12.6326C13.4748 13.7274 14.1822 14.6538 15.1591 15.0075V18.5278H16.8435V15.0075C17.8204 14.6622 18.5278 13.7358 18.5278 12.6326V10.9482H13.4748V12.6326Z" fill="#323232" />
@@ -14,8 +14,8 @@
                 </button>
             </div>
 
-            <form method="GET" action="{{ route('manage.voucher') }}" class="flex-1 relative">
-                <input type="text" id="searchInput" name="search" value="{{ request('search') }}" placeholder="Cari Kode atau Nama Voucher"
+            <form  data-cy="voucher-search-form" method="GET" action="{{ route('manage.voucher') }}" class="flex-1 relative">
+                <input data-cy="voucher-search-input" type="text" id="searchInput" name="search" value="{{ request('search') }}" placeholder="Cari Kode atau Nama Voucher"
                     class="w-full p-2 rounded-md border border-black focus:outline-none">
                 <div class="absolute right-4 top-1/2 transform -translate-y-1/2">
                     <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -24,27 +24,27 @@
                 </div>
             </form>
 
-            <div>
+            <div data-cy="voucher-pagination">
                 {{ $vouchers->onEachSide(1)->links('vendor.pagination.custom') }}
             </div>
         </div>
 
         {{-- Voucher Grid --}}
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 w-full">
+        <div  data-cy="voucher-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 w-full">
             @forelse ($vouchers as $voucher)
-                <div class="bg-white border border-gray-200 shadow-sm rounded-2xl relative group hover:shadow-md transition p-5 flex flex-col justify-between h-full">
+                <div data-cy="voucher-card" class="bg-white border border-gray-200 shadow-sm rounded-2xl relative group hover:shadow-md transition p-5 flex flex-col justify-between h-full">
                     
                     {{-- Action Buttons (Hidden until hover) --}}
                     <div class="absolute top-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition duration-200 z-10">
-                        <a href="{{ route('manage.voucher.edit', $voucher->id) }}" class="bg-white p-2.5 rounded-full shadow-md border border-gray-100 hover:bg-gray-50 transition" title="Edit Voucher">
+                        <a  data-cy="edit-voucher-button" href="{{ route('manage.voucher.edit', $voucher->id) }}" class="bg-white p-2.5 rounded-full shadow-md border border-gray-100 hover:bg-gray-50 transition" title="Edit Voucher">
                             <svg width="16" height="16" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M0 9.48896V11.9856H2.49666L9.86013 4.62215L7.36348 2.12549L0 9.48896ZM11.7909 2.6914C12.0505 2.43174 12.0505 2.01231 11.7909 1.75265L10.233 0.194739C9.97332 -0.0649131 9.55388 -0.0649131 9.29422 0.194739L8.07586 1.41311L10.5725 3.90977L11.7909 2.6914V2.6914Z" fill="#323232" />
                             </svg>
                         </a>
-                        <form action="{{ route('manage.voucher.destroy', $voucher->id) }}" method="POST" onsubmit="return confirm('Hapus voucher ini?');">
+                        <form  data-cy="delete-voucher-form" action="{{ route('manage.voucher.destroy', $voucher->id) }}" method="POST" onsubmit="return confirm('Hapus voucher ini?');">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="bg-white p-2.5 rounded-full shadow-md border border-gray-100 text-gray-700 hover:text-red-600 hover:bg-red-50 transition" title="Hapus Voucher">
+                            <button data-cy="delete-voucher-button" type="submit" class="bg-white p-2.5 rounded-full shadow-md border border-gray-100 text-gray-700 hover:text-red-600 hover:bg-red-50 transition" title="Hapus Voucher">
                                 <svg width="16" height="16" viewBox="0 0 14 18" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M0.973384 15.5741C0.973384 16.6449 1.84943 17.5209 2.92015 17.5209H10.7072C11.7779 17.5209 12.654 16.6449 12.654 15.5741V3.89354H0.973384V15.5741ZM13.6274 0.973384H10.2205L9.24715 0H4.38023L3.40684 0.973384H0V2.92015H13.6274V0.973384Z" fill="currentColor" />
                                 </svg>
@@ -54,23 +54,23 @@
 
                     {{-- Card Content --}}
                     <div>
-                        <span class="inline-block bg-[#F5F5F5] text-[#323232] text-[10px] font-bold px-2 py-1 rounded-md mb-3 uppercase tracking-wider">
+                        <span data-cy="voucher-type" class="inline-block bg-[#F5F5F5] text-[#323232] text-[10px] font-bold px-2 py-1 rounded-md mb-3 uppercase tracking-wider">
                             {{ $voucher->jenis_voucher }}
                         </span>
-                        <h3 class="font-bold text-xl text-gray-900 leading-tight mb-2 truncate" title="{{ $voucher->nama_voucher }}">
+                        <h3 data-cy="voucher-name" class="font-bold text-xl text-gray-900 leading-tight mb-2 truncate" title="{{ $voucher->nama_voucher }}">
                             {{ $voucher->nama_voucher }}
                         </h3>
-                        <p class="text-xs text-gray-500 line-clamp-2 min-h-[32px]">{{ $voucher->deskripsi }}</p>
+                        <p data-cy="voucher-description" class="text-xs text-gray-500 line-clamp-2 min-h-[32px]">{{ $voucher->deskripsi }}</p>
 
                         <div class="mt-4 bg-[#F5F5F5] border border-dashed border-gray-300 rounded-lg p-3 text-center">
-                            <span class="font-mono font-bold text-[#323232] text-lg tracking-widest">{{ $voucher->kode_voucher }}</span>
+                            <span data-cy="voucher-code" class="font-mono font-bold text-[#323232] text-lg tracking-widest">{{ $voucher->kode_voucher }}</span>
                         </div>
                     </div>
 
                     <div class="mt-5 border-t border-gray-100 pt-4">
                         <div class="flex justify-between items-end mb-2">
                             <span class="text-xs font-medium text-gray-500">Nilai Diskon</span>
-                            <span class="font-bold text-2xl text-[#323232]">
+                            <span data-cy="voucher-discount" class="font-bold text-2xl text-[#323232]">
                                 @if(strtolower($voucher->jenis_voucher) == 'nominal')
                                     Rp{{ number_format($voucher->nilai_diskon, 0, ',', '.') }}
                                 @else
@@ -79,14 +79,14 @@
                             </span>
                         </div>
                         <div class="flex items-center justify-between text-[10px] text-gray-400 mt-2">
-                            <span>{{ \Carbon\Carbon::parse($voucher->tanggal_mulai)->format('d M Y') }}</span>
+                            <span data-cy="voucher-start-date">{{ \Carbon\Carbon::parse($voucher->tanggal_mulai)->format('d M Y') }}</span>
                             <span>hingga</span>
-                            <span>{{ \Carbon\Carbon::parse($voucher->tanggal_berakhir)->format('d M Y') }}</span>
+                            <span data-cy="voucher-end-date">{{ \Carbon\Carbon::parse($voucher->tanggal_berakhir)->format('d M Y') }}</span>
                         </div>
                     </div>
                 </div>
             @empty
-                <div class="col-span-full flex flex-col items-center justify-center min-h-[50vh] font-medium text-xl text-center py-2 text-black ">
+                <div  data-cy="empty-voucher-state" class="col-span-full flex flex-col items-center justify-center min-h-[50vh] font-medium text-xl text-center py-2 text-black ">
                     <p>Belum Ada Voucher Yang Tersedia</p>
                 </div>
             @endforelse
@@ -94,8 +94,8 @@
     </div>
 
     {{-- Floating Action Button --}}
-    <a href="{{ route('manage.voucher.create') }}">
-        <button id="btn-tambah-voucher-baru"
+    <a data-cy="create-voucher-link" href="{{ route('manage.voucher.create') }}">
+        <button  data-cy="create-voucher-button" id="btn-tambah-voucher-baru"
             class="z-50 fixed bottom-8 flex font-inter items-center gap-3 right-4 px-5 bg-white border border-black text-black p-3 rounded-full shadow-md hover:bg-gray-50 transition">
             <p>Tambahkan Voucher Baru</p>
             <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
