@@ -73,7 +73,7 @@
                     <div class="flex flex-col gap-2">
                         <label class="font-bold text-gray-900">Nama Voucher</label>
                         <div class="relative">
-                            <input type="text" name="nama_voucher" value="{{ old('nama_voucher', $voucher->nama_voucher) }}" placeholder="Contoh: Promo Akhir Tahun"
+                            <input type="text" data-cy="voucher-name-input" name="nama_voucher" value="{{ old('nama_voucher', $voucher->nama_voucher) }}" placeholder="Contoh: Promo Akhir Tahun"
                                 class="w-full border border-black rounded-md px-4 py-3 text-lg font-bold placeholder-black focus:outline-none focus:ring-1 focus:ring-black"
                                 required>
                             <span class="absolute top-2 right-2 text-red-500 text-xl">*</span>
@@ -83,7 +83,7 @@
                     <div class="flex flex-col gap-2">
                         <label class="font-bold text-gray-900">Kode Voucher <span class="text-sm font-normal text-gray-500">(Kosongkan untuk generate otomatis)</span></label>
                         <div class="relative">
-                            <input type="text" name="kode_voucher" value="{{ old('kode_voucher', $voucher->kode_voucher) }}" placeholder="KODE-CUSTOM"
+                            <input type="text" data-cy="voucher-code-input" name="kode_voucher" value="{{ old('kode_voucher', $voucher->kode_voucher) }}" placeholder="KODE-CUSTOM"
                                 class="w-full border border-black rounded-md px-4 py-3 text-lg font-mono uppercase placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-black">
                         </div>
                         @error('kode_voucher')
@@ -94,7 +94,7 @@
                     <div class="flex flex-col gap-2 mt-2">
                         <label class="font-bold text-gray-900">Nilai Diskon</label>
                         <div class="relative">
-                            <input data-cy="voucher-discount-input"  onkeydown="if(event.key === '-') event.preventDefault();" type="number" name="nilai_diskon" value="{{ old('nilai_diskon', $voucher->nilai_diskon) }}" placeholder="0"
+                            <input data-cy="voucher-discount-input" onkeydown="if(event.key === '-') event.preventDefault();" type="number" name="nilai_diskon" value="{{ old('nilai_diskon', $voucher->nilai_diskon) }}" placeholder="0"
                                 class="w-full border border-black rounded-md px-4 py-3 text-4xl font-normal placeholder-black focus:outline-none focus:ring-1 focus:ring-black"
                                 required>
                             <span class="absolute top-2 right-2 text-red-500 text-xl">*</span>
@@ -103,7 +103,7 @@
 
                 </div>
 
-                <button type="submit" id="submitVoucher" data-cy="submit-voucher-button"
+                <button type="submit" id="submitVoucher" data-cy="btn-submit-voucher"
                     class="w-full bg-[#323232] text-white py-4 rounded-md font-bold text-lg hover:opacity-90 transition shadow-lg mt-8">
                     Perbarui Voucher
                 </button>

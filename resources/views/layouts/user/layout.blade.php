@@ -11,6 +11,4 @@
 
     <x-shared.modal.delete-modal/>
 </main>
-
-
 @endsection

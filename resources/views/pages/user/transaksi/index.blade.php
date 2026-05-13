@@ -1,7 +1,6 @@
 @extends('layouts.user.layout')
 @section('title', 'Manage Transaksi')
 @section('content')
-
     <div x-data="{
         modalOpen: false,
         selectedTrx: null,
@@ -10,60 +9,6 @@
         loadingOngkir: false,
         selectedCourier: 'jne',
         destinationId: '',
-{{--         
-        destinationName: '',
-        destinations: [],
-        showDestinationDropdown: false,
-        isSearching: false,
-        searchTimeout: null,
-
-        searchLocation(query) {
-            if (this.searchTimeout) clearTimeout(this.searchTimeout);
-            
-            if (query.length < 3) {
-                this.destinations = [];
-                this.showDestinationDropdown = false;
-                return;
-            }
-
-            this.isSearching = true;
-            this.showDestinationDropdown = true;
-
-            // Debounce delay (500ms) mencegah spam request saat ngetik cepat
-            this.searchTimeout = setTimeout(async () => {
-                try {
-                    const response = await fetch(`{{ route('manage.transaksi.search-destination') }}?q=${query}`);
-                    const data = await response.json();
-                    this.destinations = data;
-                } catch (error) {
-                    console.error('Gagal mencari lokasi:', error);
-                } finally {
-                    this.isSearching = false;
-                }
-            }, 500);
-        },
-
-        selectDestination(dest) {
-            this.destinationId = dest.id;
-            this.destinationName = dest.name || dest.display || dest.label;
-            this.showDestinationDropdown = false;
-        },
-
-        async calculateOngkir(weight) {
-            if(!this.destinationId) return alert('Pilih kota/kecamatan tujuan dari daftar dropdown terlebih dahulu.');
-            this.loadingOngkir = true;
-            this.ongkirResults = null;
-            try {
-                const response = await fetch(`{{ route('manage.transaksi.get-ongkir') }}?destination=${this.destinationId}&weight=${weight}&courier=${this.selectedCourier}`);
-                const result = await response.json();
-                this.ongkirResults = result;
-            } catch (error) {
-                alert('Gagal menghitung ongkos kirim. Pastikan API berjalan.');
-                console.error(error);
-            } finally {
-                this.loadingOngkir = false;
-            }
-        } --}}
     }" class="p-8 w-full">
         <div class="bg-white rounded-lg shadow-sm p-6 min-h-full border border-gray-200">
 
@@ -147,7 +92,6 @@
                     $isKustom = $trx->orderKustoms->count() > 0;
                     $statusBayar = in_array($trx->status, ['Paid', 'Delivered', 'Done']) ? 'Lunas' : 'Belum Lunas';
                     
-                    // Kalkulasi Total Berat (Asumsi 500 gram per pcs)
                     $totalBerat = 0;
                     if($isKustom) {
                         $totalBerat = ($trx->orderKustoms->first()->quantity ?? 1) * 500;
@@ -156,7 +100,6 @@
                             $totalBerat += ($pt->quantity * 500);
                         }
                     }
-                    // Minimal berat API adalah 1000 gram (1kg)
                     if ($totalBerat < 1000) $totalBerat = 1000;
                 @endphp
 
@@ -181,31 +124,40 @@
                                         </div>
                                     </div>
 
-@if($isKustom)
-        @php $kustomOrder = $trx->orderKustoms->first(); @endphp
-        <div class="mt-4 p-4 border border-dashed border-gray-300 rounded-lg bg-gray-50">
-            <h4 class="text-sm font-bold text-gray-800 mb-2">Bukti Pembayaran (Kustom)</h4>
-            
-            {{-- Show existing file if available --}}
-            @if($kustomOrder->attachments && $kustomOrder->attachments->count() > 0)
-                <a href="{{ asset('storage/' . $kustomOrder->attachments->first()->path) }}" target="_blank" class="text-xs text-blue-600 hover:underline mb-3 block flex items-center gap-1">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg>
-                    Lihat Bukti Saat Ini
-                </a>
-            @endif
+                                @if($isKustom)
+                                        @php
+                                            $kustomOrder = $trx->orderKustoms->first(); 
+                                            $paymentAttachment = $kustomOrder->attachments->first(function ($attachment) {
+                                                return str_contains($attachment->path, 'payments/kustom');
+                                            });
+                                        @endphp
+                                        
+                                        <div class="mt-4 p-4 border border-dashed border-gray-300 rounded-lg bg-gray-50">
+                                            <h4 class="text-sm font-bold text-gray-800 mb-2">Bukti Pembayaran (Kustom)</h4>
+                                            
+                                            @if($paymentAttachment)
+                                                <a href="{{ asset('storage/' . $paymentAttachment->path) }}" target="_blank" class="text-xs text-blue-600 hover:underline mb-3 block flex items-center gap-1">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg>
+                                                    Lihat Bukti Saat Ini
+                                                </a>
 
-            {{-- The actual upload form --}}
-            <form action="{{ route('manage.transaksi.upload-payment') }}" method="POST" enctype="multipart/form-data" class="flex flex-col gap-2">
-                @csrf
-                <input type="hidden" name="order_kustom_id" value="{{ $kustomOrder->order_kustom_id }}">
-                <input type="file" name="file_payment" accept=".jpg,.jpeg,.png,.pdf" required
-                    class="text-xs w-full file:mr-4 file:py-1.5 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-white file:border-gray-300 file:border file:text-gray-700 hover:file:bg-gray-100 cursor-pointer">
-                <button type="submit" class="bg-gray-800 text-white px-3 py-1.5 rounded text-xs hover:bg-black transition self-start font-medium shadow-sm">
-                    Unggah Bukti & Lunasi
-                </button>
-            </form>
-        </div>
-    @endif
+                                                <div class="p-3 bg-green-50 border border-green-200 text-green-700 rounded text-xs font-medium flex items-center gap-2">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                                    Pembayaran telah dilunasi dan bukti sudah diunggah.
+                                                </div>
+                                            @else
+                                                <form action="{{ route('manage.transaksi.upload-payment') }}" method="POST" enctype="multipart/form-data" class="flex flex-col gap-2">
+                                                    @csrf
+                                                    <input type="hidden" name="order_kustom_id" value="{{ $kustomOrder->order_kustom_id }}">
+                                                    <input type="file" name="file_payment" accept=".jpg,.jpeg,.png,.pdf" required
+                                                        class="text-xs w-full file:mr-4 file:py-1.5 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-white file:border-gray-300 file:border file:text-gray-700 hover:file:bg-gray-100 cursor-pointer">
+                                                    <button type="submit" class="bg-gray-800 text-white px-3 py-1.5 rounded text-xs hover:bg-black transition self-start font-medium shadow-sm">
+                                                        Unggah Bukti & Lunasi
+                                                    </button>
+                                                </form>
+                                            @endif
+                                        </div>
+                                    @endif
 
                                     <form action="{{ route('manage.transaksi.update', $trx->transaksi_id) }}" method="POST" id="form-{{$trx->transaksi_id}}">
                                         @csrf
@@ -215,7 +167,7 @@
                                                 <label class="text-gray-700 font-medium col-span-1">Status Bayar:</label>
                                                 <div class="col-span-2">
                                                     @if($statusBayar == 'Lunas')
-                                                        <span class="text-gray-400 text-[11px]">Paid - Via Payment Gateway</span>
+                                                        <span class="text-gray-400 text-[11px]">{{ $trx->status  }}</span>
                                                     @else
                                                         <span class="text-red-400 text-[11px]">Belum Lunas</span>
                                                     @endif
@@ -232,77 +184,6 @@
                                         </div>
                                         <p class="text-[10px] text-gray-400 mt-4 italic">* Riwayat perubahan akan tercatat otomatis.</p>
                                     </form>
-
-                                    {{-- <div class="mt-8 border-t border-gray-200 pt-6">
-                                        <h3 class="text-sm font-bold text-gray-800 mb-4 flex items-center gap-2">
-                                            <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
-                                            Cek Estimasi Ongkir
-                                        </h3>
-                                        <div class="grid grid-cols-2 gap-3 mb-3">
-                                            <div class="relative col-span-2" @click.away="showDestinationDropdown = false">
-                                                <label class="text-[10px] text-gray-500 uppercase font-bold block mb-1">Alamat Pengiriman (Kecamatan / Kota)</label>
-                                                <input type="text" 
-                                                    x-model="destinationName" 
-                                                    @input="searchLocation($event.target.value)" 
-                                                    @focus="if(destinationName.length >= 3) showDestinationDropdown = true"
-                                                    placeholder="Ketik minimal 3 huruf (contoh: sumbergempol)" 
-                                                    class="w-full border border-gray-300 rounded px-3 py-2 text-xs focus:outline-none focus:border-black bg-gray-50 focus:bg-white transition-colors relative z-10" autocomplete="off">
-                                                
-                                                <div x-show="showDestinationDropdown" x-transition.opacity
-                                                    class="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-xl max-h-48 overflow-y-auto custom-scrollbar" 
-                                                    style="display: none;">
-                                                    
-                                                    <div x-show="isSearching" class="p-3 text-xs text-center text-gray-500">Mencari lokasi...</div>
-                                                    <div x-show="!isSearching && destinations.length === 0 && destinationName.length >= 3" class="p-3 text-xs text-center text-gray-500">Lokasi tidak ditemukan</div>
-                                                    
-                                                    <template x-for="dest in destinations" :key="dest.id">
-                                                        <div @click="selectDestination(dest)" class="p-3 hover:bg-gray-100 cursor-pointer border-b border-gray-100 last:border-0 transition-colors">
-
-                                                            <p class="font-bold text-xs text-gray-800" x-text="dest.label || dest.name || dest.display || 'Lokasi Tidak Diketahui'"></p>
-                                                        </div>
-                                                    </template>
-                                                </div>
-                                            </div>
-
-                                            <div class="col-span-2">
-                                                <label class="text-[10px] text-gray-500 uppercase font-bold block mb-1">Kurir</label>
-                                                <select x-model="selectedCourier" class="w-full border border-gray-300 rounded px-3 py-2 text-xs focus:outline-none focus:border-gray-500 bg-white">
-                                                    <option value="jne">JNE</option>
-                                                    <option value="sicepat">SiCepat</option>
-                                                    <option value="jnt">J&T</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                        
-                                        <button type="button" @click="calculateOngkir({{ $totalBerat }})"
-                                            class="w-full py-2 bg-gray-100 text-gray-800 border border-gray-300 rounded-md text-xs font-semibold hover:bg-gray-200 transition flex items-center justify-center gap-2">
-                                            <span x-show="!loadingOngkir">Hitung Biaya (Berat: {{ $totalBerat/1000 }} kg)</span>
-                                            <span x-show="loadingOngkir">Memproses Data...</span>
-                                        </button>
-
-                                        <template x-if="ongkirResults && ongkirResults.length > 0">
-                                            <div class="mt-4 space-y-2 max-h-40 overflow-y-auto custom-scrollbar pr-1">
-                                                <template x-for="item in ongkirResults" :key="item.service">
-                                                    <div class="flex justify-between items-center p-3 bg-gray-50 border border-gray-200 rounded-lg">
-                                                        <div>
-                                                            <p class="font-bold text-xs text-gray-800" x-text="item.service"></p>
-                                                            <p class="text-[10px] text-gray-500" x-text="item.description"></p>
-                                                        </div>
-                                                        <div class="text-right">
-                                                            <p class="font-bold text-black text-sm" x-text="'Rp' + new Intl.NumberFormat('id-ID').format(item.cost)"></p>
-                                                            <p class="text-[10px] text-gray-500" x-text="'Estimasi: ' + item.etd"></p>
-                                                        </div>
-                                                    </div>
-                                                </template>
-                                            </div>
-                                        </template>
-
-                                        <template x-if="ongkirResults && ongkirResults.length === 0">
-                                            <div class="mt-4 p-3 bg-red-50 text-red-600 text-xs text-center border border-red-100 rounded">
-                                                Layanan kurir tidak tersedia untuk rute ini.
-                                            </div>
-                                        </template>
-                                    </div> --}}
                                 </div>
 
                                 <div class="flex justify-center gap-3 mt-6 border-t border-gray-100 pt-6">
@@ -323,7 +204,7 @@
                                         <div class="space-y-3 text-sm text-gray-700">
                                             <p><strong class="block text-gray-800 mb-1">Tipe:</strong> {{ $kustom->tipe_kustom }}</p>
                                             <p><strong class="block text-gray-800 mb-1">Kain:</strong> {{ $kustom->catatan ?? 'N/A' }}</p>
-                                            <p><strong class="block text-gray-800 mb-1">Detail Kustomisasi:</strong> {{ $kustom->detail_pilihan_kustomisasi }}</p>
+                                            <p><strong class="block text-gray-800 mb-1">Detail Kustomisasi:</strong> <x-shared.chip :details="$kustom->detail_pilihan_kustomisasi" /></p>
                                             <p><strong class="block text-gray-800 mb-1">Jumlah:</strong> {{ $kustom->quantity }} pcs</p>
                                         </div>
                                         <div class="mt-6 border-t border-gray-200 pt-4 text-right">

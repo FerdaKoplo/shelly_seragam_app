@@ -119,6 +119,14 @@ class KelolaTransaksiController extends Controller
         ]);
 
         try {
+            $existingPayment = AttachmentTransaksiKustom::where('order_kustom_id', $validated['order_kustom_id'])
+                ->where('path', 'like', '%payments/kustom%')
+                ->first();
+
+            if ($existingPayment) {
+                return back()->with('error', 'Bukti pembayaran untuk pesanan ini sudah diunggah sebelumnya.');
+            }
+
             if ($request->hasFile('file_payment')) {
                 $file = $request->file('file_payment');
 
@@ -126,13 +134,12 @@ class KelolaTransaksiController extends Controller
 
                 $path = $file->storeAs('payments/kustom', $filename, 'public');
 
-                AttachmentTransaksiKustom::create([
+                \App\Models\AttachmentTransaksiKustom::create([
                     'order_kustom_id' => $validated['order_kustom_id'],
                     'path' => $path,
                 ]);
 
                 $orderKustom = OrderTransaksiKustom::findOrFail($validated['order_kustom_id']);
-
                 $transaksi = Transaksi::findOrFail($orderKustom->transaksi_id);
 
                 if ($transaksi->status === 'Created') {

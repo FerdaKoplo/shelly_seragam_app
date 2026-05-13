@@ -15,12 +15,10 @@ class TransaksiSeeder extends Seeder
      */
     public function run()
     {
-$faker = Faker::create('id_ID');
+        $faker = Faker::create('id_ID');
 
-        // 1. GET EXISTING PEGAWAI IDs
         $pegawaiIds = DB::table('user')->where('role', 'Pegawai')->pluck('user_id')->toArray();
 
-        // Fallback: If no Pegawai exists yet, create one so the seeder doesn't break
         if (empty($pegawaiIds)) {
             $dummyId = DB::table('user')->insertGetId([
                 'nama' => 'Dummy Pegawai',
@@ -39,24 +37,29 @@ $faker = Faker::create('id_ID');
 
         foreach (range(1, 20) as $i) {
 
-            $statusOptions = ["Created", "Paid", "Delivered", "Done"];
+            $isCustomOrder = $faker->boolean(40);
+
+            if ($isCustomOrder) {
+                $status = 'Created';
+            } else {
+                $statusOptions = ["Created", "Paid", "Delivered", "Done"];
+                $status = $faker->randomElement($statusOptions);
+            }
 
             $transaksiId = DB::table('transaksi')->insertGetId([
-                'pegawai_id' => $faker->randomElement($pegawaiIds), // <-- ADDED THIS LINE
+                'pegawai_id' => $faker->randomElement($pegawaiIds),
                 'nama_customer' => $faker->name,
                 'no_hp_customer' => $faker->phoneNumber,
                 'alamat_customer' => $faker->address,
                 'no_resi_customer' => 'RESI-' . strtoupper($faker->bothify('??#####')),
-                'status' => $faker->randomElement($statusOptions),
+                'status' => $status, // Use the dynamically set status here
                 'tanggal_transaksi' => $faker->dateTimeBetween('-1 month', 'now'),
-                'total_harga' => 0, 
+                'total_harga' => 0,
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
 
             $grandTotal = 0;
-
-            $isCustomOrder = $faker->boolean(40); 
 
             if ($isCustomOrder) {
                 $tipeOptions = ['Bundle', 'Atasan', 'Bawahan'];
@@ -67,13 +70,15 @@ $faker = Faker::create('id_ID');
                     'ukuran_dipilih' => $faker->randomElement(['S, M, L', 'All Size', 'Custom List']),
                     'tipe_kustom' => $faker->randomElement($tipeOptions),
                     'catatan' => $faker->sentence,
-                    'detail_pilihan_kustomisasi' => json_encode(['kain' => 'cotton', 'sablon' => 'DTF']), 
+                    'detail_pilihan_kustomisasi' => json_encode(['kain' => 'cotton', 'sablon' => 'DTF']),
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);
 
                 $grandTotal += $faker->numberBetween(500000, 5000000);
 
+                // Note: These attachments act as the "Design Attachments", not the payment receipt.
+                // Your payment upload will add a new row to this table!
                 for ($k = 0; $k < rand(1, 3); $k++) {
                     DB::table('attachment_transaksi_kustom')->insert([
                         'order_kustom_id' => $orderKustomId,
