@@ -7,7 +7,7 @@
 <div class="flex flex-wrap gap-2 mt-1">
     @forelse($detailKustom as $key => $value)
         <span class="inline-flex items-center px-3 py-1 rounded-full text-[11px] font-medium bg-white border border-gray-300 text-gray-700 shadow-sm">
-            <strong class="text-gray-900 mr-1 capitalize">{{ str_replace('_', ' ', $key) }}:</strong> 
+            <strong class="text-gray-900 mr-1 capitalize">{{ str_replace('_', ' ', $key) }}:</strong>
             <span class="capitalize">{{ $value }}</span>
         </span>
     @empty
