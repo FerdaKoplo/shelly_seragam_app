@@ -181,9 +181,31 @@
                                         </div>
                                     </div>
 
-                                        <div>
-                                            <input type="file">
-                                        </div>
+@if($isKustom)
+        @php $kustomOrder = $trx->orderKustoms->first(); @endphp
+        <div class="mt-4 p-4 border border-dashed border-gray-300 rounded-lg bg-gray-50">
+            <h4 class="text-sm font-bold text-gray-800 mb-2">Bukti Pembayaran (Kustom)</h4>
+            
+            {{-- Show existing file if available --}}
+            @if($kustomOrder->attachments && $kustomOrder->attachments->count() > 0)
+                <a href="{{ asset('storage/' . $kustomOrder->attachments->first()->path) }}" target="_blank" class="text-xs text-blue-600 hover:underline mb-3 block flex items-center gap-1">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg>
+                    Lihat Bukti Saat Ini
+                </a>
+            @endif
+
+            {{-- The actual upload form --}}
+            <form action="{{ route('manage.transaksi.upload-payment') }}" method="POST" enctype="multipart/form-data" class="flex flex-col gap-2">
+                @csrf
+                <input type="hidden" name="order_kustom_id" value="{{ $kustomOrder->order_kustom_id }}">
+                <input type="file" name="file_payment" accept=".jpg,.jpeg,.png,.pdf" required
+                    class="text-xs w-full file:mr-4 file:py-1.5 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-white file:border-gray-300 file:border file:text-gray-700 hover:file:bg-gray-100 cursor-pointer">
+                <button type="submit" class="bg-gray-800 text-white px-3 py-1.5 rounded text-xs hover:bg-black transition self-start font-medium shadow-sm">
+                    Unggah Bukti & Lunasi
+                </button>
+            </form>
+        </div>
+    @endif
 
                                     <form action="{{ route('manage.transaksi.update', $trx->transaksi_id) }}" method="POST" id="form-{{$trx->transaksi_id}}">
                                         @csrf

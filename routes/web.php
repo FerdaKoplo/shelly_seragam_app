@@ -200,9 +200,10 @@ Route::match(['GET', 'POST'], '/checkout', function (Request $request) {
         }, array_values($request->session()->get('cart', [])));
     }
 
-    // Shipping options are loaded dynamically from the shipping cost endpoint
-    // after the user selects a destination from the RajaOngkir/Komerce search.
-    $shippingOptions = [];
+    $shippingOptions = [
+        ['id' => 'reg', 'label' => 'Regular', 'duration' => '2-3 hari', 'price' => 15000],
+        ['id' => 'exp', 'label' => 'Express', 'duration' => '1 hari', 'price' => 35000],
+    ];
 
     $uploadedFiles = [];
 
@@ -416,6 +417,7 @@ Route::prefix('admin')->middleware('auth')->group(function () {
         Route::get('/get-ongkir', [KelolaTransaksiController::class, 'getOngkir'])->name('.get-ongkir');
         Route::get('/search-destination', [KelolaTransaksiController::class, 'searchDestination'])->name('.search-destination');
         Route::post('/', [KelolaTransaksiController::class, 'store'])->name('.store');
+        Route::post('/upload-payment', [KelolaTransaksiController::class, 'uploadTransaksiKustomPayment'])->name('.upload-payment');
         Route::put('/{id}', [KelolaTransaksiController::class, 'update'])->name('.update');
     });
 
