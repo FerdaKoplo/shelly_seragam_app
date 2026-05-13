@@ -36,7 +36,7 @@
                     
                     {{-- Action Buttons (Hidden until hover) --}}
                     <div class="absolute top-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition duration-200 z-10">
-                        <a  data-cy="edit-voucher-button" href="{{ route('manage.voucher.edit', $voucher->id) }}" class="bg-white p-2.5 rounded-full shadow-md border border-gray-100 hover:bg-gray-50 transition" title="Edit Voucher">
+                        <a  data-cy="btn-edit-voucher" href="{{ route('manage.voucher.edit', $voucher->id) }}" class="bg-white p-2.5 rounded-full shadow-md border border-gray-100 hover:bg-gray-50 transition" title="Edit Voucher">
                             <svg width="16" height="16" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M0 9.48896V11.9856H2.49666L9.86013 4.62215L7.36348 2.12549L0 9.48896ZM11.7909 2.6914C12.0505 2.43174 12.0505 2.01231 11.7909 1.75265L10.233 0.194739C9.97332 -0.0649131 9.55388 -0.0649131 9.29422 0.194739L8.07586 1.41311L10.5725 3.90977L11.7909 2.6914V2.6914Z" fill="#323232" />
                             </svg>
@@ -44,7 +44,7 @@
                         <form  data-cy="delete-voucher-form" action="{{ route('manage.voucher.destroy', $voucher->id) }}" method="POST" onsubmit="return confirm('Hapus voucher ini?');">
                             @csrf
                             @method('DELETE')
-                            <button data-cy="delete-voucher-button" type="submit" class="bg-white p-2.5 rounded-full shadow-md border border-gray-100 text-gray-700 hover:text-red-600 hover:bg-red-50 transition" title="Hapus Voucher">
+                            <button data-cy="btn-delete-voucher" type="submit" class="bg-white p-2.5 rounded-full shadow-md border border-gray-100 text-gray-700 hover:text-red-600 hover:bg-red-50 transition" title="Hapus Voucher">
                                 <svg width="16" height="16" viewBox="0 0 14 18" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M0.973384 15.5741C0.973384 16.6449 1.84943 17.5209 2.92015 17.5209H10.7072C11.7779 17.5209 12.654 16.6449 12.654 15.5741V3.89354H0.973384V15.5741ZM13.6274 0.973384H10.2205L9.24715 0H4.38023L3.40684 0.973384H0V2.92015H13.6274V0.973384Z" fill="currentColor" />
                                 </svg>
@@ -95,7 +95,7 @@
 
     {{-- Floating Action Button --}}
     <a data-cy="create-voucher-link" href="{{ route('manage.voucher.create') }}">
-        <button  data-cy="create-voucher-button" id="btn-tambah-voucher-baru"
+        <button  data-cy="btn-tambah-voucher-baru" id="btn-tambah-voucher-baru"
             class="z-50 fixed bottom-8 flex font-inter items-center gap-3 right-4 px-5 bg-white border border-black text-black p-3 rounded-full shadow-md hover:bg-gray-50 transition">
             <p>Tambahkan Voucher Baru</p>
             <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">

@@ -104,7 +104,7 @@
 
             </div>
 
-            <button type="submit" id="submitVoucher" data-cy="submit-voucher-button"
+            <button type="submit" id="submitVoucher" data-cy="btn-submit-voucher"
                 class="w-full bg-[#323232] text-white py-4 rounded-md font-bold text-lg hover:opacity-90 transition shadow-lg mt-8">
                 Tambahkan Voucher
             </button>
