@@ -5,7 +5,7 @@
     <div x-data class="flex gap-16 flex-col justify-center items-center px-10"  data-cy="voucher-page">
         {{-- Search & Filter Section --}}
         <div class="flex items-center gap-7 w-full"  data-cy="voucher-toolbar">
-            <div>
+            <div hidden>
                 <button id="btn-filter-voucher"  data-cy="filter-voucher-button" type="button" @click="$dispatch('open-modal', 'modal-filter-voucher')"
                     class="border border-black p-2.5 rounded-md hover:bg-gray-50 transition">
                     <svg width="19" height="19" viewBox="0 0 19 19" fill="none" xmlns="http://www.w3.org/2000/svg">
