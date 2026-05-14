@@ -258,7 +258,7 @@
                 const q = (this.destinationQuery || "").trim();
                 this.destinationId = null;
                 this.destinationResults = [];
-                if (q.length < 2) return;
+                if (q.length < 3) return;
                 if (this.destinationSearchTimer) clearTimeout(this.destinationSearchTimer);
                 this.destinationSearchTimer = setTimeout(async () => {
                     this.isLoadingDestinations = true;
