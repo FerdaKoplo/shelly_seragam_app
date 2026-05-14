@@ -12,7 +12,9 @@ use App\Http\Controllers\User\ManageKustomisasiController;
 use App\Http\Controllers\User\PegawaiController;
 use App\Http\Controllers\User\StatistikPenjualanController;
 use App\Http\Controllers\User\VoucherController;
+use App\Http\Controllers\Webhooks\XenditWebhookController;
 use App\Models\ProdukKatalog;
+use App\Models\XenditInvoice;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
@@ -77,6 +79,13 @@ Route::prefix('keranjang')->name('cart.')->group(function () {
 Route::prefix('shipping')->name('shipping.')->group(function () {
     Route::get('/destinations', [ShippingController::class, 'destinations'])->name('destinations');
     Route::post('/cost', [ShippingController::class, 'cost'])->name('cost');
+});
+
+/**
+ * Webhooks
+ */
+Route::prefix('webhooks')->name('webhooks.')->group(function () {
+    Route::post('/xendit/invoice', [XenditWebhookController::class, 'invoice'])->name('xendit.invoice');
 });
 
 /**
@@ -313,6 +322,7 @@ Route::match(['GET', 'POST'], '/checkout', function (Request $request) {
             'currency' => 'IDR',
             'description' => 'Pembayaran pesanan ' . $externalId,
             'invoice_duration' => 86400,
+            'callback_url' => route('webhooks.xendit.invoice'),
             'success_redirect_url' => url('/checkout') . '?' . http_build_query([
                 'checkout_success' => '1',
                 'type' => 'katalog',
@@ -352,6 +362,18 @@ Route::match(['GET', 'POST'], '/checkout', function (Request $request) {
                 ->withErrors(['payment_method' => 'Response Xendit tidak valid (invoice_url kosong).'])
                 ->withInput();
         }
+
+        XenditInvoice::query()->updateOrCreate(
+            ['external_id' => $externalId],
+            [
+                'invoice_id' => (string) ($response->json('id') ?? $response->json('invoice_id') ?? ''),
+                'status' => (string) ($response->json('status') ?? ''),
+                'amount' => $amount,
+                'invoice_url' => $invoiceUrl,
+                'expiry_date' => $response->json('expiry_date'),
+                'raw_payload' => $response->json(),
+            ]
+        );
 
         return redirect()->away($invoiceUrl);
     }
