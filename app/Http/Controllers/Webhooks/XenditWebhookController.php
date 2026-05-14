@@ -3,7 +3,8 @@
 namespace App\Http\Controllers\Webhooks;
 
 use App\Http\Controllers\Controller;
-use App\Models\XenditInvoice;
+use App\Models\CheckoutOrder;
+use App\Models\PaymentInvoice;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -36,8 +37,9 @@ class XenditWebhookController extends Controller
         $expiryDate = data_get($payload, 'expiry_date');
         $paidAt = data_get($payload, 'paid_at');
 
-        $invoice = XenditInvoice::query()->firstOrNew(['external_id' => $externalId]);
+        $invoice = PaymentInvoice::query()->where('provider', 'xendit')->firstOrNew(['external_id' => $externalId]);
         $invoice->fill([
+            'provider' => 'xendit',
             'invoice_id' => $invoiceId !== '' ? $invoiceId : ($invoice->invoice_id ?? null),
             'status' => $status !== '' ? $status : ($invoice->status ?? null),
             'amount' => $amount > 0 ? $amount : ($invoice->amount ?? 0),
@@ -48,7 +50,15 @@ class XenditWebhookController extends Controller
         ]);
         $invoice->save();
 
+        if (strcasecmp($status, 'PAID') === 0) {
+            $order = CheckoutOrder::query()->where('external_id', $externalId)->first();
+            if ($order) {
+                $order->status = 'PAID';
+                $order->paid_at = $invoice->paid_at;
+                $order->save();
+            }
+        }
+
         return response()->json(['ok' => true]);
     }
 }
-

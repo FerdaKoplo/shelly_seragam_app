@@ -8,8 +8,11 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('xendit_invoices', function (Blueprint $table) {
+        Schema::create('payment_invoices', function (Blueprint $table) {
             $table->id();
+            $table->string('provider')->index(); // e.g. xendit
+            $table->foreignId('checkout_order_id')->constrained('checkout_orders')->cascadeOnDelete();
+
             $table->string('external_id')->unique();
             $table->string('invoice_id')->nullable()->index();
             $table->string('status')->nullable()->index();
@@ -24,7 +27,7 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('xendit_invoices');
+        Schema::dropIfExists('payment_invoices');
     }
 };
 
