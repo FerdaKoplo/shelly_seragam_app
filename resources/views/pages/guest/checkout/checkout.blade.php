@@ -375,9 +375,12 @@
                         const price = parseInt(value, 10);
                         if (!Number.isFinite(price) || price <= 0) return;
 
+                        // Hide JTR services for retail/small parcels (show only above 1kg).
+                        const serviceStr = String(service || "");
+                        if (/^JTR\b/i.test(serviceStr) && !(weightKg > 1)) return;
+
                         // Filter threshold-style JTR variants based on current cart weight.
                         // Examples seen from provider: "JTR<130", "JTR>130", "JTR > 200"
-                        const serviceStr = String(service || "");
                         const jtrThreshold = serviceStr.match(/JTR\s*([<>])\s*(\d+)/i) || serviceStr.match(/JTR([<>])(\d+)/i);
                         if (jtrThreshold) {
                             const op = jtrThreshold[1];
