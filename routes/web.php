@@ -120,7 +120,9 @@ Route::match(['GET', 'POST'], '/checkout', function (Request $request) {
             'province' => ['required', 'string', 'min:2', 'max:100'],
             'postal_code' => ['required', 'string', 'regex:/^[0-9]{4,6}$/'],
 
-            'shipping_id' => ['required', 'in:reg,exp'],
+            // Value comes from dynamic RajaOngkir/Komerce cost mapping on the checkout page
+            // (e.g. "jne-reg", "jne-jtr", etc). Avoid hard-coding reg/exp.
+            'shipping_id' => ['required', 'string', 'min:1', 'max:100'],
             'notes' => ['nullable', 'string', 'max:1000'],
         ]);
     }
