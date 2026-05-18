@@ -3,8 +3,8 @@
 @section('content')
 
 <div class="px-4 md:px-12 pb-20"
-    x-data="{ 
-        showForm: false, 
+    x-data="{
+        showForm: false,
         isEdit: false,
         actionUrl: '{{ route('manage.pegawai.store') }}',
         formData: {
@@ -22,7 +22,6 @@
             this.formData.password = ''; 
             this.pegawaiIsActive = (p.status === 'Active');
             this.actionUrl = '/admin/manage-pegawai/' + p.user_id;
-            // Scroll to form on mobile
             if(window.innerWidth < 768) {
                 setTimeout(() => {
                     document.getElementById('pegawaiForm').scrollIntoView({ behavior: 'smooth' });
