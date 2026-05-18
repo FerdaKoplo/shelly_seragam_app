@@ -90,15 +90,16 @@
 
 <script>
     function checkoutPage(initial) {
-        return {
+            return {
             type: initial.type,
             items: initial.items || [],
             customData: initial.customData || null,
             shippingOptions: initial.shippingOptions || [],
             isSubmitting: false,
             isConfirming: false,
-            isLoadingDestinations: false,
-            isLoadingShipping: false,
+                isLoadingDestinations: false,
+                isLoadingShipping: false,
+                shippingRequestKey: null,
             destinationSearchTimer: null,
             destinationQuery: "",
             destinationId: null,
@@ -258,7 +259,7 @@
                 const q = (this.destinationQuery || "").trim();
                 this.destinationId = null;
                 this.destinationResults = [];
-                if (q.length < 2) return;
+                if (q.length < 3) return;
                 if (this.destinationSearchTimer) clearTimeout(this.destinationSearchTimer);
                 this.destinationSearchTimer = setTimeout(async () => {
                     this.isLoadingDestinations = true;
@@ -315,6 +316,11 @@
                 if (!this.destinationId) return;
                 if (this.isLoadingShipping) return;
                 this.isLoadingShipping = true;
+                const requestKey = `${this.destinationId}|${this.totalWeight}|jne`;
+                this.shippingRequestKey = requestKey;
+                this.shippingOptions = [];
+                this.shippingMethod = null;
+                this.shippingCost = 0;
                 try {
                     const resp = await fetch(`{{ route('shipping.cost') }}`, {
                         method: "POST",
@@ -331,6 +337,7 @@
                     });
 
                     const json = await resp.json().catch(() => ({}));
+                    if (this.shippingRequestKey !== requestKey) return;
                     const raw = Array.isArray(json.data) ?
                         json.data :
                         (Array.isArray(json?.rajaongkir?.results) ? json.rajaongkir.results : []);
@@ -363,9 +370,27 @@
                     }
 
                     const mapped = [];
+                    const weightKg = (this.totalWeight || 0) / 1000;
                     const pushOption = (courierName, service, value, etd) => {
                         const price = parseInt(value, 10);
                         if (!Number.isFinite(price) || price <= 0) return;
+
+                        // Hide JTR services for retail/small parcels (show only above 1kg).
+                        const serviceStr = String(service || "");
+                        if (/^JTR\b/i.test(serviceStr) && !(weightKg > 1)) return;
+
+                        // Filter threshold-style JTR variants based on current cart weight.
+                        // Examples seen from provider: "JTR<130", "JTR>130", "JTR > 200"
+                        const jtrThreshold = serviceStr.match(/JTR\s*([<>])\s*(\d+)/i) || serviceStr.match(/JTR([<>])(\d+)/i);
+                        if (jtrThreshold) {
+                            const op = jtrThreshold[1];
+                            const thresholdKg = parseInt(jtrThreshold[2], 10);
+                            if (Number.isFinite(thresholdKg)) {
+                                if (op === "<" && !(weightKg < thresholdKg)) return;
+                                if (op === ">" && !(weightKg > thresholdKg)) return;
+                            }
+                        }
+
                         mapped.push({
                             id: `${courierName}-${service}`.toLowerCase().replace(/\s+/g, "-"),
                             label: `${courierName} ${service}`.trim(),

@@ -11,7 +11,7 @@ class ShippingController extends Controller
     public function destinations(Request $request, RajaOngkirService $rajaOngkir)
     {
         $request->validate([
-            'search' => ['required', 'string', 'min:2', 'max:100'],
+            'search' => ['required', 'string', 'min:3', 'max:100'],
         ]);
 
         // Simple per-session throttling to avoid upstream 429.
