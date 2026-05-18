@@ -4,15 +4,13 @@
 
         @include('components.user.nav')
 
-        @if(!View::hasSection('hide_sidebar'))
-            <div x-show="sidebarOpen" x-transition:enter="transition opacity-ease-linear duration-300"
-                x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
-                x-transition:leave="transition opacity-ease-linear duration-300" x-transition:leave-start="opacity-100"
-                x-transition:leave-end="opacity-0" @click="sidebarOpen = false" class="fixed inset-0 bg-black/50 z-40 lg:hidden"
-                x-cloak>
-            </div>
-            @include('components.user.sidebar')
-        @endif
+        <div x-show="sidebarOpen" x-transition:enter="transition opacity-ease-linear duration-300"
+            x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+            x-transition:leave="transition opacity-ease-linear duration-300" x-transition:leave-start="opacity-100"
+            x-transition:leave-end="opacity-0" @click="sidebarOpen = false" class="fixed inset-0 bg-black/50 z-40 lg:hidden"
+            x-cloak>
+        </div>
+        @include('components.user.sidebar')
 
 
         <main class="pt-24 transition-all duration-300 {{ View::hasSection('hide_sidebar') ? '' : 'lg:ml-80' }}">

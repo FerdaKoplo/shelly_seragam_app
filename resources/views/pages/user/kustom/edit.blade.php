@@ -1,6 +1,5 @@
 @extends('layouts.user.layout')
 @section('title', 'Edit Produk Kustom')
-@section('hide_sidebar', true)
 
 @section('content')
     @php
