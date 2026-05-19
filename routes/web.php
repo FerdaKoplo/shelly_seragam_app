@@ -12,7 +12,10 @@ use App\Http\Controllers\User\ManageKustomisasiController;
 use App\Http\Controllers\User\PegawaiController;
 use App\Http\Controllers\User\StatistikPenjualanController;
 use App\Http\Controllers\User\VoucherController;
+use App\Http\Controllers\Webhooks\XenditWebhookController;
+use App\Models\CheckoutOrder;
 use App\Models\ProdukKatalog;
+use App\Models\PaymentInvoice;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
@@ -81,6 +84,13 @@ Route::prefix('shipping')->name('shipping.')->group(function () {
 });
 
 /**
+ * Webhooks
+ */
+Route::prefix('webhooks')->name('webhooks.')->group(function () {
+    Route::post('/xendit/invoice', [XenditWebhookController::class, 'invoice'])->name('xendit.invoice');
+});
+
+/**
  * Checkout
  */
 Route::match(['GET', 'POST'], '/checkout', function (Request $request) {
@@ -121,7 +131,9 @@ Route::match(['GET', 'POST'], '/checkout', function (Request $request) {
             'province' => ['required', 'string', 'min:2', 'max:100'],
             'postal_code' => ['required', 'string', 'regex:/^[0-9]{4,6}$/'],
 
-            'shipping_id' => ['required', 'in:reg,exp'],
+            // Value comes from dynamic RajaOngkir/Komerce cost mapping on the checkout page
+            // (e.g. "jne-reg", "jne-jtr", etc). Avoid hard-coding reg/exp.
+            'shipping_id' => ['required', 'string', 'min:1', 'max:100'],
             'notes' => ['nullable', 'string', 'max:1000'],
         ]);
     }
@@ -201,10 +213,9 @@ Route::match(['GET', 'POST'], '/checkout', function (Request $request) {
         }, array_values($request->session()->get('cart', [])));
     }
 
-    $shippingOptions = [
-        ['id' => 'reg', 'label' => 'Regular', 'duration' => '2-3 hari', 'price' => 15000],
-        ['id' => 'exp', 'label' => 'Express', 'duration' => '1 hari', 'price' => 35000],
-    ];
+    // Shipping options are loaded dynamically from the shipping cost endpoint
+    // after the user selects a destination from the RajaOngkir/Komerce search.
+    $shippingOptions = [];
 
     $uploadedFiles = [];
 
@@ -293,6 +304,26 @@ Route::match(['GET', 'POST'], '/checkout', function (Request $request) {
                 ->withInput();
         }
 
+        $order = CheckoutOrder::query()->create([
+            'external_id' => $externalId,
+            'status' => 'CREATED',
+            'type' => 'katalog',
+            'customer_name' => (string) $request->input('full_name'),
+            'customer_email' => (string) $request->input('email'),
+            'customer_phone' => (string) $request->input('phone'),
+            'address' => (string) $request->input('address'),
+            'city' => (string) $request->input('city'),
+            'province' => (string) $request->input('province'),
+            'postal_code' => (string) $request->input('postal_code'),
+            'destination_id' => (int) $request->input('destination_id', 0) ?: null,
+            'shipping_id' => $shippingMethod,
+            'shipping_cost' => $shippingPrice,
+            'subtotal' => $subtotal,
+            'total' => $amount,
+            'items' => $items,
+            'notes' => (string) $request->input('notes', ''),
+        ]);
+
         $fullName = trim((string) $request->input('full_name'));
         $nameParts = preg_split('/\s+/', $fullName, -1, PREG_SPLIT_NO_EMPTY) ?: [];
         $givenNames = trim((string) ($nameParts[0] ?? $fullName));
@@ -314,6 +345,7 @@ Route::match(['GET', 'POST'], '/checkout', function (Request $request) {
             'currency' => 'IDR',
             'description' => 'Pembayaran pesanan ' . $externalId,
             'invoice_duration' => 86400,
+            'callback_url' => route('webhooks.xendit.invoice'),
             'success_redirect_url' => url('/checkout') . '?' . http_build_query([
                 'checkout_success' => '1',
                 'type' => 'katalog',
@@ -354,6 +386,18 @@ Route::match(['GET', 'POST'], '/checkout', function (Request $request) {
                 ->withErrors(['payment_method' => 'Response Xendit tidak valid (invoice_url kosong).'])
                 ->withInput();
         }
+
+        PaymentInvoice::query()->create([
+            'provider' => 'xendit',
+            'checkout_order_id' => $order->id,
+            'external_id' => $externalId,
+            'invoice_id' => (string) ($response->json('id') ?? $response->json('invoice_id') ?? ''),
+            'status' => (string) ($response->json('status') ?? ''),
+            'amount' => $amount,
+            'invoice_url' => $invoiceUrl,
+            'expiry_date' => $response->json('expiry_date'),
+            'raw_payload' => $response->json(),
+        ]);
 
         return redirect()->away($invoiceUrl);
     }

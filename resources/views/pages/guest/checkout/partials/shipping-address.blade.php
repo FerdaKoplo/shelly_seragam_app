@@ -1,12 +1,12 @@
-<div class="space-y-4">
+<div class="space-y-4" data-cy="shipping-section">
     <h2 class="text-xl font-bold">Alamat Pengiriman</h2>
     
     <div class="grid grid-cols-2 gap-3">
         <div class="col-span-2">
-            <input type="text" name="address" placeholder="Alamat Jalan"
+            <input   data-cy="input-address" type="text" name="address" placeholder="Alamat Jalan"
                 x-model="address.address" @input="delete errors.address"
                 class="w-full bg-gray-100 border-none rounded-xl p-4 focus:ring-2 focus:ring-black transition">
-            <p x-show="errors.address" x-text="errors.address" class="mt-1 text-sm text-red-600"></p>
+            <p x-show="errors.address" data-cy="error-address" x-text="errors.address" class="mt-1 text-sm text-red-600"></p>
         </div>
 
         <div class="col-span-2">
@@ -14,6 +14,7 @@
                 <input
                     type="text"
                     name="city"
+                    data-cy="input-destination"
                     placeholder="Kota / Kecamatan"
                     x-model="destinationQuery"
                     @input="delete errors.city; searchDestinations()"
@@ -21,11 +22,12 @@
                     autocomplete="off"
                     class="w-full bg-gray-100 border-none rounded-xl p-4 focus:ring-2 focus:ring-black transition">
 
-                <div
+                <div data-cy="destination-results"
                     x-show="destinationResults.length > 0"
                     class="absolute z-10 mt-2 w-full bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden max-h-64 overflow-y-auto">
                     <template x-for="dest in destinationResults" :key="dest.id || dest.destination_id || dest.label">
                         <button
+                            data-cy="destination-option"
                             type="button"
                             class="w-full text-left px-4 py-3 hover:bg-gray-50"
                             @click="selectDestination(dest)">
@@ -35,21 +37,21 @@
                     </template>
                 </div>
             </div>
-            <p x-show="errors.city" x-text="errors.city" class="mt-1 text-sm text-red-600"></p>
+            <p x-show="errors.city" x-text="errors.city"  data-cy="error-city" class="mt-1 text-sm text-red-600"></p>
         </div>
 
         <div>
-            <input type="text" name="province" placeholder="Provinsi"
+            <input type="text" name="province" placeholder="Provinsi" data-cy="input-province"
                 x-model="address.province" @input="delete errors.province"
                 class="w-full bg-gray-100 border-none rounded-xl p-4 focus:ring-2 focus:ring-black">
-            <p x-show="errors.province" x-text="errors.province" class="mt-1 text-sm text-red-600"></p>
+            <p x-show="errors.province" data-cy="error-province" x-text="errors.province" class="mt-1 text-sm text-red-600"></p>
         </div>
 
         <div>
-            <input type="text" name="postal_code" placeholder="Kode Pos"
+            <input type="text" name="postal_code" placeholder="Kode Pos" data-cy="input-postal-code"
                 x-model="address.postal_code" @input="delete errors.postal_code"
                 class="w-full bg-gray-100 border-none rounded-xl p-4 focus:ring-2 focus:ring-black">
-            <p x-show="errors.postal_code" x-text="errors.postal_code" class="mt-1 text-sm text-red-600"></p>
+            <p x-show="errors.postal_code" data-cy="error-postal-code" x-text="errors.postal_code" class="mt-1 text-sm text-red-600"></p>
         </div>
     </div>
 
@@ -60,11 +62,12 @@
             Lengkapi alamat pengiriman yang valid untuk melihat opsi pengiriman, durasi, dan ongkir.
         </div>
 
-        <div x-show="isAddressValid" class="flex flex-wrap gap-3">
+        <div data-cy="shipping-options" x-show="isAddressValid" class="flex flex-wrap gap-3">
             <template x-for="option in shippingOptions" :key="option.id">
                 <button
                     type="button"
                     @click="selectShipping(option)"
+                      data-cy="shipping-option"
                     :class="shippingMethod === option.id ? 'border-black bg-black text-white' : 'border-gray-200 bg-white text-gray-600 hover:border-gray-400'"
                     class="flex-1 min-w-[160px] border-2 py-4 px-6 rounded-xl text-sm font-bold transition-all duration-200 flex flex-col items-center gap-1">
 
@@ -77,7 +80,7 @@
     </div>
 
     {{-- Hidden input to ensure the selected method is sent to the server --}}
-    <input type="hidden" name="shipping_id" :value="shippingMethod">
-    <input type="hidden" name="destination_id" :value="destinationId">
+    <input type="hidden" name="shipping_id" :value="shippingMethod" data-cy="shipping-id">
+    <input type="hidden" name="destination_id" :value="destinationId" data-cy="destination-id">
     <p x-show="errors.shipping_id" x-text="errors.shipping_id" class="text-sm text-red-600"></p>
 </div>

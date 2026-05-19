@@ -24,7 +24,7 @@ class VoucherCustomerTest extends TestCase
 
         $response->assertSessionHasErrors('code');
     }
-
+    
     /** TC-WBT-CUS006-TDD-02 */
     public function test_apply_expired_voucher()
     {

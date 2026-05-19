@@ -2,7 +2,7 @@
         show: false, 
         message: 'Something went wrong', 
         title: 'Error',
-        type: ''
+        type: 'error'
     }" x-init="
         @if($errors->any())
             show = true;
@@ -20,13 +20,13 @@
         });
     " x-show="show" x-transition.opacity.duration.300ms style="display: none;" id="notificationOverlay"
     class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-    <div @click.outside="show = false" :class="type === 'success' ? 'bg-green-100' : 'bg-warningSecondary'"
+    <div  data-cy="notification-modal" @click.outside="show = false" :class="type === 'success' ? 'bg-green-100' : 'bg-warningSecondary'"
         class="relative w-[400px] rounded-2xl shadow-xl p-8 py-12 flex flex-col items-center justify-center text-center">
         <button id="btnDismiss" @click="show = false" :class="type === 'success' ? 'text-green-600' : 'text-warningPrimary'"
             class="absolute top-1 font-semibold right-4 hover:opacity-75 transition">
             <p class="font-inter">X</p>
         </button>
-        <h2 :class="type === 'success' ? 'text-green-600' : 'text-warningPrimary'"
+        <h2 data-cy="notification-message" :class="type === 'success' ? 'text-green-600' : 'text-warningPrimary'"
             class="font-semibold text-xl tracking-wide" x-text="message"></h2>
     </div>
 </div>
