@@ -21,7 +21,8 @@
     <x-shared.button variant="outline"
         data-cy="btn-whatsapp"
         class="bg-white w-full sm:w-auto sm:min-w-[320px] px-8 py-3 shadow-lg flex items-center justify-center gap-2"
-        href="https://wa.me/6287893385014?text=Halo%20Shelly%20Seragam%2C%20saya%20ingin%20konsultasi%2Fbikin%20seragam."
+        href="https://wa.me/{{ config('services.whatsapp.number') }}?text=Halo%20Shelly%20Seragam%2C%20saya%20ingin%20konsultasi%2Fbikin%20seragam."
+        {{-- href="https://wa.me/6287893385014?text=Halo%20Shelly%20Seragam%2C%20saya%20ingin%20konsultasi%2Fbikin%20seragam." --}}
         target="_blank" rel="noopener noreferrer" aria-label="Hubungi Shelly Seragam via WhatsApp">
         Hubungi Kami
         <span class="text-green-500 text-xl">

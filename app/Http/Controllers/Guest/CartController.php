@@ -41,13 +41,28 @@ class CartController extends Controller
 
     public function add(Request $request, int $katalog_id)
     {
-        $qty = max(1, (int) $request->input('quantity', 1));
+        // $qty = max(1, (int) $request->input('quantity', 1));
+        // $size = $request->input('size');
+        // $color = $request->input('color');
+        // $mode = $request->input('mode');
+        // $stok = $request->input('stok');
+
+        $request->validate([
+            'quantity' => 'required|integer|min:1',
+        ], [
+            'quantity.min' => 'Kuantitas harus lebih dari 0',
+        ]);
+
+        $qty = (int) $request->input('quantity');
+        
         $size = $request->input('size');
         $color = $request->input('color');
         $mode = $request->input('mode');
         $stok = $request->input('stok');
 
         $katalog = ProdukKatalog::with(['produk', 'fotos'])->findOrFail($katalog_id);
+
+        // $katalog = ProdukKatalog::with(['produk', 'fotos'])->findOrFail($katalog_id);
 
         $name = $katalog->produk->nama_produk
             ?? $katalog->produk->nama

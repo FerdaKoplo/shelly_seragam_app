@@ -4,7 +4,7 @@
 @section('content')
 <x-shared.notification />
     <div class="px-6 pb-12">
-        <a href="{{ route('manage.voucher') }}"
+        <a  data-cy="back-to-voucher-page" href="{{ route('manage.voucher') }}"
             class="flex items-center gap-4 text-sm mb-8 w-fit hover:opacity-75 transition">
             <svg width="30" height="30" viewBox="0 0 41 41" fill="none">
                 <path d="M35.875 18.7917H11.6679L17.7837 12.6587L15.375 10.25L5.125 20.5L15.375 30.75L17.7837 28.3413L11.6679 22.2083H35.875V18.7917Z" fill="#323232" />
@@ -12,7 +12,7 @@
             <h1 class="font-roboto font-bold text-2xl text-[#323232]">Edit Voucher</h1>
         </a>
 
-        <form action="{{ route('manage.voucher.update', $voucher->id) }}" method="POST" class="grid grid-cols-1 lg:grid-cols-12 gap-28">
+        <form data-cy="edit-voucher-form" action="{{ route('manage.voucher.update', $voucher->id) }}" method="POST" class="grid grid-cols-1 lg:grid-cols-12 gap-28">
             @csrf
             @method('PUT')
 
@@ -22,7 +22,7 @@
                 <div class="flex flex-col gap-2">
                     <label class="font-bold text-gray-900">Deskripsi Voucher</label>
                     <div class="relative">
-                        <textarea name="deskripsi" rows="5" placeholder="Tambahkan Deskripsi Syarat & Ketentuan"
+                        <textarea data-cy="voucher-description-input" name="deskripsi" rows="5" placeholder="Tambahkan Deskripsi Syarat & Ketentuan"
                             class="w-full border border-black rounded-md p-4 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-black resize-none"
                             required>{{ old('deskripsi', $voucher->deskripsi) }}</textarea>
                         <span class="absolute top-4 right-4 text-red-500 text-xl">*</span>
@@ -33,7 +33,7 @@
                     <div class="flex flex-col gap-2">
                         <label class="font-bold text-gray-900">Tanggal Mulai</label>
                         <div class="relative">
-                            <input type="date" name="tanggal_mulai" value="{{ old('tanggal_mulai', \Carbon\Carbon::parse($voucher->tanggal_mulai)->format('Y-m-d')) }}"
+                            <input data-cy="voucher-start-date-input"  type="date" name="tanggal_mulai" value="{{ old('tanggal_mulai', \Carbon\Carbon::parse($voucher->tanggal_mulai)->format('Y-m-d')) }}"
                                 class="w-full border border-black rounded-md px-4 py-3 text-black focus:outline-none focus:ring-1 focus:ring-black"
                                 required>
                             <span class="absolute top-2 right-2 text-red-500 text-xl">*</span>
@@ -43,7 +43,7 @@
                     <div class="flex flex-col gap-2">
                         <label class="font-bold text-gray-900">Tanggal Berakhir</label>
                         <div class="relative">
-                            <input type="date" name="tanggal_berakhir" value="{{ old('tanggal_berakhir', \Carbon\Carbon::parse($voucher->tanggal_berakhir)->format('Y-m-d')) }}"
+                            <input data-cy="voucher-end-date-input" type="date" name="tanggal_berakhir" value="{{ old('tanggal_berakhir', \Carbon\Carbon::parse($voucher->tanggal_berakhir)->format('Y-m-d')) }}"
                                 class="w-full border border-black rounded-md px-4 py-3 text-black focus:outline-none focus:ring-1 focus:ring-black"
                                 required>
                             <span class="absolute top-2 right-2 text-red-500 text-xl">*</span>
@@ -54,9 +54,9 @@
                 <div class="flex flex-col gap-2">
                     <label class="font-bold text-gray-900">Jenis Voucher</label>
                     <div class="relative">
-                        <select name="jenis_voucher" class="w-full border border-black rounded-md px-4 py-3 focus:outline-none focus:ring-1 focus:ring-black appearance-none" required>
-                            <option value="nominal" {{ old('jenis_voucher', $voucher->jenis_voucher) == 'nominal' ? 'selected' : '' }}>Nominal (Rp)</option>
-                            <option value="persentase" {{ old('jenis_voucher', $voucher->jenis_voucher) == 'persentase' ? 'selected' : '' }}>Persentase (%)</option>
+                        <select data-cy="voucher-type-select" name="jenis_voucher" class="w-full border border-black rounded-md px-4 py-3 focus:outline-none focus:ring-1 focus:ring-black appearance-none" required>
+                            <option data-cy="voucher-type-nominal" value="nominal" {{ old('jenis_voucher', $voucher->jenis_voucher) == 'nominal' ? 'selected' : '' }}>Nominal (Rp)</option>
+                            <option data-cy="voucher-type-persentase" value="persentase" {{ old('jenis_voucher', $voucher->jenis_voucher) == 'persentase' ? 'selected' : '' }}>Persentase (%)</option>
                         </select>
                         <div class="pointer-events-none absolute inset-y-0 right-4 flex items-center px-2 text-gray-700">
                             <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
@@ -73,7 +73,7 @@
                     <div class="flex flex-col gap-2">
                         <label class="font-bold text-gray-900">Nama Voucher</label>
                         <div class="relative">
-                            <input type="text" name="nama_voucher" value="{{ old('nama_voucher', $voucher->nama_voucher) }}" placeholder="Contoh: Promo Akhir Tahun"
+                            <input type="text" data-cy="voucher-name-input" name="nama_voucher" value="{{ old('nama_voucher', $voucher->nama_voucher) }}" placeholder="Contoh: Promo Akhir Tahun"
                                 class="w-full border border-black rounded-md px-4 py-3 text-lg font-bold placeholder-black focus:outline-none focus:ring-1 focus:ring-black"
                                 required>
                             <span class="absolute top-2 right-2 text-red-500 text-xl">*</span>
@@ -83,7 +83,7 @@
                     <div class="flex flex-col gap-2">
                         <label class="font-bold text-gray-900">Kode Voucher <span class="text-sm font-normal text-gray-500">(Kosongkan untuk generate otomatis)</span></label>
                         <div class="relative">
-                            <input type="text" name="kode_voucher" value="{{ old('kode_voucher', $voucher->kode_voucher) }}" placeholder="KODE-CUSTOM"
+                            <input type="text" data-cy="voucher-code-input" name="kode_voucher" value="{{ old('kode_voucher', $voucher->kode_voucher) }}" placeholder="KODE-CUSTOM"
                                 class="w-full border border-black rounded-md px-4 py-3 text-lg font-mono uppercase placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-black">
                         </div>
                         @error('kode_voucher')
@@ -94,7 +94,7 @@
                     <div class="flex flex-col gap-2 mt-2">
                         <label class="font-bold text-gray-900">Nilai Diskon</label>
                         <div class="relative">
-                            <input type="number" name="nilai_diskon" value="{{ old('nilai_diskon', $voucher->nilai_diskon) }}" placeholder="0"
+                            <input data-cy="voucher-discount-input" onkeydown="if(event.key === '-') event.preventDefault();" type="number" name="nilai_diskon" value="{{ old('nilai_diskon', $voucher->nilai_diskon) }}" placeholder="0"
                                 class="w-full border border-black rounded-md px-4 py-3 text-4xl font-normal placeholder-black focus:outline-none focus:ring-1 focus:ring-black"
                                 required>
                             <span class="absolute top-2 right-2 text-red-500 text-xl">*</span>
@@ -103,7 +103,7 @@
 
                 </div>
 
-                <button type="submit" id="submitVoucher"
+                <button type="submit" id="submitVoucher" data-cy="btn-submit-voucher"
                     class="w-full bg-[#323232] text-white py-4 rounded-md font-bold text-lg hover:opacity-90 transition shadow-lg mt-8">
                     Perbarui Voucher
                 </button>

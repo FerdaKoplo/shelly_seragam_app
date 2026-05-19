@@ -26,7 +26,7 @@
                     Lihat di Google Maps <span aria-hidden="true">📍</span>
                 </x-shared.button>
 
-                <x-shared.button variant="outline" class="justify-between text-sm"
+                <x-shared.button variant="outline" class="justify-between text-sm" data-cy="btn-whatsapp-location"
                     href="https://wa.me/6287893385014?text=Halo%20Shelly%20Seragam%2C%20saya%20ingin%20konsultasi."
                     target="_blank" rel="noopener noreferrer" aria-label="Hubungi Shelly Seragam via WhatsApp">
                     Hubungi Kami <span aria-hidden="true">💬</span>

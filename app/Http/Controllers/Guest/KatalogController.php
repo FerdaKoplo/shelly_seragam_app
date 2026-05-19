@@ -49,7 +49,6 @@ class KatalogController extends Controller
             }
         }
 
-        // 4. FILTER BARU: Pakaian Untuk (Pria / Wanita)
         if ($request->filled('filter_gender')) {
             $query->whereHas('produk.detailProduks', function ($q) use ($request) {
                 // Asumsi nama atribut di DB adalah 'Pakaian Untuk' atau 'Gender'
