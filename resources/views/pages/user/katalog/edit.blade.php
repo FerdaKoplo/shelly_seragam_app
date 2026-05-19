@@ -166,7 +166,7 @@
                             </button>
                         </div>
 
-                        <div x-show="variations.filter(i => i.type === 'ukuran').length > 0"
+                        <div x-show="variations.filter(i => i.type === 'ukuran').length > 0" data-cy="size-item"
                             class="flex flex-wrap gap-2 mb-4">
                             <template x-for="(v, i) in variations" :key="i">
                                 <template x-if="v.type === 'ukuran'">
