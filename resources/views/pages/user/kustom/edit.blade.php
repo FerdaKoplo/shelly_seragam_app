@@ -87,17 +87,17 @@
                             <div class="w-full border-b border-black"></div>
                         </div>
 
-                        <div x-show="sec.showKombinasi" x-transition:enter="transition ease-out duration-200"
+                        <div x-show="sec.showKombinasi" x-transition:enter="transition ease-out duration-200" data-cy="kombinasi-section"
                             class="border-2 border-dashed border-gray-300 rounded-xl p-4 md:p-6 flex flex-col gap-5 relative bg-white">
 
                             <button type="button" @click="sec.showKombinasi = false"
-                                class="absolute top-3 right-4 text-gray-400 hover:text-black font-bold text-lg p-2">×</button>
+                                class="absolute top-3 right-4 text-gray-400 hover:text-black font-bold text-lg p-2">X</button>
 
                             <h3 class="text-xl md:text-2xl font-bold pr-8">Kombinasi Jenis Kain</h3>
 
                             <div class="flex gap-2 md:gap-3 flex-wrap items-center">
                                 @foreach($allCounts as $n)
-                                    <button type="button" @click="toggleCount(sIdx, {{ $n }})"
+                                    <button type="button" @click="toggleCount(sIdx, {{ $n }})"  data-cy="toggle-kombinasi-{{ $n }}"
                                         :class="sec.enabledCounts.includes({{ $n }}) ? 'bg-black text-white border-black' : 'bg-white text-black border-gray-300'"
                                         class="relative px-3 md:px-4 py-2 border rounded-lg text-xs md:text-sm font-medium transition-colors">
                                         {{ $n }} Kombinasi
@@ -126,7 +126,7 @@
                             </div>
                         </div>
 
-                        <div x-show="sec.showBordir" x-transition:enter="transition ease-out duration-200"
+                        <div x-show="sec.showBordir" x-transition:enter="transition ease-out duration-200" data-cy="bordir-section"
                             class="border-2 border-dashed border-gray-300 rounded-xl p-4 md:p-6 flex flex-col gap-4 relative bg-white">
 
                             <button type="button" @click="sec.showBordir = false"
