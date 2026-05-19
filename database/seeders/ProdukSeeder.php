@@ -3,7 +3,7 @@
 namespace Database\Seeders;
 
 use Carbon\Carbon;
-use Illuminate\Support\Facades\DB;
+use DB;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Faker\Factory as Faker;

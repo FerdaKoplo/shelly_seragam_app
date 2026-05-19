@@ -3,8 +3,8 @@
 @section('content')
 
 <div class="flex-col bg-gray-50 min-h-screen"
-    x-data="{
-        showForm: false,
+    x-data="{ 
+        showForm: false, 
         isEdit: false,
         actionUrl: '{{ route('manage.pegawai.store') }}',
         formData: {

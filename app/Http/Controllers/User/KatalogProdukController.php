@@ -8,10 +8,10 @@ use App\Models\FotoProdukKatalog;
 use App\Models\PilihanDetailProduk;
 use App\Models\Produk;
 use App\Models\ProdukKatalog;
-use Illuminate\Support\Facades\DB;
+use DB;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
+use Log;
+use Storage;
 
 class KatalogProdukController extends Controller
 {

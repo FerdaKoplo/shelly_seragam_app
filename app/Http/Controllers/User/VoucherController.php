@@ -7,7 +7,7 @@ use App\Models\Voucher;
 use Date;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
-use Illuminate\Support\Str;
+use Str;
 
 class VoucherController extends Controller
 {
