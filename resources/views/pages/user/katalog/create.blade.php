@@ -206,7 +206,7 @@
                             </template>
                         </div>
 
-                        <button type="button" @click="$dispatch('open-modal', 'modal-color-variation')"
+                        <button type="button" @click="$dispatch('open-modal', 'modal-color-variation')" data-cy="open-color-modal"
                             class="w-full border-2 border-dashed border-gray-300 rounded-full py-2 text-gray-500 text-sm hover:border-gray-400 hover:bg-gray-50 transition">
                             Tambahkan Variasi Warna
                         </button>
