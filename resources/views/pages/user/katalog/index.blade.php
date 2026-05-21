@@ -37,7 +37,7 @@
                     $photoUrl = $firstPhoto ? asset('storage/' . $firstPhoto->path) : asset('images/default-product.jpg');
                 @endphp
 
-                <div data-cy="produk-card" class="bg-white shadow-md rounded-2xl relative group  transition-all duration-300 flex flex-col border border-gray-100">
+                <div data-cy="produk-card" + data-archived="{{ $isArchived }}" class="bg-white shadow-md rounded-2xl relative group  transition-all duration-300 flex flex-col border border-gray-100">
 
                     @if($isArchived)
                         <form action="{{ route('manage.katalog.restore', $item->produk_id) }}" method="POST" class="absolute top-2 right-2 z-20">

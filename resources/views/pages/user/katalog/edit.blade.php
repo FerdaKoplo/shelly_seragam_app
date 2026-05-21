@@ -170,7 +170,7 @@
                             class="flex flex-wrap gap-2 mb-4">
                             <template x-for="(v, i) in variations" :key="i">
                                 <template x-if="v.type === 'ukuran'">
-                                    <div
+                                    <div data-cy="size-item"
                                         class="bg-gray-100 border border-gray-300 px-3 py-1.5 rounded-md text-xs md:text-sm flex items-center gap-2">
                                         <span class="font-medium" x-text="v.name"></span>
                                         <span class="text-xs text-gray-500" x-text="`(${v.chest}/${v.sleeve})`"></span>
@@ -217,6 +217,7 @@
 
                 <div class="flex flex-col gap-3 pt-4">
                     <button type="submit"
+                    id="btn-simpan-perubahan"
                         class="w-full bg-[#323232] text-white py-4 rounded-md font-bold hover:opacity-90 transition shadow-lg">
                         Simpan Perubahan
                     </button>

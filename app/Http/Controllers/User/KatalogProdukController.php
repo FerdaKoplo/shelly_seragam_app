@@ -53,7 +53,7 @@ class KatalogProdukController extends Controller
                     $query->where('status', 'Arsip');
                     break;
                 default:
-                    $query->where('stok', '>=', 0);
+                    $query->where('stok', '>=', 0)->where('status', 'Tersedia');
                     break;
             }
         } else {
