@@ -93,7 +93,7 @@
 
                             <div class="flex gap-2 md:gap-3 flex-wrap items-center">
                                 @foreach($allCounts as $n)
-                                    <button type="button" @click="toggleCount(sIdx, {{ $n }})"
+                                    <button data-cy="toggle-kombinasi-{{ $n }}" type="button" @click="toggleCount(sIdx, {{ $n }})"
                                         :class="sec.enabledCounts.includes({{ $n }}) ? 'bg-black text-white border-black' : 'bg-white text-black border-gray-300'"
                                         class="relative px-3 md:px-4 py-2 border rounded-lg text-xs md:text-sm font-medium transition-colors">
                                         {{ $n }} Kombinasi
@@ -143,7 +143,7 @@
                             </div>
                         </div>
 
-                        <button type="button" @click="tambahAspek(sIdx)" x-show="!sec.showKombinasi || !sec.showBordir"
+                        <button type="button" @click="tambahAspek(sIdx)" x-show="!sec.showKombinasi || !sec.showBordir" data-cy="btn-add-aspek-utama"
                             class="w-full border border-dashed border-gray-400 rounded-xl py-4 md:py-6 text-sm text-gray-500 hover:bg-gray-50 transition font-medium">
                             + Tambahkan Aspek Utama
                         </button>

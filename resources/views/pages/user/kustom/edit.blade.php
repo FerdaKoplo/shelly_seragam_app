@@ -97,7 +97,7 @@
 
                             <div class="flex gap-2 md:gap-3 flex-wrap items-center">
                                 @foreach($allCounts as $n)
-                                    <button type="button" @click="toggleCount(sIdx, {{ $n }})"
+                                    <button data-cy="toggle-kombinasi-{{ $n }}" type="button" @click="toggleCount(sIdx, {{ $n }})"
                                         :class="sec.enabledCounts.includes({{ $n }}) ? 'bg-black text-white border-black' : 'bg-white text-black border-gray-300'"
                                         class="relative px-3 md:px-4 py-2 border rounded-lg text-xs md:text-sm font-medium transition-colors">
                                         {{ $n }} Kombinasi
