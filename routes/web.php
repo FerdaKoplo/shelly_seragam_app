@@ -16,6 +16,7 @@ use App\Http\Controllers\Webhooks\XenditWebhookController;
 use App\Models\CheckoutOrder;
 use App\Models\ProdukKatalog;
 use App\Models\PaymentInvoice;
+use App\Services\CheckoutTransaksiService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
@@ -319,9 +320,12 @@ Route::match(['GET', 'POST'], '/checkout', function (Request $request) {
             'shipping_cost' => $shippingPrice,
             'subtotal' => $subtotal,
             'total' => $amount,
-            'items' => $items,
+            'items' => $katalogItems,
             'notes' => (string) $request->input('notes', ''),
         ]);
+
+        // Mirror checkout order into "transaksi" so it appears in admin "Manage Transaksi".
+        app(CheckoutTransaksiService::class)->ensureTransaksiFromCheckoutOrder($order);
 
         $fullName = trim((string) $request->input('full_name'));
         $nameParts = preg_split('/\s+/', $fullName, -1, PREG_SPLIT_NO_EMPTY) ?: [];
@@ -414,6 +418,35 @@ Route::match(['GET', 'POST'], '/checkout', function (Request $request) {
             'shipping_id',
         ])
     ) {
+        $externalId = 'ORDER-' . now()->format('YmdHis') . '-' . Str::upper(Str::random(6));
+
+        $order = CheckoutOrder::query()->create([
+            'external_id' => $externalId,
+            'status' => 'CREATED',
+            'type' => 'kustom',
+            'customer_name' => (string) $request->input('full_name'),
+            'customer_email' => (string) $request->input('email'),
+            'customer_phone' => (string) $request->input('phone'),
+            'address' => (string) $request->input('address'),
+            'city' => (string) $request->input('city'),
+            'province' => (string) $request->input('province'),
+            'postal_code' => (string) $request->input('postal_code'),
+            'destination_id' => (int) $request->input('destination_id', 0) ?: null,
+            'shipping_id' => (string) $request->input('shipping_id', ''),
+            'shipping_cost' => 0,
+            'subtotal' => (int) ($mockCustomData['price'] ?? 0),
+            'total' => (int) ($mockCustomData['price'] ?? 0),
+            'items' => [
+                'category' => $mockCustomData['type'] ?? 'kustom',
+                'total_quantity' => (int) $request->input('total_quantity', 1),
+                'size' => $mockCustomData['size'] ?? null,
+                'attachments' => $mockCustomData['attachments'] ?? [],
+            ],
+            'notes' => $checkoutNotes,
+        ]);
+
+        app(CheckoutTransaksiService::class)->ensureTransaksiFromCheckoutOrder($order);
+
         return redirect()->route('checkout', ['type' => 'kustom'])
             ->with('success', $orderSuccessMessage);
     }

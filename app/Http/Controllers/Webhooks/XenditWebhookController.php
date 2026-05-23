@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Webhooks;
 use App\Http\Controllers\Controller;
 use App\Models\CheckoutOrder;
 use App\Models\PaymentInvoice;
+use App\Services\CheckoutTransaksiService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -56,6 +57,8 @@ class XenditWebhookController extends Controller
                 $order->status = 'PAID';
                 $order->paid_at = $invoice->paid_at;
                 $order->save();
+
+                app(CheckoutTransaksiService::class)->ensureTransaksiFromCheckoutOrder($order);
             }
         }
 
