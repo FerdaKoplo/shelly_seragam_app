@@ -82,5 +82,5 @@
     {{-- Hidden input to ensure the selected method is sent to the server --}}
     <input type="hidden" name="shipping_id" :value="shippingMethod" data-cy="shipping-id">
     <input type="hidden" name="destination_id" :value="destinationId" data-cy="destination-id">
-    <p x-show="errors.shipping_id" x-text="errors.shipping_id" class="text-sm text-red-600"></p>
+    <p x-show="errors.shipping_id" data-cy="error-shipping-method" x-text="errors.shipping_id" class="text-sm text-red-600"></p>
 </div>

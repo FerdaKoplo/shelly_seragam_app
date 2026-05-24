@@ -81,6 +81,7 @@ class KelolaTransaksiController extends Controller
 
 
         $validated['tanggal_transaksi'] = date('Y-m-d', strtotime($validated['tanggal_transaksi']));
+        $validated['pegawai_id'] = optional($request->user())->user_id;
 
         Transaksi::create($validated);
 
