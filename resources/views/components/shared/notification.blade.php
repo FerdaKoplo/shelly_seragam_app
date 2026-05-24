@@ -4,9 +4,10 @@
         title: 'Error',
         type: 'error'
     }" x-init="
-        @if($errors->any())
+        @if(session('error'))
             show = true;
-            message = '{{ $errors->first() ?: 'Lengkapi Semua Data' }}';
+            message = @js(session('error'));
+            type = 'error';
         @endif
         @if(session('success'))
             show = true;

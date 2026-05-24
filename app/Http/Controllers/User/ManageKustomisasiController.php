@@ -176,7 +176,12 @@ class ManageKustomisasiController extends Controller
             if ($isInUse) {
                 return back()->with('error', 'Aspek tidak dapat dihapus karena masih digunakan oleh transaksi aktif');
             }
-            $kustom->produk->delete();
+
+            if ($kustom->produk) {
+                $kustom->produk->delete();
+            }
+
+            $kustom->delete();
             return redirect()->route('manage.kustom')->with('success', 'Produk kustom berhasil dihapus.');
         } catch (\Exception $e) {
             Log::error('Destroy kustom gagal', ['error' => $e->getMessage()]);

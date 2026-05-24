@@ -11,20 +11,27 @@
                 $sections = $kustoms->pluck('spesifikasi_khusus')->unique()->values()->toArray();
             @endphp
 
+
+            {{-- @if (session('error'))
+                <div class="p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50" role="alert">
+                    {{ session('error') }}
+                </div>
+            @endif --}}
+
             <div class="w-full" x-data="{ active: '{{ $sections[0] ?? '' }}' }">
 
                 <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
                     <div
                         class="border border-black py-2 md:py-3 rounded-2xl px-3 md:px-4 gap-3 md:gap-4 flex overflow-x-auto custom-scrollbar">
-                        <a  data-cy="btn-add-kustom" href="{{ route('manage.kustom.create') }}"
+                        <a data-cy="btn-add-kustom" href="{{ route('manage.kustom.create') }}"
                             class="inline-flex items-center justify-center py-1.5 px-6 md:px-14 bg-white border border-dashed border-black text-black rounded-lg font-medium text-lg hover:bg-gray-50 transition shrink-0">
                             +
                         </a>
 
                         @foreach($sections as $sec)
                             <button data-cy="section-tab-{{ $sec }}'" @click="active = '{{ $sec }}'" :class="active === '{{ $sec }}'
-                                            ? 'bg-black text-white border-black'
-                                            : 'bg-white text-black border-gray-300 hover:border-black'"
+                                                    ? 'bg-black text-white border-black'
+                                                    : 'bg-white text-black border-gray-300 hover:border-black'"
                                 class="px-6 md:px-10 py-1.5 border rounded-lg text-base md:text-lg font-medium transition-colors whitespace-nowrap shrink-0">
                                 {{ $sec }}
                             </button>
@@ -67,9 +74,9 @@
                                     </a>
 
                                     <button data-cy="btn-delete-kustom" type="button" @click="$dispatch('open-delete-modal', { 
-                                                        url: '{{ route('manage.katalog.destroy', $kustom->kustom_id) }}', 
-                                                        message: 'Apa Anda yakin ingin menghapus section {{ $kustom->spesifikasi_khusus }}?'
-                                                    })"
+                                                                    url: '{{ route('manage.kustom.destroy', $kustom->kustom_id) }}',
+                                                                    message: 'Apa Anda yakin ingin menghapus section {{ $kustom->spesifikasi_khusus }}?'
+                                                                })"
                                         class="flex-1 md:flex-none px-4 py-2 font-bold rounded-lg hover:bg-red-700 hover:text-white transition text-sm text-red-600 md:text-black">
                                         Hapus
                                     </button>
