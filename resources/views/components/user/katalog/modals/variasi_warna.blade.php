@@ -70,6 +70,7 @@
 
         <div class="mt-6">
             <button @click="submitColor()" type="button"
+            data-cy="btn-submit-color-variation"
                 class="w-full rounded-md bg-[#323232] py-3 text-sm font-medium text-white shadow-sm hover:opacity-90 focus:outline-none">
                 Simpan
             </button>

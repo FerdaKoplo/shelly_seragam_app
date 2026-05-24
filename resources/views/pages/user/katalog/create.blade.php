@@ -172,7 +172,7 @@
 
                         <div class="flex flex-wrap gap-2 mb-3">
                             <template x-for="(v, i) in variations.filter(item => item.type === 'ukuran')" :key="i">
-                                <div
+                                <div data-cy="size-item"
                                     class="bg-gray-100 border border-gray-300 px-3 py-1 rounded-full text-xs md:text-sm flex items-center gap-2">
                                     <span x-text="v.name"></span>
                                     <span class="text-xs text-gray-500" x-text="`(${v.chest}/${v.sleeve})`"></span>
@@ -182,7 +182,7 @@
                             </template>
                         </div>
 
-                        <button type="button" @click="$dispatch('open-modal', 'modal-size-variation')"
+                        <button type="button" data-cy="open-size-modal" @click="$dispatch('open-modal', 'modal-size-variation')"
                             class="w-full border-2 border-dashed border-gray-300 rounded-full py-2 text-gray-500 text-sm hover:border-gray-400 hover:bg-gray-50 transition">
                             Tambahkan Variasi Ukuran
                         </button>
@@ -206,7 +206,7 @@
                             </template>
                         </div>
 
-                        <button type="button" @click="$dispatch('open-modal', 'modal-color-variation')"
+                        <button type="button" @click="$dispatch('open-modal', 'modal-color-variation')" data-cy="open-color-modal"
                             class="w-full border-2 border-dashed border-gray-300 rounded-full py-2 text-gray-500 text-sm hover:border-gray-400 hover:bg-gray-50 transition">
                             Tambahkan Variasi Warna
                         </button>
