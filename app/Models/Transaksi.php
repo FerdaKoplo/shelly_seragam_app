@@ -46,4 +46,10 @@ class Transaksi extends Model
     }
 
 
+
+    public function paymentInvoice()
+    {
+        // Points to the PaymentInvoice using checkout_external_id matched against external_id
+        return $this->hasOne(PaymentInvoice::class, 'external_id', 'checkout_external_id');
+    }
 }

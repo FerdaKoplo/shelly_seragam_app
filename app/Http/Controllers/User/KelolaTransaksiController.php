@@ -19,7 +19,7 @@ class KelolaTransaksiController extends Controller
     public function index(Request $request)
     {
 
-        $query = Transaksi::with(['produkTransaksis.produk', 'orderKustoms.attachments', 'pengiriman', 'user']);
+        $query = Transaksi::with(['produkTransaksis.produk', 'orderKustoms.attachments', 'pengiriman', 'user', 'paymentInvoice']);
 
         if ($request->filled('search')) {
             $search = $request->search;
