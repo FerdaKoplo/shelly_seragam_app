@@ -65,7 +65,7 @@
                                 $isKustom = $trx->orderKustoms->count() > 0;
                                 $tipe = $isKustom ? 'Kustom' : 'Katalog';
                                 $statusBayar = in_array($trx->status, ['Paid', 'Delivered', 'Done']) ? 'Lunas' : 'Belum Lunas';
-                                $statusKirim = $trx->pengiriman ? ucfirst($trx->pengiriman->status_pengiriman) : ($trx->no_resi_customer ? 'Dikirim' : 'Belum Kirim');
+                                $statusKirim = $trx->pengiriman ? ucfirst($trx->pengiriman->status_pengiriman) : ($trx->no_resi_customer != '-' ? 'Dikirim' : 'Belum Kirim');
                             @endphp
                             <tr data-cy="transaksi-row-{{ $trx->transaksi_id }}" class="border-b border-gray-100 hover:bg-gray-50 transition group">
                                 <td data-cy="trx-id-{{ $trx->transaksi_id }}" class="py-3 px-4 text-gray-500">#TRX{{ str_pad($trx->transaksi_id, 3, '0', STR_PAD_LEFT) }}</td>
