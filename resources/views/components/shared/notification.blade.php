@@ -6,7 +6,14 @@
     }" x-init="
         @if($errors->any())
             show = true;
-            message = '{{ $errors->first() ?: 'Lengkapi Semua Data' }}';
+            message = @js($errors->first() ?: 'Lengkapi Semua Data');
+            type = 'error';
+        @endif
+
+        @if(session('error'))
+            show = true;
+            message = @js(session('error'));
+            type = 'error';
         @endif
         @if(session('success'))
             show = true;

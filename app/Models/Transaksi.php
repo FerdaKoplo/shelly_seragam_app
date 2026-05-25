@@ -14,7 +14,8 @@ class Transaksi extends Model
     protected $table = 'transaksi';
 
     protected $fillable = [
-        'user_id',
+        'pegawai_id',
+        'checkout_external_id',
         'nama_customer',
         'no_hp_customer',
         'alamat_customer',
@@ -26,7 +27,7 @@ class Transaksi extends Model
 
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id', 'user_id');
+        return $this->belongsTo(User::class, 'pegawai_id', 'user_id');
     }
 
     public function produkTransaksis()

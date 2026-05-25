@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
+use App\Models\AttachmentTransaksiKustom;
+use App\Models\OrderTransaksiKustom;
 use App\Models\Transaksi;
 use Illuminate\Http\Request;
 
@@ -40,18 +42,18 @@ class KelolaTransaksiController extends Controller
         return view('pages.user.transaksi.index', compact('transaksis'));
     }
 
-    public function searchDestination(Request $request)
-    {
-        $search = $request->query('q');
-        
-        if (empty($search) || strlen($search) < 3) {
-            return response()->json([]);
-        }
+    // public function searchDestination(Request $request)
+    // {
+    //     $search = $request->query('q');
 
-        $results = $this->rajaOngkir->searchDomesticDestination($search);
+    //     if (empty($search) || strlen($search) < 3) {
+    //         return response()->json([]);
+    //     }
 
-        return response()->json($results);
-    }
+    //     $results = $this->rajaOngkir->searchDomesticDestination($search);
+
+    //     return response()->json($results);
+    // }
 
     public function checkResi(Request $request)
     {
@@ -79,6 +81,7 @@ class KelolaTransaksiController extends Controller
 
 
         $validated['tanggal_transaksi'] = date('Y-m-d', strtotime($validated['tanggal_transaksi']));
+        $validated['pegawai_id'] = optional($request->user())->user_id;
 
         Transaksi::create($validated);
 
@@ -108,16 +111,63 @@ class KelolaTransaksiController extends Controller
         return back()->with('success', 'Detail transaksi berhasil diperbarui.');
     }
 
-    public function getOngkir(Request $request)
+
+    public function uploadTransaksiKustomPayment(Request $request)
     {
-        $request->validate([
-            'destination' => 'required',
-            'weight' => 'required|numeric',
-            'courier' => 'required'
+        $validated = $request->validate([
+            'order_kustom_id' => 'required|exists:order_transaksi_kustom,order_kustom_id',
+            'file_payment' => 'required|file|mimes:jpeg,png,jpg,pdf|max:5120',
         ]);
 
-        $costs = $this->rajaOngkir->getCost(444, $request->destination, $request->weight, $request->courier);
+        try {
+            $existingPayment = AttachmentTransaksiKustom::where('order_kustom_id', $validated['order_kustom_id'])
+                ->where('path', 'like', '%payments/kustom%')
+                ->first();
 
-        return response()->json($costs);
+            if ($existingPayment) {
+                return back()->with('error', 'Bukti pembayaran untuk pesanan ini sudah diunggah sebelumnya.');
+            }
+
+            if ($request->hasFile('file_payment')) {
+                $file = $request->file('file_payment');
+
+                $filename = time() . '_' . preg_replace('/\s+/', '_', $file->getClientOriginalName());
+
+                $path = $file->storeAs('payments/kustom', $filename, 'public');
+
+                \App\Models\AttachmentTransaksiKustom::create([
+                    'order_kustom_id' => $validated['order_kustom_id'],
+                    'path' => $path,
+                ]);
+
+                $orderKustom = OrderTransaksiKustom::findOrFail($validated['order_kustom_id']);
+                $transaksi = Transaksi::findOrFail($orderKustom->transaksi_id);
+
+                if ($transaksi->status === 'Created') {
+                    $transaksi->update(['status' => 'Paid']);
+                }
+
+                return back()->with('success', 'Bukti pembayaran kustom berhasil diunggah.');
+            }
+
+            return back()->with('error', 'File pembayaran tidak ditemukan dalam request.');
+
+        } catch (\Exception $e) {
+            return back()->with('error', 'Terjadi kesalahan saat mengunggah file: ' . $e->getMessage());
+        }
+
     }
+
+    // public function getOngkir(Request $request)
+    // {
+    //     $request->validate([
+    //         'destination' => 'required',
+    //         'weight' => 'required|numeric',
+    //         'courier' => 'required'
+    //     ]);
+
+    //     $costs = $this->rajaOngkir->getCost(444, $request->destination, $request->weight, $request->courier);
+
+    //     return response()->json($costs);
+    // }
 }
