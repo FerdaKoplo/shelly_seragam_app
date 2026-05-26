@@ -206,11 +206,82 @@ class CheckoutController extends Controller
             });
 
             $shippingMethod = (string) $request->input('shipping_id', '');
-            $shippingPrice = (int) data_get(
-                collect($shippingOptions)->firstWhere('id', $shippingMethod),
-                'price',
-                0
-            );
+            $shippingPrice = 0;
+
+            $matchedOption = collect($shippingOptions)->firstWhere('id', $shippingMethod);
+            if ($matchedOption) {
+                $shippingPrice = (int) $matchedOption['price'];
+            } elseif ($request->filled('destination_id')) {
+                try {
+                    $destinationId = (int) $request->input('destination_id');
+                    $totalQty = collect($katalogItems)->sum('quantity');
+                    $weight = max(1, $totalQty) * 200;
+
+                    $rajaOngkir = app(\App\Services\RajaOngkirService::class);
+                    $origin = (int) env('RAJA_ONGKIR_ORIGIN_ID', 444);
+                    $rawResults = $rajaOngkir->calculateDomesticCost(
+                        $origin,
+                        $destinationId,
+                        $weight,
+                        'jne',
+                        'lowest'
+                    );
+
+                    $mapped = [];
+                    $weightKg = $weight / 1000;
+                    $pushOption = function ($courierName, $service, $value, $etd) use (&$mapped, $weightKg) {
+                        $price = (int) $value;
+                        if ($price <= 0) return;
+                        $serviceStr = (string) $service;
+                        if (preg_match('/^JTR\b/i', $serviceStr) && !($weightKg > 1)) return;
+
+                        if (preg_match('/JTR\s*([<>])\s*(\d+)/i', $serviceStr, $matches) || preg_match('/JTR([<>])(\d+)/i', $serviceStr, $matches)) {
+                            $op = $matches[1];
+                            $thresholdKg = (int) $matches[2];
+                            if ($op === "<" && !($weightKg < $thresholdKg)) return;
+                            if ($op === ">" && !($weightKg > $thresholdKg)) return;
+                        }
+
+                        $mapped[] = [
+                            'id' => strtolower(str_replace(' ', '-', $courierName . '-' . $service)),
+                            'price' => $price,
+                        ];
+                    };
+
+                    foreach ($rawResults as $courier) {
+                        $courierName = $courier['name'] ?? $courier['courier'] ?? $courier['code'] ?? 'Kurir';
+                        $costs = $courier['costs'] ?? $courier['cost'] ?? $courier['services'] ?? null;
+                        if (is_array($costs)) {
+                            foreach ($costs as $c) {
+                                $service = $c['service'] ?? $c['name'] ?? $c['code'] ?? 'Service';
+                                $costArr = $c['cost'] ?? $c['costs'] ?? [];
+                                $firstCost = is_array($costArr) ? ($costArr[0] ?? null) : null;
+                                $value = $firstCost['value'] ?? $c['value'] ?? null;
+                                $etd = $firstCost['etd'] ?? $c['etd'] ?? '';
+                                if ($value !== null) {
+                                    $pushOption($courierName, $service, $value, $etd);
+                                }
+                            }
+                            continue;
+                        }
+
+                        $service = $courier['service'] ?? $courier['service_type'] ?? $courier['type'] ?? 'Service';
+                        $value = $courier['value'] ?? $courier['cost'] ?? $courier['price'] ?? $courier['tariff'] ?? null;
+                        $etd = $courier['etd'] ?? $courier['duration'] ?? $courier['estimation'] ?? '';
+                        if ($value !== null) {
+                            $pushOption($courierName, $service, $value, $etd);
+                        }
+                    }
+
+                    $matchedDynamic = collect($mapped)->firstWhere('id', $shippingMethod);
+                    if ($matchedDynamic) {
+                        $shippingPrice = (int) $matchedDynamic['price'];
+                    }
+                } catch (\Exception $e) {
+                    \Log::error('Failed to calculate dynamic shipping price during checkout: ' . $e->getMessage());
+                }
+            }
+
             $amount = $subtotal + $shippingPrice;
 
             if ($amount <= 0) {
