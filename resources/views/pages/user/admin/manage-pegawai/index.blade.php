@@ -101,7 +101,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="4" class="py-10 text-center text-gray-400 italic">Data pegawai tidak ditemukan.</td>
+                        <td data-cy="table-pgw-not-found" colspan="4" class="py-10 text-center text-gray-400 italic">Data pegawai tidak ditemukan.</td>
                     </tr>
                     @endforelse
                 </tbody>

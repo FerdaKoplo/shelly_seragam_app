@@ -219,6 +219,6 @@
 
     <x-guest.katalog.modals.panduan-ukuran />
 
-    <x-guest.katalog.toast />
+    <x-shared.toast />
 
 @endsection

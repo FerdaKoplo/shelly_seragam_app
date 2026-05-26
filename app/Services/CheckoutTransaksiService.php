@@ -17,6 +17,8 @@ class CheckoutTransaksiService
             $statusMap = [
                 'CREATED' => 'Created',
                 'PAID' => 'Paid',
+                'PENDING' => 'Created', // Treat pending as created/unpaid
+                'SETTLED' => 'Paid',    // Explicitly treat settled as paid
             ];
 
             $transaksiStatus = $statusMap[strtoupper((string) $order->status)] ?? 'Created';
@@ -24,6 +26,12 @@ class CheckoutTransaksiService
             $transaksi = Transaksi::query()->firstOrNew([
                 'checkout_external_id' => $order->external_id,
             ]);
+
+            //SETA
+            // FORCE STATS: If it's a catalog product and the order checkout state is paid, ensure it evaluates as 'Paid'
+            if ($order->type === 'katalog' && strtoupper((string) $order->status) === 'PAID') {
+                $transaksiStatus = 'Paid';
+            }
 
             $transaksi->fill([
                 'pegawai_id' => $transaksi->pegawai_id, // keep whatever assigned by admin
@@ -40,6 +48,12 @@ class CheckoutTransaksiService
                 'tanggal_transaksi' => ($order->paid_at?->toDateString()) ?? now()->toDateString(),
                 'total_harga' => (float) ($order->total ?? $order->subtotal ?? 0),
             ]);
+
+            //SETA
+            // Force state overwrite if model dirty state check fails on existing records
+            if ($transaksi->exists) {
+                $transaksi->status = $transaksiStatus;
+            }
             $transaksi->save();
 
             if ($order->type === 'katalog') {
@@ -111,4 +125,3 @@ class CheckoutTransaksiService
         ]);
     }
 }
-

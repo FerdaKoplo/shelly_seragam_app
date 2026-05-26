@@ -51,10 +51,11 @@ class XenditWebhookController extends Controller
         ]);
         $invoice->save();
 
-        if (strcasecmp($status, 'PAID') === 0) {
+        // Check for both PAID and SETTLED states safely
+        if (in_array(strtoupper($status), ['PAID', 'SETTLED'])) {
             $order = CheckoutOrder::query()->where('external_id', $externalId)->first();
             if ($order) {
-                $order->status = 'PAID';
+                $order->status = 'PAID'; 
                 $order->paid_at = $invoice->paid_at;
                 $order->save();
 
