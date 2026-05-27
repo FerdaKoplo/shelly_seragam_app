@@ -114,8 +114,13 @@ class ManagePegawaiAdminTest extends TestCase
         ]);
 
         DB::table('transaksi')->insert([
-            'transaksi_id' => 'TRX-20260101-001',
             'user_id' => $pegawai->user_id,
+            'nama_customer' => 'Customer Test',
+            'no_hp_customer' => '08123456789',
+            'alamat_customer' => 'Alamat Test',
+            'no_resi_customer' => 'RESI123456',
+            'tanggal_transaksi' => '2026-01-01',
+            'total_harga' => 150000,
         ]);
 
         $response = $this->delete(route('manage.pegawai.destroy', $pegawai->user_id));

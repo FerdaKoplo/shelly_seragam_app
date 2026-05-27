@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('kategori');
             $table->decimal('harga', 15, 2);
             $table->integer('stok');
-            $table->enum('status', ['Tersedia', 'Arsip','Habis']);
+            $table->enum('status', ['Tersedia', 'Arsip','Habis'])->default('Tersedia');
             $table->timestamps();
         });
     }

@@ -103,6 +103,7 @@ class KatalogProdukController extends Controller
                 'kategori' => $validated['kategori'],
                 'harga' => $validated['harga'],
                 'stok' => $validated['stok'],
+                'status' => $validated['stok'] > 0 ? 'Tersedia' : 'Habis',
             ]);
 
             if ($request->has('variations')) {
