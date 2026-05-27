@@ -30,7 +30,7 @@ class KatalogPreOrderTest extends TestCase
         $response = $this->get(route('product.show', $katalog->katalog_id));
 
         $response->assertOk();
-        $response->assertSee('Stok habis — tetap bisa Pre-Order', false);
+        $response->assertSee('Stok habis. Namun anda tetap bisa melakukan Pre-Order', false);
         $response->assertSee('Pre-Order Sekarang');
         $response->assertSee('Checkout Pre-Order');
     }
