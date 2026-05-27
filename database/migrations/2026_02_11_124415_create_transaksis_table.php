@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('transaksi', function (Blueprint $table) {
             $table->id('transaksi_id');
             $table->foreignId('user_id')
+               ->nullable()
                ->references('user_id')
                 ->on('user')
                 ->onDelete('cascade');
