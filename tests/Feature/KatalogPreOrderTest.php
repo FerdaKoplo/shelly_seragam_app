@@ -59,4 +59,48 @@ class KatalogPreOrderTest extends TestCase
         $response->assertSee('Checkout');
         $response->assertDontSee('Checkout Pre-Order');
     }
+
+    public function test_preorder_checkout_page_renders_with_preorder_mode(): void
+    {
+        $response = $this->get(route('checkout', ['type' => 'katalog', 'mode' => 'preorder']));
+
+        $response->assertOk();
+        $response->assertViewIs('pages.guest.checkout.checkout');
+        $response->assertViewHas('type', 'katalog');
+    }
+
+    public function test_preorder_checkout_page_calculates_preorder_subtotal(): void
+    {
+        $response = $this->withSession([
+            'cart' => [
+                15 => [
+                    'id' => 15,
+                    'katalog_id' => 15,
+                    'name' => 'Seragam Kerja PO',
+                    'price' => 200000,
+                    'quantity' => 5,
+                    'image' => null,
+                ]
+            ]
+        ])->get(route('checkout', ['type' => 'katalog', 'mode' => 'preorder']));
+
+        $response->assertOk();
+        $response->assertViewHas('items', function (array $items) {
+            return count($items) === 1
+                && $items[0]['katalog_id'] === 15
+                && $items[0]['name'] === 'Seragam Kerja PO'
+                && $items[0]['price'] === 200000
+                && $items[0]['quantity'] === 5;
+        });
+    }
+
+    public function test_preorder_checkout_notes_passed_correctly(): void
+    {
+        $response = $this->withSession([
+            'cart_notes' => 'Catatan Preorder khusus: bordir nama di sebelah dada kanan.'
+        ])->get(route('checkout', ['type' => 'katalog', 'mode' => 'preorder']));
+
+        $response->assertOk();
+        $response->assertViewHas('checkoutNotes', 'Catatan Preorder khusus: bordir nama di sebelah dada kanan.');
+    }
 }
