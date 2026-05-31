@@ -5,7 +5,8 @@ namespace App\Providers;
 use Arr;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\ServiceProvider;
-use Str;
+use Illuminate\Support\Str;
+// use Str;
 
 class AppServiceProvider extends ServiceProvider
 {
