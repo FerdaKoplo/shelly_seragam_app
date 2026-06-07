@@ -1,4 +1,4 @@
-<x-shared.modal_base name="modal-panduan-ukuran" maxWidth="2xl" :showCloseButton="true">
+<x-shared.modal_base data-cy="size-guide-modal" name="modal-panduan-ukuran" maxWidth="2xl" :showCloseButton="true">
     <div x-data="{
         {{-- This mock data should be passed from your Product Model in the backend --}}
         measurements: [
@@ -53,10 +53,6 @@
             </div>
         </div>
 
-        <div class="mt-8 sm:hidden">
-            <button @click="$dispatch('close-modal', 'size-guide-modal')" class="w-full py-3 bg-zinc-900 text-white rounded-lg font-bold">
-                Tutup
-            </button>
-        </div>
+        
     </div>
 </x-shared.modal_base>

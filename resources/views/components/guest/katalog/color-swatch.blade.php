@@ -2,6 +2,7 @@
 
 <button 
     type="button"
+    data-cy="color-{{ $id }}"
     @click="selectedColor = '{{ $id }}'"
     {{ $attributes->merge(['class' => 'flex grow mx-2 h-10 rounded-md transition-all border-2']) }}
     style="background-color: {{ $color }};"

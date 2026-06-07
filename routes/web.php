@@ -149,6 +149,10 @@ Route::match(['GET', 'POST'], '/checkout', function (Request $request) {
     ]);
 })->name('checkout');
 
+Route::prefix('shipping')->name('shipping.')->group(function () {
+    Route::get('/destinations', [ShippingController::class, 'destinations'])->name('destinations');
+    Route::post('/cost', [ShippingController::class, 'cost'])->name('cost');
+});
 // user routes
 Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::get('/manage-transaksi', function () {

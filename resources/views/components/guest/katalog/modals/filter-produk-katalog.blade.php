@@ -1,26 +1,23 @@
 <x-shared.modal_base name="modal-filter-produk-katalog" data-cy="modal-filter" title="Filter Produk" maxWidth="3xl">
-    <div
-        x-data="{
+    <div x-data="{
             filters: [],
-
             groups: {
+                gender: ['pria', 'wanita'],
                 kategori: ['kategori-semua','seragam','formal','atasan','jas','batik','setelan'],
                 ukuran: ['size-semua','size-s','size-m','size-l','size-xl','size-xxl'],
+                material: ['material-semua', 'katun', 'woll', 'kargo', 'resmi', 'material-batik'],
                 sort: ['relevan','highest-price','lowest-price','newest','best-selling'],
                 stok: ['stok-ready','stok-empty'],
             },
 
             toggleFilter(id) {
-                // kalau id termasuk salah satu group, treat sebagai single-select group
                 for (const [groupName, ids] of Object.entries(this.groups)) {
                     if (ids.includes(id)) {
-                        // remove semua id lain dalam group yang sama
                         this.filters = this.filters.filter(f => !ids.includes(f));
                         break;
                     }
                 }
 
-                // toggle id on/off
                 if (this.filters.includes(id)) {
                     this.filters = this.filters.filter(f => f !== id);
                 } else {
@@ -30,14 +27,11 @@
 
             resetFilters() {
                 const url = new URL(window.location.href);
-
-                // tetap pertahankan search & min/max harga kalau user sudah isi via URL
                 const keep = new URLSearchParams();
                 ['search','min_harga','max_harga'].forEach((k) => {
                     const v = url.searchParams.get(k);
                     if (v !== null && v !== '') keep.set(k, v);
                 });
-
                 const query = keep.toString();
                 window.location.href = query ? (`/katalog?${query}`) : '/katalog';
             },
@@ -45,50 +39,46 @@
             applyFilters() {
                 const url = new URL(window.location.href);
 
-                // bersihkan param filter dulu
-                ['filter_kategori','filter_status','sort','filter_ukuran'].forEach((k) => url.searchParams.delete(k));
+                ['filter_kategori','filter_status','sort','filter_ukuran', 'filter_gender', 'filter_material'].forEach((k) => url.searchParams.delete(k));
 
-                // kategori (sesuai DB; controller pakai exact match)
-                const kategoriMap = {
-                    seragam: 'Seragam',
-                    formal: 'Formal',
-                    atasan: 'Atasan',
-                    jas: 'Jas',
-                    batik: 'Batik',
-                    setelan: 'Setelan',
-                };
+                const genderMap = { pria: 'Pria', wanita: 'Wanita' };
                 for (const id of this.filters) {
-                    if (kategoriMap[id]) {
-                        url.searchParams.set('filter_kategori', kategoriMap[id]);
-                        break;
-                    }
+                    if (genderMap[id]) { url.searchParams.set('filter_gender', genderMap[id]); break; }
                 }
 
-                // stok/ketersediaan -> filter_status (sesuai controller)
-                if (this.filters.includes('stok-ready')) url.searchParams.set('filter_status', 'ready');
-                if (this.filters.includes('stok-empty')) url.searchParams.set('filter_status', 'empty');
-                // kalau tidak ada stok-selected, default backend sudah: stok >= 0
+                const kategoriMap = {
+                    seragam: 'Seragam', formal: 'Formal', atasan: 'Atasan',
+                    jas: 'Jas', batik: 'Batik', setelan: 'Setelan',
+                };
+                for (const id of this.filters) {
+                    if (kategoriMap[id]) { url.searchParams.set('filter_kategori', kategoriMap[id]); break; }
+                }
 
-                // sort (sesuai controller)
+                if (this.filters.includes('stok-ready')) url.searchParams.set('filter_status', 'ready');
+                if (this.filters.includes('stok-empty')) url.searchParams.set('filter_status', 'pre-order');
+
+                const materialMap = {
+                    katun: 'Katun', woll: 'Woll', kargo: 'Kargo',
+                    resmi: 'Resmi', 'material-batik': 'Batik'
+                };
+
+                for (const id of this.filters) {
+                    if (materialMap[id]) { url.searchParams.set('filter_material', materialMap[id]); break; }
+                }
+
+                const sizeMap = {
+                    'size-s': 'S', 'size-m': 'M', 'size-l': 'L',
+                    'size-xl': 'XL', 'size-xxl': 'XXL',
+                };
+                for (const id of this.filters) {
+                    if (sizeMap[id]) { url.searchParams.set('filter_ukuran', sizeMap[id]); break; }
+                }
+
                 if (this.filters.includes('highest-price')) url.searchParams.set('sort', 'price_high');
                 else if (this.filters.includes('lowest-price')) url.searchParams.set('sort', 'price_low');
                 else if (this.filters.includes('newest')) url.searchParams.set('sort', 'newest');
-                // relevan / best-selling belum didukung controller -> skip
-
-                // ukuran (siapkan dulu; backend menyusul)
-                const sizeMap = {
-                    'size-s': 'S',
-                    'size-m': 'M',
-                    'size-l': 'L',
-                    'size-xl': 'XL',
-                    'size-xxl': 'XXL',
-                };
-                for (const id of this.filters) {
-                    if (sizeMap[id]) {
-                        url.searchParams.set('filter_ukuran', sizeMap[id]);
-                        break;
-                    }
-                }
+                else if (this.filters.includes('best-selling')) url.searchParams.set('sort', 'best_selling');
+                else if (this.filters.includes('relevan')) url.searchParams.set('sort', 'relevan');
 
                 window.location.href = url.toString();
             },
@@ -122,7 +112,7 @@
                 <h4 class="font-bold text-gray-900 mb-3">Ketersediaan</h4>
                 <div class="flex flex-wrap gap-3">
                     <x-guest.katalog.filter-button label="Stok Ready" id="stok-ready" />
-                    <x-guest.katalog.filter-button label="Stok Habis" id="stok-empty" />
+                    <x-guest.katalog.filter-button label="Pre-Order" id="stok-empty" />
                 </div>
                 <p class="text-xs text-gray-500 mt-2">
                     Default: semua produk yang tidak diarsipkan (stok &gt;= 0).
@@ -181,9 +171,9 @@
                     <span
                         class="inline-flex items-center gap-1 px-3 py-1 bg-gray-100 text-gray-800 text-xs font-bold rounded-full border border-gray-200">
                         <span x-text="filterId"></span>
-                        <button @click="toggleFilter(filterId)" class="hover:text-red-500 transition-colors">
+                        {{-- <button @click="toggleFilter(filterId)" class="hover:text-red-500 transition-colors">
                             <i class="fa-solid fa-xmark ml-1"></i>
-                        </button>
+                        </button> --}}
                     </span>
                 </template>
             </div>
@@ -191,13 +181,11 @@
 
         <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end gap-3">
             <div class="flex justify-end gap-3 w-full">
-                <button @click="resetFilters()"
-                    data-cy="btn-reset-filter"
+                <button @click="resetFilters()" data-cy="btn-reset-filter"
                     class="px-8 py-2 font-bold text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
                     Hapus Filter
                 </button>
-                <button @click="applyFilters()"
-                    data-cy="btn-apply-filter"
+                <button @click="applyFilters()" data-cy="btn-apply-filter"
                     class="px-8 py-2 font-bold text-white bg-[#333333] rounded-md hover:bg-black transition-colors">
                     Terapkan Filter
                 </button>
