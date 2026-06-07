@@ -1,5 +1,6 @@
 @props(['label', 'id'])
 <button
+    data-cy="size-{{ $id }}"
     type="button"
     @click="selectedSize = '{{ $id }}'"
     {{ $attributes->merge(['class' => 'px-4 py-2 text-sm font-medium border rounded-md transition-all text-center']) }}
