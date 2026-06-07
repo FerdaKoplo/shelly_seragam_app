@@ -78,6 +78,7 @@
         <div class="flex gap-3 mb-6">
             @foreach([1, 2, 3] as $num)
                 <button type="button"
+                data-cy="combination-{{ $num }}"
                     @click="combinationCount = {{ $num }}; dispatchEstimate();"
                     :class="combinationCount === {{ $num }} ? 'border-black bg-black text-white' : 'border-gray-300 bg-white text-gray-600'"
                     class="px-6 py-1.5 text-sm font-medium rounded-md border transition-all">
@@ -98,6 +99,7 @@
                     <div class="grid grid-cols-3 gap-2">
                         @foreach(['Standar', 'Katun', 'Woll', 'Nylon', 'Kaos', 'Kargo', 'Satin', 'Polyester', 'Batik'] as $material)
                             <button type="button"
+                            data-cy="material-{{ $i }}-{{ strtolower($material) }}"
                                 @click="selectedMaterials.m{{ $i }} = '{{ $material }}'; dispatchEstimate();"
                                 :class="selectedMaterials.m{{ $i }} === '{{ $material }}' ? 'border-black bg-black text-white' : 'border-gray-300 bg-white text-gray-600'"
                                 class="px-0 py-2 text-[10px] font-medium rounded-md border transition-all text-center">
@@ -115,6 +117,7 @@
         <div class="flex flex-wrap gap-2">
             @for ($i = 0; $i <= 5; $i++)
                 <button type="button"
+                data-cy="bordir-{{ $i }}"
                     @click="bordirCount = {{ $i }}; dispatchEstimate();"
                     :class="bordirCount === {{ $i }} ? 'border-black bg-black text-white' : 'border-gray-300 bg-white text-gray-600'"
                     class="min-w-[80px] px-6 py-1.5 text-sm font-medium rounded-md border transition-all">
