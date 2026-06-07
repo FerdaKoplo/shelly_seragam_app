@@ -150,7 +150,7 @@ Route::match(['GET', 'POST'], '/checkout', function (Request $request) {
 })->name('checkout');
 
 // user routes
-Route::prefix('admin')->group(function () {
+Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::get('/manage-transaksi', function () {
         return view('pages.user.transaksi.index');
     })->name('manage.transaksi');
