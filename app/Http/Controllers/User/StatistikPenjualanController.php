@@ -24,7 +24,7 @@ class StatistikPenjualanController extends Controller
 
         $allTransactions = (clone $query)
             ->with(['produkTransaksis', 'orderKustoms', 'pengiriman'])
-            ->orderBy('tanggal_transaksi', 'desc') 
+            ->orderBy('tanggal_transaksi', 'desc')
             ->paginate(10)
             ->appends(request()->query());
 
@@ -68,6 +68,17 @@ class StatistikPenjualanController extends Controller
     {
         $bulan = $request->bulan;
         $year = date('Y');
+
+        $query = Transaksi::whereYear('tanggal_transaksi', $year);
+
+        if ($bulan) {
+            $query->whereMonth('tanggal_transaksi', $bulan);
+        }
+
+        if ($query->count() === 0) {
+            return back()->with('error', 'Tidak Ada Data Untuk Diexport');
+        }
+
         return Excel::download(new ExportStatistikPenjualan($bulan, $year), 'laporan-transaksi.xlsx');
     }
 }
