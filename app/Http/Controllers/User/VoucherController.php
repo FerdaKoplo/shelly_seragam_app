@@ -227,18 +227,6 @@ class VoucherController extends Controller
         return back()->with('success', 'Voucher Berhasil Dihapus');
 
     }
-
-
-    // helper
-    // private function randomizeVoucherCodeName(string $userInput, int $randomLength = 5): string
-    // {
-    //     $cleanPrefix = Str::upper(Str::slug($userInput));
-
-    //     $randomStringVoucher = Str::upper(Str::random($randomLength));
-
-    //     return $cleanPrefix . '-' . $randomStringVoucher;
-    // }
-
     private function normalizeVoucherCode(string $code): string
     {
         return Str::upper(trim($code));

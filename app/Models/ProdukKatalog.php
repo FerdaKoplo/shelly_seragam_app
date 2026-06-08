@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Cache;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -43,6 +44,14 @@ class ProdukKatalog extends Model
                 $katalog->status = $katalog->stok <= 0 ? 'Pre-Order' : 'Tersedia';
             }
         });
-    }
 
+        $clearCache = function () {
+            Cache::forget('katalog_categories_list');
+
+            Cache::flush();
+        };
+
+        static::saved($clearCache);
+        static::deleted($clearCache);
+    }
 }
