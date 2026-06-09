@@ -24,7 +24,7 @@ return new class extends Migration
             $table->string('nama_customer');
             $table->string('no_hp_customer');
             $table->text('alamat_customer');
-            $table->string('no_resi_customer');
+            $table->string('no_resi_customer')->nullable();
             $table->enum('status', ["Created", "Paid", "Delivered", "Done"])->default('Created');
             $table->date('tanggal_transaksi');
             $table->double('total_harga');

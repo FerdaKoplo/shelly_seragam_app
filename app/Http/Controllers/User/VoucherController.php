@@ -54,22 +54,40 @@ class VoucherController extends Controller
             ]);
         }
 
+        // mengikuti test case jadi yang divalidasi untuk kode_voucher dirubah dari nullable ke required
         $validated = $request->validate([
             'nama_voucher' => 'required|string|max:255',
-            'kode_voucher' => 'nullable|string|unique:vouchers,kode_voucher',
+            'kode_voucher' => 'required|string|unique:vouchers,kode_voucher',
             'deskripsi' => 'required|string',
             'nilai_diskon' => 'required|numeric|gt:0',
             'tanggal_mulai' => 'required|date|date_format:Y-m-d|after_or_equal:today',
             'tanggal_berakhir' => 'required|date|date_format:Y-m-d|after:tanggal_mulai',
             'jenis_voucher' => ['required', Rule::in(Voucher::JENIS_VOUCHER)],
         ], [
-            'kode_voucher.unique' => 'Voucher Dengan Kode Yang Sama Sudah Dibuat ',
+            'kode_voucher.required' => 'Kode voucher wajib diisi.',
+            'kode_voucher.unique' => 'Voucher Dengan Kode Yang Sama Sudah Dibuat.',
             'nilai_diskon.gt' => 'Nilai diskon tidak bisa negatif atau nol.',
         ]);
 
-        $kodeVoucher = $request->filled('kode_voucher')
-            ? $this->normalizeVoucherCode($validated['kode_voucher'])
-            : $this->randomizeVoucherCodeName($validated['nama_voucher']);
+        // $validated = $request->validate([
+        //     'nama_voucher' => 'required|string|max:255',
+        //     'kode_voucher' => 'nullable|string|unique:vouchers,kode_voucher',
+        //     'deskripsi' => 'required|string',
+        //     'nilai_diskon' => 'required|numeric|gt:0',
+        //     'tanggal_mulai' => 'required|date|date_format:Y-m-d|after_or_equal:today',
+        //     'tanggal_berakhir' => 'required|date|date_format:Y-m-d|after:tanggal_mulai',
+        //     'jenis_voucher' => ['required', Rule::in(Voucher::JENIS_VOUCHER)],
+        // ], [
+        //     'kode_voucher.unique' => 'Voucher Dengan Kode Yang Sama Sudah Dibuat ',
+        //     'nilai_diskon.gt' => 'Nilai diskon tidak bisa negatif atau nol.',
+        // ]);
+
+        // $kodeVoucher = $request->filled('kode_voucher')
+        //     ? $this->normalizeVoucherCode($validated['kode_voucher'])
+        //     : $this->randomizeVoucherCodeName($validated['nama_voucher']);
+
+        // diganti dari langsung terisi untuk kode vouchernya menjadi input manual 
+        $kodeVoucher = $this->normalizeVoucherCode($validated['kode_voucher']);
 
         $voucher = Voucher::create([
             'nama_voucher' => $validated['nama_voucher'],
@@ -101,20 +119,19 @@ class VoucherController extends Controller
 
         $validated = $request->validate([
             'nama_voucher' => 'required|string|max:255',
-            'kode_voucher' => 'nullable|string|unique:vouchers,kode_voucher,' . $id,
+            'kode_voucher' => 'required|string|unique:vouchers,kode_voucher,' . $id,
             'deskripsi' => 'required|string',
             'nilai_diskon' => 'required|numeric|gt:0',
             'tanggal_mulai' => 'required|date|date_format:Y-m-d|after_or_equal:today',
             'tanggal_berakhir' => 'required|date|date_format:Y-m-d|after:tanggal_mulai',
             'jenis_voucher' => ['required', Rule::in(Voucher::JENIS_VOUCHER)],
         ], [
-            'kode_voucher.unique' => 'Voucher Dengan Kode Yang Sama Sudah Dibuat ',
+            'kode_voucher.required' => 'Kode voucher wajib diisi.', 
+            'kode_voucher.unique' => 'Voucher Dengan Kode Yang Sama Sudah Dibuat.',
             'nilai_diskon.gt' => 'Nilai diskon tidak bisa negatif atau nol.',
         ]);
 
-        $kodeVoucher = $request->filled('kode_voucher')
-            ? $this->normalizeVoucherCode($validated['kode_voucher'])
-            : $this->randomizeVoucherCodeName($validated['nama_voucher']);
+        $kodeVoucher = $this->normalizeVoucherCode($validated['kode_voucher']);
 
         $voucher = Voucher::findOrFail($id);
 
@@ -213,14 +230,14 @@ class VoucherController extends Controller
 
 
     // helper
-    private function randomizeVoucherCodeName(string $userInput, int $randomLength = 5): string
-    {
-        $cleanPrefix = Str::upper(Str::slug($userInput));
+    // private function randomizeVoucherCodeName(string $userInput, int $randomLength = 5): string
+    // {
+    //     $cleanPrefix = Str::upper(Str::slug($userInput));
 
-        $randomStringVoucher = Str::upper(Str::random($randomLength));
+    //     $randomStringVoucher = Str::upper(Str::random($randomLength));
 
-        return $cleanPrefix . '-' . $randomStringVoucher;
-    }
+    //     return $cleanPrefix . '-' . $randomStringVoucher;
+    // }
 
     private function normalizeVoucherCode(string $code): string
     {

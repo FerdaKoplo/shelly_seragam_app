@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers\User;
 
-use App\Models\User;
 use App\Http\Controllers\Controller;
+use App\Models\User;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -35,22 +36,29 @@ class PegawaiController extends Controller
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'nama'     => 'required|string|max:255',
-            'username' => 'required|string|unique:user,username|max:255',
-            'password' => 'required|string',
-            'status'   => 'required|in:Active,Inactive',
-        ]);
 
-        User::create([
-            'nama'     => $validated['nama'],
-            'username' => $validated['username'],
-            'password' => Hash::make($validated['password']),
-            'status'   => $validated['status'],
-            'role'     => 'Pegawai',
-        ]);
+        // try {
+          
+            $validated = $request->validate([
+                'nama'     => 'required|string|max:255',
+                'username' => 'required|string|unique:user,username|max:255',
+                'password' => 'required|string',
+                'status'   => 'required|in:Active,Inactive',
+            ]);
+            
+            User::create([
+                'nama'     => $validated['nama'],
+                'username' => $validated['username'],
+                'password' => Hash::make($validated['password']),
+                'status'   => $validated['status'],
+                'role'     => 'Pegawai',
+            ]);
+    
+            return back()->with('success', 'Pegawai berhasil ditambahkan.');
+        // } catch (Exception $e) {
+        //     return back()->with('error', $e->getMessage());
+        // }
 
-        return back()->with('success', 'Pegawai berhasil ditambahkan.');
     }
 
 

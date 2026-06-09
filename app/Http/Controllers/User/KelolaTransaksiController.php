@@ -42,19 +42,6 @@ class KelolaTransaksiController extends Controller
         return view('pages.user.transaksi.index', compact('transaksis'));
     }
 
-    // public function searchDestination(Request $request)
-    // {
-    //     $search = $request->query('q');
-
-    //     if (empty($search) || strlen($search) < 3) {
-    //         return response()->json([]);
-    //     }
-
-    //     $results = $this->rajaOngkir->searchDomesticDestination($search);
-
-    //     return response()->json($results);
-    // }
-
     public function checkResi(Request $request)
     {
         $request->validate([
@@ -90,12 +77,39 @@ class KelolaTransaksiController extends Controller
 
     public function update(Request $request, $id)
     {
-        $transaksi = Transaksi::findOrFail($id);
+        // Validasi Input & Kondisional Resi (TC-WBT-ADM005-02)
+       $transaksi = Transaksi::findOrFail($id);
 
         $validated = $request->validate([
-            'no_resi_customer' => 'nullable|string|max:255',
             'status' => 'nullable|in:Created,Paid,Delivered,Done',
+            'no_resi_customer' => [
+                'nullable',
+                'string',
+                'max:255',
+                'required_if:status,Delivered'
+            ],
+        ], [
+            'no_resi_customer.required_if' => 'Nomor Resi Wajib Diisi',
         ]);
+
+        //Validasi State Machine (TC-WBT-ADM005-01)
+        if ($request->filled('status') && $request->status !== $transaksi->status) {
+            
+            $allowedNextState = [
+                'Created'   => 'Paid',
+                'Paid'      => 'Delivered',
+                'Delivered' => 'Done',
+                'Done'      => null,
+            ];
+
+            $validNext = $allowedNextState[$transaksi->status] ?? null;
+
+            if ($request->status !== $validNext) {
+                throw \Illuminate\Validation\ValidationException::withMessages([
+                    'status' => 'Perubahan status tidak valid'
+                ]);
+            }
+        }
 
         $transaksi->update([
             'no_resi_customer' => $validated['no_resi_customer'] ?? $transaksi->no_resi_customer,
@@ -157,17 +171,4 @@ class KelolaTransaksiController extends Controller
         }
 
     }
-
-    // public function getOngkir(Request $request)
-    // {
-    //     $request->validate([
-    //         'destination' => 'required',
-    //         'weight' => 'required|numeric',
-    //         'courier' => 'required'
-    //     ]);
-
-    //     $costs = $this->rajaOngkir->getCost(444, $request->destination, $request->weight, $request->courier);
-
-    //     return response()->json($costs);
-    // }
 }
