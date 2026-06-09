@@ -48,6 +48,7 @@
         {{-- Payment Gateway Integration Button --}}
         <x-shared.button
             @click="submitOrder()"
+            data-cy="btn-submit-checkout"
             variant="primary"
             :rounded="false"
             ::disabled="isSubmitting"

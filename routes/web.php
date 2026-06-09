@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Guest\CartController;
+use App\Http\Controllers\Guest\CheckoutController;
 use App\Http\Controllers\Guest\KatalogController;
 use App\Http\Controllers\Guest\LandingController;
 use App\Http\Controllers\User\KatalogProdukController;
@@ -10,9 +11,7 @@ use App\Http\Controllers\User\KelolaTransaksiController;
 use App\Http\Controllers\User\ManageKustomisasiController;
 use App\Http\Controllers\User\PegawaiController;
 use App\Http\Controllers\User\StatistikPenjualanController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Storage;
 
 /*
 |--------------------------------------------------------------------------
@@ -69,85 +68,7 @@ Route::prefix('keranjang')->name('cart.')->group(function () {
 /**
  * Checkout
  */
-Route::match(['GET', 'POST'], '/checkout', function (Request $request) {
-    $type = $request->input('type', $request->query('type', 'katalog'));
-    $checkoutNotes = (string) $request->input('notes', $request->session()->get('cart_notes', ''));
-
-    $katalogItems = array_map(function ($item) {
-        $rawImage = $item['image'] ?? null;
-        $isAbsolute = is_string($rawImage)
-            && (str_starts_with($rawImage, 'http://') || str_starts_with($rawImage, 'https://'));
-
-        $item['image_url'] = $isAbsolute
-            ? $rawImage
-            : ($rawImage ? asset('storage/' . ltrim($rawImage, '/')) : 'https://picsum.photos/id/1/600/800');
-
-        return [
-            'id' => $item['id'] ?? $item['katalog_id'] ?? null,
-            'katalog_id' => $item['katalog_id'] ?? $item['id'] ?? null,
-            'name' => $item['name'] ?? 'Produk',
-            'price' => (int) ($item['price'] ?? 0),
-            'quantity' => (int) ($item['quantity'] ?? 1),
-            'size' => $item['size'] ?? null,
-            'image' => $item['image'] ?? null,
-            'image_url' => $item['image_url'],
-        ];
-    }, array_values($request->session()->get('cart', [])));
-
-    $shippingOptions = [
-        ['id' => 'reg', 'label' => 'Regular', 'price' => 15000],
-        ['id' => 'exp', 'label' => 'Express', 'price' => 35000],
-    ];
-
-    $uploadedFiles = [];
-
-    if ($request->isMethod('post') && $request->hasFile('design_files')) {
-        $allowedExtensions = ['jpg', 'jpeg', 'png', 'svg', 'cdr'];
-        $request->validate([
-            'design_files' => ['array'],
-            'design_files.*' => [
-                'file',
-                'max:10240',
-                function ($attribute, $value, $fail) use ($allowedExtensions) {
-                    $extension = strtolower($value->getClientOriginalExtension());
-                    if (!in_array($extension, $allowedExtensions, true)) {
-                        $fail('Format file tidak didukung. Gunakan .jpg, .png, .svg, atau .cdr');
-                    }
-                },
-            ],
-        ]);
-
-        foreach ($request->file('design_files', []) as $file) {
-            $extension = strtolower($file->getClientOriginalExtension());
-            $path = $file->store('uploads/kustom', 'public');
-            $uploadedFiles[] = [
-                'name' => $file->getClientOriginalName(),
-                'url' => Storage::disk('public')->url($path),
-                'extension' => $extension,
-            ];
-        }
-    }
-
-    $mockCustomData = [
-        'title' => 'Kustom',
-        'qty' => ($request->input('total_quantity', 1)) . ' pcs',
-        'type' => $request->input('category', 'bundle'),
-        'price' => (int) $request->input('estimated_total', 1750000),
-
-        'attachments' => $uploadedFiles,
-
-        'notes' => $checkoutNotes,
-        'size' => $request->input('size'),
-    ];
-
-    return view('pages.guest.checkout.checkout', [
-        'type' => $type,
-        'items' => $katalogItems,
-        'customData' => $mockCustomData,
-        'checkoutNotes' => $checkoutNotes,
-        'shippingOptions' => $shippingOptions,
-    ]);
-})->name('checkout');
+Route::match(['GET', 'POST'], '/checkout', CheckoutController::class)->name('checkout');
 
 // user routes
 Route::prefix('admin')->group(function () {
