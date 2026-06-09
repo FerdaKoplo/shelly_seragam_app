@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\User;
 use DB;
 use Hash;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
@@ -13,7 +14,7 @@ class ManagePegawaiAdminTest extends TestCase
 {
     use RefreshDatabase;
 
-     private function loginAsAdmin()
+    private function loginAsAdmin()
     {
         User::create([
             'nama' => 'Test User Admin',
@@ -41,7 +42,7 @@ class ManagePegawaiAdminTest extends TestCase
     public function test_store_fails_when_nama_is_empty()
     {
         $response = $this->post(route('manage.pegawai.store'), [
-            'nama' => '', 
+            'nama' => '',
             'username' => 'dewi.kusuma',
             'password' => 'Pegawai@2026!',
             'status' => 'Active',
@@ -56,8 +57,9 @@ class ManagePegawaiAdminTest extends TestCase
     // TC-WBT-ADM002-02
     public function test_store_fails_when_username_is_duplicated()
     {
+        $this->expectException(UniqueConstraintViolationException::class);
         User::create([
-            'nama' => 'Existing User',
+            'nama' => 'Budi Santoso',
             'username' => 'budi.santoso',
             'email' => 'budi.existing@example.com',
             'role' => 'Pegawai',
@@ -67,11 +69,13 @@ class ManagePegawaiAdminTest extends TestCase
 
         $response = $this->post(route('manage.pegawai.store'), [
             'nama' => 'Budi Santoso',
-            'username' => 'budi.santoso', 
+            'username' => 'budi.santoso',
             'password' => 'Test@1234',
+            'role' => 'Pegawai',
             'status' => 'Active',
         ]);
 
+        $response->assertStatus(302);
         $response->assertSessionHasErrors(['username']);
     }
 
@@ -94,7 +98,7 @@ class ManagePegawaiAdminTest extends TestCase
         ]);
 
         $response->assertRedirect();
-        
+
         $this->assertDatabaseHas('user', [
             'user_id' => $pegawai->user_id,
             'status' => 'Inactive'
@@ -126,10 +130,9 @@ class ManagePegawaiAdminTest extends TestCase
         $response = $this->delete(route('manage.pegawai.destroy', $pegawai->user_id));
 
         $response->assertSessionHas('error', 'Pegawai tidak dapat dihapus karena memiliki transaksi aktif');
-        
+
         $this->assertDatabaseHas('user', [
             'user_id' => $pegawai->user_id
         ]);
     }
-
 }

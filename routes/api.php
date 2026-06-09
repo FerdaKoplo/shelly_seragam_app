@@ -17,3 +17,8 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+<<<<<<< HEAD
+=======
+
+Route::post('/voucher/validate', [\App\Http\Controllers\User\VoucherController::class, 'validateVoucher'])->name('voucher.validate');
+>>>>>>> dev
