@@ -111,7 +111,7 @@ class CheckoutController extends Controller
             'design_files' => ['array'],
             'design_files.*' => [
                 'file',
-                'max:10240',
+                'max:5120',
                 function ($attribute, $value, $fail) use ($allowedExtensions) {
                     $extension = strtolower($value->getClientOriginalExtension());
                     if (!in_array($extension, $allowedExtensions, true)) {

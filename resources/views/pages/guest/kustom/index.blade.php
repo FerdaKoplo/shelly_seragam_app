@@ -122,7 +122,7 @@
                 <div class="border-2 border-dashed border-gray-300 rounded-xl p-10 text-center flex flex-col items-center justify-center bg-gray-50/50">
                     <i class="fas fa-cloud-upload-alt text-2xl mb-2 text-gray-400"></i>
                     <p class="text-sm text-gray-500 font-medium">Choose files or drag & drop them here</p>
-                    <p class="text-xs text-gray-400 mt-1 mb-4">JPG, PNG, SVG, CDR formats, up to 10MB per file</p>
+                    <p class="text-xs text-gray-400 mt-1 mb-4">JPG, PNG, SVG, CDR formats, up to 5MB per file</p>
                     <label class="cursor-pointer bg-white border border-gray-300 px-6 py-2 rounded-lg text-sm font-medium hover:bg-gray-50">
                         Browse Files
                         <input type="file" name="design_files[]" accept=".jpg,.jpeg,.png,.svg,.cdr" multiple class="hidden"
