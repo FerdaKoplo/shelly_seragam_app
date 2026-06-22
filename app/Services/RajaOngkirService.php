@@ -15,7 +15,7 @@ class RajaOngkirService
     public function __construct()
     {
         $this->apiKey = (string) env('RAJA_ONGKIR_KEY', '');
-        $baseUrl = (string) env('RAJA_ONGKIR_BASE_URL', '');
+        $this->baseUrl = (string) env('RAJA_ONGKIR_BASE_URL', '');
         $this->baseUrl = rtrim($baseUrl, '/') . '/';
 
         // Some providers use `key` (RajaOngkir), others use `x-api-key` (Komerce/Komship).
