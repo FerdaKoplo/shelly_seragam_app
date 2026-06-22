@@ -16,7 +16,7 @@ class RajaOngkirService
     {
         $this->apiKey = (string) env('RAJA_ONGKIR_KEY', '');
         $this->baseUrl = (string) env('RAJA_ONGKIR_BASE_URL', '');
-        $this->baseUrl = rtrim($baseUrl, '/') . '/';
+        $this->baseUrl = rtrim($this->baseUrl, '/') . '/';
 
         // Some providers use `key` (RajaOngkir), others use `x-api-key` (Komerce/Komship).
         // Sending both keeps compatibility with either gateway.
