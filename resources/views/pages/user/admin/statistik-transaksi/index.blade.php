@@ -2,10 +2,8 @@
 @section('title', 'Statistik Transaksi')
 @section('content')
     <div class="px-4 md:px-12 pb-20">
-        {{-- TOP SECTION: Filters & Chart --}}
         <div class="flex flex-col lg:flex-row mt-6 gap-8 lg:gap-16">
 
-            {{-- Left: Filter & Stats Cards --}}
             <div class="flex flex-col gap-5 w-full lg:w-1/3 shrink-0">
                 <div class="relative">
                     <form action="{{ route('statistik.transaksi') }}" method="GET">
@@ -66,7 +64,6 @@
                 </div>
             </div>
 
-            {{-- Right: Chart Section --}}
             <div class="flex flex-col w-full">
                 <div class="bg-white p-4 md:p-6 rounded-2xl shadow-sm border border-gray-100 w-full">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
@@ -109,7 +106,6 @@
             </div>
         </div>
 
-        {{-- BOTTOM SECTION: Table --}}
         <div class="mt-12">
             <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
                 <h1 class="text-3xl md:text-4xl font-bold">Data Transaksi</h1>

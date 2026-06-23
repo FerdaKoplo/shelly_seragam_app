@@ -42,6 +42,13 @@ class PegawaiController extends Controller
             'status'   => 'required|in:Active,Inactive',
         ]);
 
+        $usernameExist = User::where('username', $request->email)->exists();
+
+        if($usernameExist) {
+            return back()->with('error', 'Pegawai dengan ');
+        }
+
+
         User::create([
             'nama'     => $validated['nama'],
             'username' => $validated['username'],
@@ -52,8 +59,6 @@ class PegawaiController extends Controller
 
         return back()->with('success', 'Pegawai berhasil ditambahkan.');
     }
-
-
     
     public function update(Request $request, $user_id)
     {

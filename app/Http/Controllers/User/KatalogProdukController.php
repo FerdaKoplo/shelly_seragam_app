@@ -76,12 +76,16 @@ class KatalogProdukController extends Controller
     {
         $validated = $request->validate([
             'nama_produk' => 'required|string|max:255',
-            'harga' => 'required|numeric|min:0',
+            'harga' => 'required|numeric|min:10000|max:5000000',
             'stok' => 'required|integer|min:0',
             'deskripsi' => 'required|string',
             'kategori' => 'required|string',
             'fotos.*' => 'image|mimes:jpeg,png,jpg|max:2048',
             'variations' => 'nullable|array'
+        ], [
+            'harga.min' => 'Harga minimal adalah Rp 10.000',
+            'harga.max' => 'Harga maksimal adalah Rp 5.000.000',
+            'harga.numeric' => 'Format angka tidak valid.',
         ]);
 
         try {
@@ -150,78 +154,21 @@ class KatalogProdukController extends Controller
     {
         $validated = $request->validate([
             'nama_produk' => 'required|string|max:255',
-            'harga' => 'required|numeric|min:0',
+            'harga' => 'required|numeric|min:10000|max:5000000',
             'stok' => 'required|integer|min:0',
             'deskripsi' => 'required|string',
             'kategori' => 'required|string',
             'fotos.*' => 'image|mimes:jpeg,png,jpg|max:2048',
             'deleted_photos' => 'nullable|array',
             'variations' => 'nullable|array'
+        ], [
+            'harga.min'     => 'Harga minimal adalah Rp 10.000',
+            'harga.max'     => 'Harga maksimal adalah Rp 5.000.000',
+            'harga.numeric' => 'Format angka tidak valid.',
         ]);
 
         try {
             DB::beginTransaction();
-
-            // $katalog = ProdukKatalog::where('produk_id', $id)->firstOrFail();
-            // $produk = $katalog->produk;
-
-            // $produk->update([
-            //     'nama_produk' => $validated['nama_produk'],
-            //     'deskripsi' => $validated['deskripsi'],
-            // ]);
-
-            // $katalog->update([
-            //     'kategori' => $validated['kategori'],
-            //     'harga' => $validated['harga'],
-            //     'stok' => $validated['stok'],
-            // ]);
-
-            // DetailProduk::where('produk_id', $produk->produk_id)->delete();
-
-            // if ($request->has('variations')) {
-            //     $variations = collect($request->variations);
-            //     $types = ['ukuran', 'warna'];
-
-            //     foreach ($types as $type) {
-            //         $items = $variations->where('type', $type);
-            //         if ($items->isNotEmpty()) {
-            //             $detail = DetailProduk::create([
-            //                 'produk_id' => $produk->produk_id,
-            //                 'nama_detail' => ucfirst($type),
-            //                 'deskripsi_detail' => 'Variasi ' . ucfirst($type),
-            //             ]);
-
-            //             foreach ($items as $item) {
-            //                 $data = json_decode($item['data'], true);
-            //                 unset($data['type']);
-
-            //                 PilihanDetailProduk::create([
-            //                     'detail_produk_id' => $detail->detail_produk_id,
-            //                     'opsi' => $data,
-            //                     'pengaruh_harga' => 0,
-            //                 ]);
-            //             }
-            //         }
-            //     }
-            // }
-
-            // if ($request->has('deleted_photos')) {
-            //     $photosToDelete = FotoProdukKatalog::whereIn('id', $request->deleted_photos)->get();
-            //     foreach ($photosToDelete as $photo) {
-            //         Storage::disk('public')->delete($photo->path);
-            //         $photo->delete();
-            //     }
-            // }
-
-            // if ($request->hasFile('fotos')) {
-            //     foreach ($request->file('fotos') as $photo) {
-            //         $path = $photo->store('uploads/produk', 'public');
-            //         FotoProdukKatalog::create([
-            //             'produk_id' => $produk->produk_id,
-            //             'path' => $path,
-            //         ]);
-            //     }
-            // }
 
             $katalog = ProdukKatalog::where('produk_id', $id)->firstOrFail();
             $produk = $katalog->produk;

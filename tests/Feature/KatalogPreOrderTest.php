@@ -11,8 +11,15 @@ class KatalogPreOrderTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->withoutVite();
+    }
+
     public function test_produk_stok_habis_tetap_tampilkan_opsi_preorder(): void
     {
+        $this->withoutExceptionHandling();
         $produk = Produk::create([
             'nama_produk' => 'Kemeja Preorder',
             'deskripsi' => 'Produk untuk uji pre-order',
@@ -37,6 +44,7 @@ class KatalogPreOrderTest extends TestCase
 
     public function test_produk_stok_tersedia_tetap_tampilkan_aksi_normal(): void
     {
+        $this->withoutExceptionHandling();
         $produk = Produk::create([
             'nama_produk' => 'Kemeja Ready',
             'deskripsi' => 'Produk untuk uji stok tersedia',

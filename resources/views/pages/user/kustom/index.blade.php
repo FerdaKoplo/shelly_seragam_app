@@ -12,9 +12,8 @@
             @endphp
 
 
-            @if (session('error'))
-                <x-shared.toast />
-            @endif
+            {{-- @if (session('error')) <x-shared.toast />
+            @endif --}}
 
             <div class="w-full" x-data="{ active: '{{ $sections[0] ?? '' }}' }">
 

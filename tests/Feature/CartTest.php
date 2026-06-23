@@ -11,10 +11,12 @@ use Tests\TestCase;
 class CartTest extends TestCase
 {
     use RefreshDatabase;
-    protected function setUp(): void
-    {
-        parent::setUp();
-    }
+    // protected function setUp(): void
+    // {
+    //     parent::setUp();
+    // }
+
+    // TC-WBT-CUS004-01
     public function test_if_product_stock_is_0_or_negative(): void
     {
         $produk = Produk::create([
@@ -42,4 +44,5 @@ class CartTest extends TestCase
         $cart = session('cart', []);
         $this->assertArrayNotHasKey($katalog->katalog_id ?? $katalog->id, $cart);
     }
+
 }

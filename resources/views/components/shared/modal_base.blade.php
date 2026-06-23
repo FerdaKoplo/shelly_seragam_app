@@ -42,7 +42,7 @@ $maxWidthClass = [
             @if($showCloseButton)
             <button type="button" @click="closeModal()"
                 data-cy="close-modal"
-                class="absolute top-1 text-2xl right-5 z-10 p-1 text-gray-900 hover:text-gray-500 transition-colors">
+                class="absolute top-1 text-2xl  right-5 z-10 p-1 text-gray-900 hover:text-gray-500 transition-colors">
                 X
             </button>
             @endif

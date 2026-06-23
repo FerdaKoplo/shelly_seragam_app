@@ -52,4 +52,14 @@ class Transaksi extends Model
         // Points to the PaymentInvoice using checkout_external_id matched against external_id
         return $this->hasOne(PaymentInvoice::class, 'external_id', 'checkout_external_id');
     }
+
+    protected static function booted(): void
+    {
+        $clearStatistikCache = function () {
+            \Illuminate\Support\Facades\Cache::flush();
+        };
+
+        static::saved($clearStatistikCache);
+        static::deleted($clearStatistikCache);
+    }
 }

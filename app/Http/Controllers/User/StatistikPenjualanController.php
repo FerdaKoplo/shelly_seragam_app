@@ -5,63 +5,24 @@ namespace App\Http\Controllers\User;
 use App\Exports\ExportStatistikPenjualan;
 use App\Http\Controllers\Controller;
 use App\Models\Transaksi;
+use App\Services\StatistikPenjualanService;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Cache;
 use App\Exports\TransaksiExport;
 
 class StatistikPenjualanController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request, StatistikPenjualanService $statistikService)
     {
-        $query = Transaksi::query();
+        $queryString = json_encode($request->all());
+        $cacheKey = 'statistik_penjualan_' . md5($queryString);
 
-        $currentYear = date('Y');
-        $query->whereYear('tanggal_transaksi', $currentYear);
+        $data = Cache::remember($cacheKey, now()->addMinutes(30), function () use ($request, $statistikService) {
+            return $statistikService->getDashboardData($request);
+        });
 
-        if ($request->filled('bulan')) {
-            $query->whereMonth('tanggal_transaksi', $request->bulan);
-        }
-
-        $allTransactions = (clone $query)
-            ->with(['produkTransaksis', 'orderKustoms', 'pengiriman'])
-            ->orderBy('tanggal_transaksi', 'desc')
-            ->paginate(10)
-            ->appends(request()->query());
-
-        $salesQuery = Transaksi::selectRaw('MONTH(tanggal_transaksi) as month, COUNT(*) as total')
-            ->whereYear('tanggal_transaksi', $currentYear);
-
-        $salesDataRaw = $salesQuery->groupBy('month')->pluck('total', 'month')->toArray();
-
-        $salesData = [];
-        for ($m = 1; $m <= 12; $m++) {
-            $salesData[] = $salesDataRaw[$m] ?? 0;
-        }
-
-        // --- Bagian Card Statistik (Mengikuti Filter Bulan) ---
-        $totalRevenue = (clone $query)->sum('total_harga');
-
-        $totalOrders = (clone $query)->count();
-
-        $totalRegularProducts = (clone $query)
-            ->join('produk_transaksi', 'transaksi.transaksi_id', '=', 'produk_transaksi.transaksi_id')
-            ->sum('produk_transaksi.quantity');
-
-        $totalCustomOrders = (clone $query)
-            ->join('order_transaksi_kustom', 'transaksi.transaksi_id', '=', 'order_transaksi_kustom.transaksi_id')
-            ->sum('order_transaksi_kustom.quantity');
-
-        $totalProductSold = $totalRegularProducts + $totalCustomOrders;
-
-        return view('pages.user.admin.statistik-transaksi.index', compact(
-            'allTransactions',
-            'totalOrders',
-            'totalRegularProducts',
-            'totalCustomOrders',
-            'totalProductSold',
-            'salesData',
-            'totalRevenue'
-        ));
+        return view('pages.user.admin.statistik-transaksi.index', $data);
     }
 
     public function export(Request $request)

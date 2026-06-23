@@ -56,7 +56,6 @@ class CartController extends Controller
 
         $katalog = ProdukKatalog::with(['produk', 'fotos'])->findOrFail($katalog_id);
 
-        // $katalog = ProdukKatalog::with(['produk', 'fotos'])->findOrFail($katalog_id);
 
         $name = $katalog->produk->nama_produk
             ?? $katalog->produk->nama

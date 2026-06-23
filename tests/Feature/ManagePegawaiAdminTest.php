@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\User;
 use DB;
 use Hash;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
@@ -56,6 +57,7 @@ class ManagePegawaiAdminTest extends TestCase
     // TC-WBT-ADM002-02
     public function test_store_fails_when_username_is_duplicated()
     {
+        $this->expectException(UniqueConstraintViolationException::class);
         User::create([
             'nama' => 'Existing User',
             'username' => 'budi.santoso',
@@ -67,7 +69,7 @@ class ManagePegawaiAdminTest extends TestCase
 
         $response = $this->post(route('manage.pegawai.store'), [
             'nama' => 'Budi Santoso',
-            'username' => 'budi.santoso', 
+            'username' => 'budi.santoso',
             'password' => 'Test@1234',
             'status' => 'Active',
         ]);
