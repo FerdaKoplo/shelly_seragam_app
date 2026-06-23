@@ -4,7 +4,7 @@
 
 <div class="px-4 md:px-12 pb-20"
     x-data="{
-        showForm: false,
+        showForm: @json($errors->any()),
         isEdit: false,
         actionUrl: '{{ route('manage.pegawai.store') }}',
         formData: {
@@ -86,17 +86,19 @@
                                 {{ $p->status }}
                             </span>
                         </td>
-                        <td class="py-4 px-6 flex justify-center gap-2">
-                            <button @click="editPegawai({{ json_encode($p) }})"
-                                class="bg-[#4A90E2] text-white px-4 py-1.5 rounded text-xs font-bold hover:bg-blue-600 transition">
-                                Edit
-                            </button>
-                            <form action="{{ route('manage.pegawai.destroy', $p->user_id) }}" method="POST" onsubmit="return confirm('Hapus pegawai ini?')">
-                                @csrf @method('DELETE')
-                                <button type="submit" class="bg-[#C04D41] text-white px-4 py-1.5 rounded text-xs font-bold hover:bg-red-700 transition">
-                                    Hapus
+                        <td class="py-4 px-6">
+                            <div class="flex justify-center items-center gap-2">
+                                <button @click="editPegawai({{ json_encode($p) }})"
+                                    class="bg-[#4A90E2] text-white px-4 h-9 rounded text-xs font-bold hover:bg-blue-600 transition">
+                                    Edit
                                 </button>
-                            </form>
+                                <form class="inline-block m-0" action="{{ route('manage.pegawai.destroy', $p->user_id) }}" method="POST" onsubmit="return confirm('Hapus pegawai ini?')">
+                                    @csrf @method('DELETE')
+                                    <button type="submit" class="bg-[#C04D41] text-white px-4 h-9 rounded text-xs font-bold hover:bg-red-700 transition">
+                                        Hapus
+                                    </button>
+                                </form>
+                            </div>
                         </td>
                     </tr>
                     @empty
@@ -113,7 +115,7 @@
         {{ $pegawai->appends(request()->query())->links('vendor.pagination.custom') }}
     </div>
 
-    <div x-show="showForm" x-transition id="pegawaiForm" x-cloak
+    <div x-show="showForm"  x-transition id="pegawaiForm" x-cloak
         class="mt-10 w-full max-w-2xl border border-gray-300 rounded-2xl p-6 md:p-10 bg-white shadow-xl mx-auto mb-20">
         
         <div class="flex items-center justify-between mb-8">

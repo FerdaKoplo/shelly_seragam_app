@@ -58,7 +58,7 @@ class PegawaiController extends Controller
             'password.max'      => 'Password tidak boleh lebih dari 20 karakter.',
             'status.required'   => 'Status wajib dipilih.',
             'status.in'         => 'Status yang dipilih tidak valid.',
-            'password'          => 'Password harus terdiri dari minimal 8 karakter, mengandung huruf besar, huruf kecil, angka, dan karakter spesial (@$!%*#?&).',
+            'password' => 'Password harus terdiri dari minimal 8 karakter, mengandung huruf besar, huruf kecil, angka, dan karakter spesial (@$!%*#?&).',
         ];
 
         $validated = $request->validate($rules, $messages);
