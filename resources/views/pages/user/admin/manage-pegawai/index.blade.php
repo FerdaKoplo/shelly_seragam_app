@@ -19,7 +19,7 @@
             this.showForm = true;
             this.formData.nama = p.nama;
             this.formData.username = p.username;
-            this.formData.password = ''; 
+            this.formData.password = '';
             this.pegawaiIsActive = (p.status === 'Active');
             this.actionUrl = '/admin/manage-pegawai/' + p.user_id;
             if(window.innerWidth < 768) {
@@ -129,27 +129,78 @@
                 @method('PUT')
             </template>
 
+            <!-- Nama -->
             <div class="flex flex-col md:grid md:grid-cols-3 md:items-center gap-2">
                 <label class="text-sm font-bold text-gray-700">Nama Lengkap</label>
-                <input type="text" name="nama" x-model="formData.nama" required
-                    class="md:col-span-2 bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-black outline-none transition">
+                <div class="md:col-span-2">
+                    <input type="text" name="nama" x-model="formData.nama" required
+                        class="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-black outline-none transition">
+                    @error('nama')
+                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
             </div>
 
+            <!-- Username -->
             <div class="flex flex-col md:grid md:grid-cols-3 md:items-center gap-2">
                 <label class="text-sm font-bold text-gray-700">Username</label>
-                <input type="text" name="username" x-model="formData.username" required
-                    class="md:col-span-2 bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-black outline-none transition">
+                <div class="md:col-span-2">
+                    <input type="text" name="username" x-model="formData.username" required
+                        class="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-black outline-none transition">
+                    @error('username')
+                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
             </div>
 
-            <div class="flex flex-col md:grid md:grid-cols-3 md:items-center gap-2">
+            <!-- Password -->
+            <div class="flex flex-col md:grid md:grid-cols-3 md:items-start gap-2">
                 <label class="text-sm font-bold text-gray-700">Password</label>
                 <div class="md:col-span-2">
                     <input type="password" name="password" x-model="formData.password"
                         :placeholder="isEdit ? '(Biarkan kosong jika tidak diubah)' : 'Masukkan password'"
                         class="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-black outline-none transition">
+                    
+                    <!-- Aturan password -->
+                    <p class="text-xs text-gray-500 mt-1" x-show="!isEdit || formData.password.length > 0">
+                        Password harus terdiri dari minimal 8 karakter, maksimal 20 karakter, mengandung huruf besar, huruf kecil, angka, dan karakter spesial (@$!%*#?&).
+                    </p>
+
+                    @error('password')
+                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                    @enderror
+
+                    <!-- Indikator visual checklist -->
+                    <div class="grid grid-cols-2 gap-1 mt-2 text-xs" x-show="formData.password.length > 0">
+                        <span class="flex items-center gap-1" :class="formData.password.length >= 8 ? 'text-green-600' : 'text-gray-400'">
+                            <span x-show="formData.password.length >= 8">✅</span>
+                            <span x-show="formData.password.length < 8">⬜</span> Min 8 karakter
+                        </span>
+                        <span class="flex items-center gap-1" :class="formData.password.match(/[A-Z]/) ? 'text-green-600' : 'text-gray-400'">
+                            <span x-show="formData.password.match(/[A-Z]/)">✅</span>
+                            <span x-show="!formData.password.match(/[A-Z]/)">⬜</span> Huruf besar
+                        </span>
+                        <span class="flex items-center gap-1" :class="formData.password.match(/[a-z]/) ? 'text-green-600' : 'text-gray-400'">
+                            <span x-show="formData.password.match(/[a-z]/)">✅</span>
+                            <span x-show="!formData.password.match(/[a-z]/)">⬜</span> Huruf kecil
+                        </span>
+                        <span class="flex items-center gap-1" :class="formData.password.match(/[0-9]/) ? 'text-green-600' : 'text-gray-400'">
+                            <span x-show="formData.password.match(/[0-9]/)">✅</span>
+                            <span x-show="!formData.password.match(/[0-9]/)">⬜</span> Angka
+                        </span>
+                        <span class="flex items-center gap-1 col-span-2" :class="formData.password.match(/[@$!%*#?&]/) ? 'text-green-600' : 'text-gray-400'">
+                            <span x-show="formData.password.match(/[@$!%*#?&]/)">✅</span>
+                            <span x-show="!formData.password.match(/[@$!%*#?&]/)">⬜</span> Karakter spesial (@$!%*#?&)
+                        </span>
+                        <span class="flex items-center gap-1 col-span-2" :class="formData.password.length <= 20 ? 'text-green-600' : 'text-red-600'">
+                            <span x-show="formData.password.length <= 20">✅</span>
+                            <span x-show="formData.password.length > 20">❌</span> Maks 20 karakter
+                        </span>
+                    </div>
                 </div>
             </div>
 
+            <!-- Status -->
             <div class="flex flex-col md:grid md:grid-cols-3 md:items-center gap-2">
                 <label class="text-sm font-bold text-gray-700">Status Akun</label>
                 <div class="md:col-span-2 flex">
