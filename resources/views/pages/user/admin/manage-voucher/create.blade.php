@@ -14,7 +14,8 @@
             <h1 class="font-roboto font-bold text-xl md:text-2xl text-[#323232]">Tambahkan Voucher Baru</h1>
         </a>
 
-        <form data-cy="create-voucher-form" action="{{ route('manage.voucher.store') }}" method="POST"
+        <form x-data="{ jenis: '{{ old('jenis_voucher', '') }}' }" data-cy="create-voucher-form"
+            action="{{ route('manage.voucher.store') }}" method="POST"
             class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-28">
             @csrf
 
@@ -58,7 +59,7 @@
                 <div class="flex flex-col gap-2">
                     <label class="font-bold text-gray-900 text-sm md:text-base">Jenis Voucher</label>
                     <div class="relative">
-                        <select data-cy="voucher-type-select" name="jenis_voucher"
+                        <select x-model="jenis" data-cy="voucher-type-select" name="jenis_voucher"
                             class="w-full border border-black rounded-md px-4 py-3 text-sm md:text-base focus:outline-none focus:ring-1 focus:ring-black appearance-none bg-white"
                             required>
                             <option value="" disabled selected>Pilih Jenis Diskon</option>
@@ -105,12 +106,20 @@
 
                     <div class="flex flex-col gap-2 mt-2">
                         <label class="font-bold text-gray-900 text-sm md:text-base">Nilai Diskon</label>
-                        <div class="relative">
+
+                        <div class="relative flex items-center">
+                            <span x-show="jenis === 'nominal'" x-cloak style="display: none;"
+                                class="absolute left-4 text-xl md:text-3xl font-medium text-gray-500">Rp</span>
+
                             <input data-cy="voucher-discount-input"
                                 onkeydown="if(event.key === '-') event.preventDefault();" type="number" name="nilai_diskon"
-                                value="{{ old('nilai_diskon') }}" placeholder="0"
-                                class="w-full border border-black placeholder:text-gray-400 rounded-md px-4 py-3 text-2xl md:text-4xl font-normal placeholder-black focus:outline-none focus:ring-1 focus:ring-black"
-                                required>
+                                value="{{ old('nilai_diskon') }}" placeholder="0" :max="jenis === 'persentase' ? 100 : null"
+                                class="w-full border border-black rounded-md py-3 text-2xl md:text-4xl font-normal placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-black"
+                                :class="jenis === 'nominal' ? 'pl-16 pr-8' : 'pl-4 pr-12'" required>
+
+                            <span x-show="jenis === 'persentase'" x-cloak style="display: none;"
+                                class="absolute right-8 text-xl md:text-3xl font-medium text-gray-500">%</span>
+
                             <span class="absolute top-2 right-2 text-red-500 text-xl">*</span>
                         </div>
                     </div>

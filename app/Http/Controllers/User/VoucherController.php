@@ -8,7 +8,6 @@ use Date;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Str;
-
 class VoucherController extends Controller
 {
     public function index(Request $request)
@@ -35,10 +34,7 @@ class VoucherController extends Controller
             }
         }
         $vouchers = $query->orderBy('created_at', 'desc')->paginate(10)->appends(request()->except('page'));
-
         return view('pages.user.admin.manage-voucher.index', compact('vouchers'));
-
-
     }
 
     public function create()
@@ -54,39 +50,23 @@ class VoucherController extends Controller
             ]);
         }
 
-        // mengikuti test case jadi yang divalidasi untuk kode_voucher dirubah dari nullable ke required
         $validated = $request->validate([
             'nama_voucher' => 'required|string|max:255',
             'kode_voucher' => 'required|string|unique:vouchers,kode_voucher',
             'deskripsi' => 'required|string',
-            'nilai_diskon' => 'required|numeric|gt:0',
+            'nilai_diskon' => 'required|numeric|gte:0|min:1',
             'tanggal_mulai' => 'required|date|date_format:Y-m-d|after_or_equal:today',
-            'tanggal_berakhir' => 'required|date|date_format:Y-m-d|after:tanggal_mulai',
+            'tanggal_berakhir' => 'required|date|date_format:Y-m-d|after_or_equal:today|after_or_equal:tanggal_mulai',
             'jenis_voucher' => ['required', Rule::in(Voucher::JENIS_VOUCHER)],
         ], [
             'kode_voucher.required' => 'Kode voucher wajib diisi.',
             'kode_voucher.unique' => 'Voucher Dengan Kode Yang Sama Sudah Dibuat.',
-            'nilai_diskon.gt' => 'Nilai diskon tidak bisa negatif atau nol.',
+            'nilai_diskon.gte' => 'Nilai diskon tidak boleh negatif.',
+            'nilai_diskon.min' => 'Nilai diskon minimal adalah 1.',
+            'tanggal_berakhir.after_or_equal' => 'Tanggal selesai tidak boleh kurang dari hari ini.',
+
         ]);
 
-        // $validated = $request->validate([
-        //     'nama_voucher' => 'required|string|max:255',
-        //     'kode_voucher' => 'nullable|string|unique:vouchers,kode_voucher',
-        //     'deskripsi' => 'required|string',
-        //     'nilai_diskon' => 'required|numeric|gt:0',
-        //     'tanggal_mulai' => 'required|date|date_format:Y-m-d|after_or_equal:today',
-        //     'tanggal_berakhir' => 'required|date|date_format:Y-m-d|after:tanggal_mulai',
-        //     'jenis_voucher' => ['required', Rule::in(Voucher::JENIS_VOUCHER)],
-        // ], [
-        //     'kode_voucher.unique' => 'Voucher Dengan Kode Yang Sama Sudah Dibuat ',
-        //     'nilai_diskon.gt' => 'Nilai diskon tidak bisa negatif atau nol.',
-        // ]);
-
-        // $kodeVoucher = $request->filled('kode_voucher')
-        //     ? $this->normalizeVoucherCode($validated['kode_voucher'])
-        //     : $this->randomizeVoucherCodeName($validated['nama_voucher']);
-
-        // diganti dari langsung terisi untuk kode vouchernya menjadi input manual 
         $kodeVoucher = $this->normalizeVoucherCode($validated['kode_voucher']);
 
         $voucher = Voucher::create([
@@ -121,14 +101,16 @@ class VoucherController extends Controller
             'nama_voucher' => 'required|string|max:255',
             'kode_voucher' => 'required|string|unique:vouchers,kode_voucher,' . $id,
             'deskripsi' => 'required|string',
-            'nilai_diskon' => 'required|numeric|gt:0',
+            'nilai_diskon' => 'required|numeric|gte:0|min:1',
             'tanggal_mulai' => 'required|date|date_format:Y-m-d|after_or_equal:today',
-            'tanggal_berakhir' => 'required|date|date_format:Y-m-d|after:tanggal_mulai',
+            'tanggal_berakhir' => 'required|date|date_format:Y-m-d|after_or_equal:today|after_or_equal:tanggal_mulai',
             'jenis_voucher' => ['required', Rule::in(Voucher::JENIS_VOUCHER)],
         ], [
             'kode_voucher.required' => 'Kode voucher wajib diisi.', 
             'kode_voucher.unique' => 'Voucher Dengan Kode Yang Sama Sudah Dibuat.',
-            'nilai_diskon.gt' => 'Nilai diskon tidak bisa negatif atau nol.',
+            'nilai_diskon.gte' => 'Nilai diskon tidak boleh negatif.',
+            'nilai_diskon.min' => 'Nilai diskon minimal adalah 1.',
+            'tanggal_berakhir.after_or_equal' => 'Tanggal selesai tidak boleh kurang dari hari ini.',
         ]);
 
         $kodeVoucher = $this->normalizeVoucherCode($validated['kode_voucher']);
@@ -212,7 +194,7 @@ class VoucherController extends Controller
                 'status' => 'Habis'
             ]);
 
-            return back()->with('sucess', 'Voucher Berhasil Dinonaktifkan');
+            return back()->with('success', 'Voucher Berhasil Dinonaktifkan');
 
         } catch (\Exception $e) {
             return back()->with('error', 'Gagal menghapus menonaktifkan voucher.');

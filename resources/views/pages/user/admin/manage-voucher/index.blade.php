@@ -45,7 +45,7 @@
             class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8 w-full">
             @forelse ($vouchers as $voucher)
                 <div data-cy="voucher-card"
-                    class="bg-white border border-gray-200 shadow-sm rounded-2xl relative group hover:shadow-md transition p-5 flex flex-col justify-between h-full min-h-[280px]">
+                    class="{{ $voucher->status === 'Habis' ? 'bg-gray-50 border-gray-300 opacity-70 grayscale-[0.5]' : 'bg-white border-gray-200 hover:shadow-md' }} bg-white border border-gray-200 shadow-sm rounded-2xl relative group hover:shadow-md transition p-5 flex flex-col justify-between h-full min-h-[280px]">
 
                     <div
                         class="absolute top-3 right-3 flex gap-2 md:opacity-0 md:group-hover:opacity-100 transition duration-200 z-10">
@@ -58,34 +58,58 @@
                                     fill="#323232" />
                             </svg>
                         </a>
-                        <form data-cy="delete-voucher-form" action="{{ route('manage.voucher.destroy', $voucher->id) }}"
-                            method="POST" onsubmit="return confirm('Hapus voucher ini?');">
-                            @csrf
-                            @method('DELETE')
-                            <button data-cy="btn-delete-voucher" type="submit"
-                                class="bg-white p-2 md:p-2.5 rounded-full shadow-md border border-gray-100 text-gray-700 hover:text-red-600 hover:bg-red-50 transition"
-                                title="Hapus Voucher">
-                                <svg class="w-4 h-4" viewBox="0 0 14 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        @if($voucher->status !== 'Habis')
+                            <button type="button" data-cy="btn-deactivate-voucher"
+                                @click="$dispatch('open-modal', 'modal-deactivate-confirmation'); $dispatch('set-deactivate-url', '{{ route('manage.voucher.deactivate', $voucher->id) }}')"
+                                class="bg-white p-2 md:p-2.5 rounded-full shadow-md border border-gray-100 text-gray-700 hover:text-orange-500 hover:bg-orange-50 transition"
+                                title="Nonaktifkan Voucher">
+                                <svg width="18" height="18" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path
-                                        d="M0.973384 15.5741C0.973384 16.6449 1.84943 17.5209 2.92015 17.5209H10.7072C11.7779 17.5209 12.654 16.6449 12.654 15.5741V3.89354H0.973384V15.5741ZM13.6274 0.973384H10.2205L9.24715 0H4.38023L3.40684 0.973384H0V2.92015H13.6274V0.973384Z"
+                                        d="M11.5401 5.3262H9.27647V2.6631H6.70214V5.3262H4.4385L7.98931 8.87701L11.5401 5.3262ZM14.2032 0H1.76652C0.781176 0 0 0.79893 0 1.7754V14.2032C0 15.1797 0.781176 15.9786 1.76652 15.9786H14.2032C15.1797 15.9786 15.9786 15.1797 15.9786 14.2032V1.7754C15.9786 0.79893 15.1797 0 14.2032 0ZM14.2032 14.2032H1.7754V11.5401H4.93562C5.54813 12.5965 6.68439 13.3155 7.99818 13.3155C9.31198 13.3155 10.4394 12.5965 11.0607 11.5401H14.2032V14.2032ZM14.2032 9.76471H9.77358C9.77358 10.7412 8.97465 11.5401 7.99818 11.5401C7.02171 11.5401 6.22278 10.7412 6.22278 9.76471H1.7754L1.76652 1.7754H14.2032V9.76471Z"
                                         fill="currentColor" />
                                 </svg>
                             </button>
-                        </form>
+
+                        @else
+                            <form data-cy="delete-voucher-form" action="{{ route('manage.voucher.destroy', $voucher->id) }}"
+                                method="POST" onsubmit="return confirm('Hapus voucher ini?');">
+                                @csrf
+                                @method('DELETE')
+                                <button data-cy="btn-delete-voucher" type="submit"
+                                    class="bg-white p-2 md:p-2.5 rounded-full shadow-md border border-gray-100 text-gray-700 hover:text-red-600 hover:bg-red-50 transition"
+                                    title="Hapus Voucher">
+                                    <svg class="w-4 h-4" viewBox="0 0 14 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path
+                                            d="M0.973384 15.5741C0.973384 16.6449 1.84943 17.5209 2.92015 17.5209H10.7072C11.7779 17.5209 12.654 16.6449 12.654 15.5741V3.89354H0.973384V15.5741ZM13.6274 0.973384H10.2205L9.24715 0H4.38023L3.40684 0.973384H0V2.92015H13.6274V0.973384Z"
+                                            fill="currentColor" />
+                                    </svg>
+                                </button>
+                            </form>
+                        @endif
+
                     </div>
 
                     <div>
-                        <span data-cy="voucher-type"
-                            class="inline-block bg-[#F5F5F5] text-[#323232] text-[9px] md:text-[10px] font-bold px-2 py-1 rounded-md mb-3 uppercase tracking-wider">
-                            {{ $voucher->jenis_voucher }}
-                        </span>
+                        <div class="flex gap-2 mb-3">
+                            <span data-cy="voucher-type"
+                                class="inline-block bg-[#F5F5F5] text-[#323232] text-[9px] md:text-[10px] font-bold px-2 py-1 rounded-md uppercase tracking-wider">
+                                {{ $voucher->jenis_voucher }}
+                            </span>
+                            @if($voucher->status === 'Habis')
+                                <span data-cy="voucher-status"
+                                    class="inline-block bg-red-500 text-white text-[9px] md:text-[10px] font-bold px-2 py-1 rounded-md uppercase tracking-wider">
+                                    Tidak Aktif
+                                </span>
+                            @endif
+                        </div>
                         <h3 data-cy="voucher-name"
                             class="font-bold text-lg md:text-xl text-gray-900 leading-tight mb-2 truncate"
                             title="{{ $voucher->nama_voucher }}">
                             {{ $voucher->nama_voucher }}
                         </h3>
                         <p data-cy="voucher-description" class="text-[11px] md:text-xs text-gray-500 line-clamp-2 min-h-[32px]">
-                            {{ $voucher->deskripsi }}</p>
+                            {{ $voucher->deskripsi }}
+                        </p>
 
                         <div class="mt-4 bg-[#F5F5F5] border border-dashed border-gray-300 rounded-lg p-3 text-center">
                             <span data-cy="voucher-code"
@@ -136,5 +160,7 @@
             </svg>
         </button>
     </a>
+
+    <x-user.voucher.modals.deactive_confirmation />
 
 @endsection

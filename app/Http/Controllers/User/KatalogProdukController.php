@@ -3,9 +3,6 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
-use App\Models\DetailProduk;
-use App\Models\FotoProdukKatalog;
-use App\Models\PilihanDetailProduk;
 use App\Models\Produk;
 use App\Models\ProdukKatalog;
 use App\Services\KatalogService;

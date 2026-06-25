@@ -49,7 +49,7 @@
 
             <a href="{{ route('manage.voucher') }}"
                 class="block w-full text-right py-4 px-8 font-semibold text-lg mb-1 {{ request()->routeIs('manage.voucher') ? $active : $inactive }}">
-                Manage Voucher
+                Manajemen Voucher
             </a>
 
             <a href="{{ route('traffic') }}"
