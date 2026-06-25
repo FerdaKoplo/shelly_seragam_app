@@ -23,20 +23,39 @@ class CartController extends Controller
             return $item;
         }, $rawItems);
 
-        $subtotal = collect($items)->sum(fn ($i) => ((int) $i['price']) * ((int) $i['quantity']));
+        $recommendations = ProdukKatalog::with(['produk', 'fotos'])
+            ->where('stok', '>', 0)
+            ->inRandomOrder()
+            ->limit(5)
+            ->get();
+
+        $subtotal = collect($items)->sum(fn($i) => ((int) $i['price']) * ((int) $i['quantity']));
 
         return view('pages.guest.keranjang.index', [
             'items' => $items,
             'subtotal' => $subtotal,
             'notes' => (string) $request->session()->get('cart_notes', ''),
+            'recommendations' => $recommendations,
         ]);
     }
 
     public function add(Request $request, int $katalog_id)
     {
-        $qty = max(1, (int) $request->input('quantity', 1));
+        $request->validate([
+            'quantity' => 'required|integer|min:1',
+        ], [
+            'quantity.min' => 'Kuantitas harus lebih dari 0',
+        ]);
+
+        $qty = (int) $request->input('quantity');
+        
+        $size = $request->input('size');
+        $color = $request->input('color');
+        $mode = $request->input('mode');
+        $stok = $request->input('stok');
 
         $katalog = ProdukKatalog::with(['produk', 'fotos'])->findOrFail($katalog_id);
+
 
         $name = $katalog->produk->nama_produk
             ?? $katalog->produk->nama
@@ -58,14 +77,18 @@ class CartController extends Controller
                 'katalog_id' => $katalog_id,
                 'name' => $name,
                 'price' => (int) $katalog->harga,
+                'stok' => (int) $stok,
                 'quantity' => $qty,
+                'size' => is_string($size) && trim($size) !== '' ? trim($size) : null,
+                'color' => is_string($color) && trim($color) !== '' ? trim($color) : null,
+                'mode' => is_string($mode) && trim($mode) !== '' ? trim($mode) : null,
                 'image' => $image,
             ];
         }
 
         $request->session()->put('cart', $cart);
 
-        return redirect()->route('keranjang');
+        return redirect()->route('keranjang')->with('cart_success', 'berhasil ditambahkan ke keranjang');
     }
 
     public function update(Request $request, int $katalog_id)

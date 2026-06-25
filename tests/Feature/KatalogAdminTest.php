@@ -133,7 +133,7 @@ class KatalogAdminTest extends TestCase
             ->post(route('manage.katalog.store'), [
                 'nama_produk' => 'Kemeja Test',
                 'kategori' => 'Kaos',
-                'harga' => 'not-a-number',
+                'harga' => 'seratus lima puluh ribu',
                 'stok' => 10,
                 'deskripsi' => 'Test deskripsi',
             ]);
@@ -183,7 +183,6 @@ class KatalogAdminTest extends TestCase
             'produk_id' => $katalog->produk_id,
         ]);
     }
-
     // public function test_example(): void
     // {
     //     $response = $this->get('/');

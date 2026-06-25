@@ -8,6 +8,7 @@ use App\Models\FotoProdukKatalog;
 use App\Models\PilihanDetailProduk;
 use App\Models\Produk;
 use App\Models\ProdukKatalog;
+use App\Services\KatalogService;
 use DB;
 use Illuminate\Http\Request;
 use Log;
@@ -22,12 +23,6 @@ class KatalogProdukController extends Controller
         if ($request->filled('search')) {
             $search = $request->search;
 
-            // $query->where(function ($q) use ($search) {
-            //     $q->whereHas('produk', function ($subQ) use ($search) {
-            //         $subQ->where('nama_produk', 'like', '%' . $search . '%');
-            //     })
-            //         ->orWhere('kategori', 'like', '%' . $search . '%');
-            // });
             if ($request->filled('search')) {
                 $search = $request->search;
 
@@ -59,7 +54,7 @@ class KatalogProdukController extends Controller
                     $query->where('status', 'Arsip');
                     break;
                 default:
-                    $query->where('stok', '>=', 0);
+                    $query->where('stok', '>=', 0)->where('status', 'Tersedia');
                     break;
             }
         } else {
@@ -77,16 +72,20 @@ class KatalogProdukController extends Controller
         return view('pages.user.katalog.create');
     }
 
-    public function store(Request $request)
+    public function store(Request $request, KatalogService $katalogService)
     {
         $validated = $request->validate([
             'nama_produk' => 'required|string|max:255',
-            'harga' => 'required|numeric|min:0',
+            'harga' => 'required|numeric|min:10000|max:5000000',
             'stok' => 'required|integer|min:0',
             'deskripsi' => 'required|string',
             'kategori' => 'required|string',
             'fotos.*' => 'image|mimes:jpeg,png,jpg|max:2048',
             'variations' => 'nullable|array'
+        ], [
+            'harga.min' => 'Harga minimal adalah Rp 10.000',
+            'harga.max' => 'Harga maksimal adalah Rp 5.000.000',
+            'harga.numeric' => 'Format angka tidak valid.',
         ]);
 
         try {
@@ -103,48 +102,14 @@ class KatalogProdukController extends Controller
                 'kategori' => $validated['kategori'],
                 'harga' => $validated['harga'],
                 'stok' => $validated['stok'],
-                'status' => $validated['stok'] > 0 ? 'Tersedia' : 'Habis',
             ]);
 
             if ($request->has('variations')) {
-                $variations = collect($request->variations);
-
-                $types = ['ukuran', 'warna'];
-
-                foreach ($types as $type) {
-                    $items = $variations->where('type', $type);
-
-                    if ($items->isNotEmpty()) {
-                        $detail = DetailProduk::create([
-                            'produk_id' => $produk->produk_id,
-                            'nama_detail' => ucfirst($type),
-                            'deskripsi_detail' => 'Variasi ' . ucfirst($type),
-                        ]);
-
-                        foreach ($items as $item) {
-                            $data = json_decode($item['data'], true);
-
-                            // $opsiValue = json_encode($data);
-
-                            PilihanDetailProduk::create([
-                                'detail_produk_id' => $detail->detail_produk_id,
-                                'opsi' => $data, //
-                                'pengaruh_harga' => 0,
-                            ]);
-                        }
-                    }
-                }
+                $katalogService->syncVariations($produk->produk_id, $request->variations);
             }
 
             if ($request->hasFile('fotos')) {
-                foreach ($request->file('fotos') as $photo) {
-                    $path = $photo->store('uploads/produk', 'public');
-
-                    FotoProdukKatalog::create([
-                        'produk_id' => $produk->produk_id,
-                        'path' => $path,
-                    ]);
-                }
+                $katalogService->uploadPhotos($produk->produk_id, $request->file('fotos'));
             }
 
             DB::commit();
@@ -185,17 +150,21 @@ class KatalogProdukController extends Controller
         return view('pages.user.katalog.edit', compact('katalog', 'existingVariations'));
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request, $id, KatalogService $katalogService)
     {
         $validated = $request->validate([
             'nama_produk' => 'required|string|max:255',
-            'harga' => 'required|numeric|min:0',
+            'harga' => 'required|numeric|min:10000|max:5000000',
             'stok' => 'required|integer|min:0',
             'deskripsi' => 'required|string',
             'kategori' => 'required|string',
             'fotos.*' => 'image|mimes:jpeg,png,jpg|max:2048',
             'deleted_photos' => 'nullable|array',
             'variations' => 'nullable|array'
+        ], [
+            'harga.min'     => 'Harga minimal adalah Rp 10.000',
+            'harga.max'     => 'Harga maksimal adalah Rp 5.000.000',
+            'harga.numeric' => 'Format angka tidak valid.',
         ]);
 
         try {
@@ -215,51 +184,16 @@ class KatalogProdukController extends Controller
                 'stok' => $validated['stok'],
             ]);
 
-            DetailProduk::where('produk_id', $produk->produk_id)->delete();
-
             if ($request->has('variations')) {
-                $variations = collect($request->variations);
-                $types = ['ukuran', 'warna'];
-
-                foreach ($types as $type) {
-                    $items = $variations->where('type', $type);
-                    if ($items->isNotEmpty()) {
-                        $detail = DetailProduk::create([
-                            'produk_id' => $produk->produk_id,
-                            'nama_detail' => ucfirst($type),
-                            'deskripsi_detail' => 'Variasi ' . ucfirst($type),
-                        ]);
-
-                        foreach ($items as $item) {
-                            $data = json_decode($item['data'], true);
-                            unset($data['type']);
-
-                            PilihanDetailProduk::create([
-                                'detail_produk_id' => $detail->detail_produk_id,
-                                'opsi' => $data,
-                                'pengaruh_harga' => 0,
-                            ]);
-                        }
-                    }
-                }
+                $katalogService->syncVariations($produk->produk_id, $request->variations);
             }
 
             if ($request->has('deleted_photos')) {
-                $photosToDelete = FotoProdukKatalog::whereIn('id', $request->deleted_photos)->get();
-                foreach ($photosToDelete as $photo) {
-                    Storage::disk('public')->delete($photo->path);
-                    $photo->delete();
-                }
+                $katalogService->removePhotos($request->deleted_photos);
             }
 
             if ($request->hasFile('fotos')) {
-                foreach ($request->file('fotos') as $photo) {
-                    $path = $photo->store('uploads/produk', 'public');
-                    FotoProdukKatalog::create([
-                        'produk_id' => $produk->produk_id,
-                        'path' => $path,
-                    ]);
-                }
+                $katalogService->uploadPhotos($produk->produk_id, $request->file('fotos'));
             }
 
             DB::commit();
@@ -299,6 +233,7 @@ class KatalogProdukController extends Controller
         }
     }
 
+
     public function destroy($id)
     {
         try {
@@ -311,7 +246,6 @@ class KatalogProdukController extends Controller
             foreach ($produk->fotos as $foto) {
                 Storage::disk('public')->delete($foto->path);
             }
-
 
             $produk->delete();
 

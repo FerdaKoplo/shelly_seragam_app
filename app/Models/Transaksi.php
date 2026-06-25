@@ -14,7 +14,8 @@ class Transaksi extends Model
     protected $table = 'transaksi';
 
     protected $fillable = [
-        'user_id',
+        'pegawai_id',
+        'checkout_external_id',
         'nama_customer',
         'no_hp_customer',
         'alamat_customer',
@@ -26,7 +27,7 @@ class Transaksi extends Model
 
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id', 'user_id');
+        return $this->belongsTo(User::class, 'pegawai_id', 'user_id');
     }
 
     public function produkTransaksis()
@@ -45,4 +46,20 @@ class Transaksi extends Model
     }
 
 
+
+    public function paymentInvoice()
+    {
+        // Points to the PaymentInvoice using checkout_external_id matched against external_id
+        return $this->hasOne(PaymentInvoice::class, 'external_id', 'checkout_external_id');
+    }
+
+    protected static function booted(): void
+    {
+        $clearStatistikCache = function () {
+            \Illuminate\Support\Facades\Cache::flush();
+        };
+
+        static::saved($clearStatistikCache);
+        static::deleted($clearStatistikCache);
+    }
 }

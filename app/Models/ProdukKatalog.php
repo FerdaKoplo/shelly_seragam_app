@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Cache;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -31,4 +32,26 @@ class ProdukKatalog extends Model
         return $this->hasMany(FotoProdukKatalog::class, 'produk_id', 'produk_id');
     }
 
+    public function vouchers()
+    {
+        return $this->hasMany(Voucher::class, 'katalog_id', 'katalog_id');
+    }
+
+    protected static function booted()
+    {
+        static::saving(function ($katalog) {
+            if ($katalog->status !== 'Arsip') {
+                $katalog->status = $katalog->stok <= 0 ? 'Pre-Order' : 'Tersedia';
+            }
+        });
+
+        $clearCache = function () {
+            Cache::forget('katalog_categories_list');
+
+            Cache::flush();
+        };
+
+        static::saved($clearCache);
+        static::deleted($clearCache);
+    }
 }
