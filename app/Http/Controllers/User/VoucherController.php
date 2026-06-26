@@ -14,7 +14,6 @@ class VoucherController extends Controller
     {
         $query = Voucher::with('katalog.produk');
 
-        // filter search voucher by kode and nama produk
         if ($request->filled('search')) {
             $query->whereLike(['kode_voucher', 'katalog.produk.nama_produk'], $request->search);
         }
@@ -69,7 +68,7 @@ class VoucherController extends Controller
 
         $kodeVoucher = $this->normalizeVoucherCode($validated['kode_voucher']);
 
-        $voucher = Voucher::create([
+        Voucher::create([
             'nama_voucher' => $validated['nama_voucher'],
             'kode_voucher' => $kodeVoucher,
             'deskripsi' => $validated['deskripsi'],
@@ -128,60 +127,6 @@ class VoucherController extends Controller
         ]);
 
         return redirect()->route('manage.voucher')->with('success', 'Voucher Berhasil Diperbarui');
-    }
-
-    // API: Validasi voucher
-    public function validateVoucher(Request $request)
-    {
-        $request->validate([
-            'kode' => 'required|string',
-        ]);
-
-        $kodeVoucher = $this->normalizeVoucherCode($request->kode);
-
-        $voucher = Voucher::whereRaw('UPPER(TRIM(kode_voucher)) = ?', [$kodeVoucher])
-            ->first();
-
-        if (!$voucher) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Voucher tidak ditemukan.'
-            ], 404);
-        }
-
-        if ($voucher->status !== 'Aktif') {
-            return response()->json([
-                'success' => false,
-                'message' => 'Voucher sudah tidak aktif.'
-            ], 422);
-        }
-
-        $today = now()->toDateString();
-
-        if ($voucher->tanggal_mulai > $today) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Voucher belum aktif.'
-            ], 422);
-        }
-
-        if ($voucher->tanggal_berakhir < $today) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Voucher sudah kedaluwarsa.'
-            ], 422);
-        }
-
-        return response()->json([
-            'success' => true,
-            'voucher' => [
-                'kode_voucher' => $voucher->kode_voucher,
-                'jenis_voucher' => $voucher->jenis_voucher,
-                'nilai_diskon' => $voucher->nilai_diskon,
-                'nama_voucher' => $voucher->nama_voucher,
-                'deskripsi' => $voucher->deskripsi,
-            ]
-        ]);
     }
 
     public function deactiveVoucher($id)

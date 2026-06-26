@@ -66,7 +66,6 @@ class ManageKustomisasiController extends Controller
         DB::beginTransaction();
         try {
             foreach ($request->input('sections') as $sec) {
-                // Section sekarang BEBAS ditambahkan berkali-kali dan bebas duplikat!
                 $produk = Produk::create([
                     'nama_produk' => 'Kustom ' . $sec['name'],
                     'deskripsi' => '',

@@ -77,8 +77,7 @@ class KelolaTransaksiController extends Controller
 
     public function update(Request $request, $id)
     {
-        // Validasi Input & Kondisional Resi (TC-WBT-ADM005-02)
-       $transaksi = Transaksi::findOrFail($id);
+        $transaksi = Transaksi::findOrFail($id);
 
         $validated = $request->validate([
             'status' => 'nullable|in:Created,Paid,Delivered,Done',
@@ -92,14 +91,13 @@ class KelolaTransaksiController extends Controller
             'no_resi_customer.required_if' => 'Nomor Resi Wajib Diisi',
         ]);
 
-        //Validasi State Machine (TC-WBT-ADM005-01)
         if ($request->filled('status') && $request->status !== $transaksi->status) {
-            
+
             $allowedNextState = [
-                'Created'   => 'Paid',
-                'Paid'      => 'Delivered',
+                'Created' => 'Paid',
+                'Paid' => 'Delivered',
                 'Delivered' => 'Done',
-                'Done'      => null,
+                'Done' => null,
             ];
 
             $validNext = $allowedNextState[$transaksi->status] ?? null;
@@ -139,36 +137,36 @@ class KelolaTransaksiController extends Controller
                 ->first();
 
             if ($existingPayment) {
-                return back()->with('error', 'Bukti pembayaran untuk pesanan ini sudah diunggah sebelumnya.');
+                $message = ['type' => 'error', 'text' => 'Bukti pembayaran untuk pesanan ini sudah diunggah sebelumnya.'];
+            } elseif (!$request->hasFile('file_payment')) {
+                $message = ['type' => 'error', 'text' => 'File pembayaran tidak ditemukan dalam request.'];
+            } else {
+                $this->storeKustomPayment($request, $validated['order_kustom_id']);
+                $message = ['type' => 'success', 'text' => 'Bukti pembayaran kustom berhasil diunggah.'];
             }
-
-            if ($request->hasFile('file_payment')) {
-                $file = $request->file('file_payment');
-
-                $filename = time() . '_' . preg_replace('/\s+/', '_', $file->getClientOriginalName());
-
-                $path = $file->storeAs('payments/kustom', $filename, 'public');
-
-                \App\Models\AttachmentTransaksiKustom::create([
-                    'order_kustom_id' => $validated['order_kustom_id'],
-                    'path' => $path,
-                ]);
-
-                $orderKustom = OrderTransaksiKustom::findOrFail($validated['order_kustom_id']);
-                $transaksi = Transaksi::findOrFail($orderKustom->transaksi_id);
-
-                if ($transaksi->status === 'Created') {
-                    $transaksi->update(['status' => 'Paid']);
-                }
-
-                return back()->with('success', 'Bukti pembayaran kustom berhasil diunggah.');
-            }
-
-            return back()->with('error', 'File pembayaran tidak ditemukan dalam request.');
-
         } catch (\Exception $e) {
-            return back()->with('error', 'Terjadi kesalahan saat mengunggah file: ' . $e->getMessage());
+            $message = ['type' => 'error', 'text' => 'Terjadi kesalahan saat mengunggah file: ' . $e->getMessage()];
         }
 
+        return back()->with($message['type'], $message['text']);
+    }
+
+    private function storeKustomPayment(Request $request, int $orderKustomId): void
+    {
+        $file = $request->file('file_payment');
+        $filename = time() . '_' . preg_replace('/\s+/', '_', $file->getClientOriginalName());
+        $path = $file->storeAs('payments/kustom', $filename, 'public');
+
+        AttachmentTransaksiKustom::create([
+            'order_kustom_id' => $orderKustomId,
+            'path' => $path,
+        ]);
+
+        $orderKustom = OrderTransaksiKustom::findOrFail($orderKustomId);
+        $transaksi = Transaksi::findOrFail($orderKustom->transaksi_id);
+
+        if ($transaksi->status === 'Created') {
+            $transaksi->update(['status' => 'Paid']);
+        }
     }
 }

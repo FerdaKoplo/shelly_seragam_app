@@ -18,4 +18,4 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::post('/voucher/validate', [\App\Http\Controllers\User\VoucherController::class, 'validateVoucher'])->name('voucher.validate');
+Route::post('/voucher/validate', [\App\Http\Controllers\Guest\RedeemVoucherController::class, 'validateVoucher'])->name('voucher.validate');

@@ -9,7 +9,6 @@ use App\Services\StatistikPenjualanService;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Cache;
-use App\Exports\TransaksiExport;
 
 class StatistikPenjualanController extends Controller
 {
