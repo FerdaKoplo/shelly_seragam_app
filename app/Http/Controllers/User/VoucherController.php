@@ -63,7 +63,7 @@ class VoucherController extends Controller
             'nilai_diskon.gte' => 'Nilai diskon tidak boleh negatif.',
             'nilai_diskon.min' => 'Nilai diskon minimal adalah 1.',
             'tanggal_berakhir.after_or_equal' => 'Tanggal selesai tidak boleh kurang dari hari ini.',
-
+            'tanggal_mulai.after_or_equal' => 'Tanggal mulai tidak boleh kurang dari hari ini.',
         ]);
 
         $kodeVoucher = $this->normalizeVoucherCode($validated['kode_voucher']);
@@ -105,7 +105,7 @@ class VoucherController extends Controller
             'tanggal_berakhir' => 'required|date|date_format:Y-m-d|after_or_equal:today|after_or_equal:tanggal_mulai',
             'jenis_voucher' => ['required', Rule::in(Voucher::JENIS_VOUCHER)],
         ], [
-            'kode_voucher.required' => 'Kode voucher wajib diisi.', 
+            'kode_voucher.required' => 'Kode voucher wajib diisi.',
             'kode_voucher.unique' => 'Voucher Dengan Kode Yang Sama Sudah Dibuat.',
             'nilai_diskon.gte' => 'Nilai diskon tidak boleh negatif.',
             'nilai_diskon.min' => 'Nilai diskon minimal adalah 1.',
